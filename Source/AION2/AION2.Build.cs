@@ -7,8 +7,17 @@ public class AION2 : ModuleRules
 	public AION2(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+        PublicIncludePaths.AddRange(new string[] { "AION2" });
+
+        PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput"
+		});
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
