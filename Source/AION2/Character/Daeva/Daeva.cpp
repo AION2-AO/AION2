@@ -1,5 +1,6 @@
 #include "Character/Daeva/Daeva.h"
 #include "Player/AOPlayerState.h"
+#include "GAS/AOGameplayTags.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -86,8 +87,7 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADaeva::Look);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADaeva::Zoom);
 		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityInputID::Dash));
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Started, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityInputID::Jump));
-		EnhancedInputComponent->BindAction(JumpAction, ETriggerEvent::Completed, this, &ADaeva::GASInputReleased, static_cast<int32>(EAbilityInputID::Jump));
+		EnhancedInputComponent->BindAction(SpaceAction, ETriggerEvent::Started, this, &ADaeva::InputSpacePressed);
 	}
 }
 
@@ -112,7 +112,6 @@ void ADaeva::Move(const FInputActionValue& Value)
 		return;
 	}
 
-	bHasCurrentMoveInput = true;
 	CurrentMoveInputDirection = NewMoveInputDirection.GetSafeNormal();
 	AddMovementInput(CurrentMoveInputDirection);
 }
@@ -175,6 +174,23 @@ void ADaeva::GASInputReleased(int32 InputId)
 			ASC->AbilitySpecInputReleased(*Spec);
 		}
 	}
+}
+
+void ADaeva::InputSpacePressed()
+{
+	//if (ASC->HasMatchingGameplayTag(FName("State.Gliding")))
+	//{
+	//	GASInputPressed(static_cast<int32>(EAbilityInputID::StopGlide));
+	//	return;
+	//}
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		//GASInputPressed(static_cast<int32>(EAbilityInputID::Glide));
+		return;
+	}
+
+	GASInputPressed(static_cast<int32>(EAbilityInputID::Jump));
 }
 
 void ADaeva::CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName)

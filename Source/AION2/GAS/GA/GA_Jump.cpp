@@ -24,14 +24,6 @@ void UGA_Jump::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FG
 	JumpTask->ReadyForActivation();
 }
 
-void UGA_Jump::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
-{
-	if (ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get()))
-	{
-		Character->StopJumping();
-	}
-}
-
 void UGA_Jump::OnLandedCallback()
 {
 	bool bReplicatedEndAbility = true;

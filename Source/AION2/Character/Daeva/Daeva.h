@@ -26,7 +26,8 @@ UENUM(BlueprintType)
 enum class EAbilityInputID : uint8
 {
 	Dash UMETA(DisplayName = "Dash"),
-	Jump UMETA(DisplayName = "Jump")
+	Jump UMETA(DisplayName = "Jump"),
+	Glide UMETA(DisplayName = "Glide")
 };
 
 UCLASS()
@@ -58,14 +59,15 @@ protected:
 	void GASInputReleased(int32 InputId);
 
 private:
+	void InputSpacePressed();
+
+private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
 
 public:
 	FORCEINLINE UAnimMontage* GetDashMontage() const { return DashMontage; }
 
 private:
-	bool bHasCurrentMoveInput = false;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	FVector CurrentMoveInputDirection;
 
@@ -101,7 +103,7 @@ private:
 	TObjectPtr<UInputAction> DashAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> JumpAction;
+	TObjectPtr<UInputAction> SpaceAction;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
