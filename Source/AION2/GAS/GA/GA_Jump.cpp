@@ -2,6 +2,7 @@
 #include "GAS/GA/AT/AT_JumpAndWaitLanding.h"
 
 #include "GameFramework/Character.h"
+#include "GA_Glide.h"
 
 bool UGA_Jump::CanActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayTagContainer* SourceTags, const FGameplayTagContainer* TargetTags, OUT FGameplayTagContainer* OptionalRelevantTags) const
 {

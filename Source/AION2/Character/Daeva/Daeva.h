@@ -23,11 +23,21 @@ enum class EDaevaPartType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMontageID : uint8
+{
+	Dash UMETA(DisplayName = "Dash"),
+	Glide UMETA(DisplayName = "Glide"),
+	GlideLand UMETA(DisplayName = "GlideLand"),
+	StopGlide UMETA(DisplayName = "StopGlide")
+};
+
+UENUM(BlueprintType)
 enum class EAbilityInputID : uint8
 {
 	Dash UMETA(DisplayName = "Dash"),
 	Jump UMETA(DisplayName = "Jump"),
-	Glide UMETA(DisplayName = "Glide")
+	Glide UMETA(DisplayName = "Glide"),
+	StopGlide UMETA(DisplayName = "StopGlide")
 };
 
 UCLASS()
@@ -36,7 +46,7 @@ class AION2_API ADaeva : public AAOCharacter
 	GENERATED_BODY()
 
 public:
-	ADaeva();
+	ADaeva(const FObjectInitializer& ObjectInitializer);
 
 protected:
 	virtual void BeginPlay() override;
@@ -59,13 +69,14 @@ protected:
 	void GASInputReleased(int32 InputId);
 
 private:
+	void InputShiftPressed();
 	void InputSpacePressed();
 
 private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
 
 public:
-	FORCEINLINE UAnimMontage* GetDashMontage() const { return DashMontage; }
+	FORCEINLINE UAnimMontage* GetMontageByAbilityInputID(EMontageID Index) const { return Montages[Index]; }
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
@@ -100,14 +111,14 @@ private:
 	TObjectPtr<UInputAction> ZoomAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> DashAction;
+	TObjectPtr<UInputAction> ShiftAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> SpaceAction;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAnimMontage> DashMontage;
+	TMap<EMontageID, TObjectPtr<UAnimMontage>> Montages;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))

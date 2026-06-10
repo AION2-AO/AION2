@@ -1,6 +1,7 @@
 #include "Character/Daeva/Daeva.h"
 #include "Player/AOPlayerState.h"
 #include "GAS/AOGameplayTags.h"
+#include "Character/AOCharacterMovementComponent.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -9,7 +10,8 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 
-ADaeva::ADaeva()
+ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -86,7 +88,7 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADaeva::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADaeva::Look);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADaeva::Zoom);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityInputID::Dash));
+		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ADaeva::InputShiftPressed);
 		EnhancedInputComponent->BindAction(SpaceAction, ETriggerEvent::Started, this, &ADaeva::InputSpacePressed);
 	}
 }
@@ -176,17 +178,23 @@ void ADaeva::GASInputReleased(int32 InputId)
 	}
 }
 
+void ADaeva::InputShiftPressed()
+{
+	GASInputPressed(static_cast<int32>(EAbilityInputID::Dash));
+}
+
 void ADaeva::InputSpacePressed()
 {
-	//if (ASC->HasMatchingGameplayTag(FName("State.Gliding")))
-	//{
-	//	GASInputPressed(static_cast<int32>(EAbilityInputID::StopGlide));
-	//	return;
-	//}
+	if (GetCharacterMovement()->MovementMode == MOVE_Custom &&
+		GetCharacterMovement()->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityInputID::StopGlide));
+		return;
+	}
 
 	if (GetCharacterMovement()->IsFalling())
 	{
-		//GASInputPressed(static_cast<int32>(EAbilityInputID::Glide));
+		GASInputPressed(static_cast<int32>(EAbilityInputID::Glide));
 		return;
 	}
 
