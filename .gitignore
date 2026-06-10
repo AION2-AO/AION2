@@ -72,6 +72,7 @@ DerivedDataCache/*
 **/Plugins/**/Intermediate/*
 **/Plugins/**/Binaries/*
 **/Plugins/**/Saved/*
+Content/__ExternalActors__/Map/Untitled/*
 
 # Temp Files
 Config/DefaultEditorPerProjectUserSettings.ini
