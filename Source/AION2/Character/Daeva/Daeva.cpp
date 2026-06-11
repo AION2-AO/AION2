@@ -1,5 +1,7 @@
 #include "Character/Daeva/Daeva.h"
 #include "Player/AOPlayerState.h"
+#include "GAS/AOGameplayTags.h"
+#include "Character/AOCharacterMovementComponent.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -8,7 +10,8 @@
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
 
-ADaeva::ADaeva()
+ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer)
 {
 	PrimaryActorTick.bCanEverTick = true;
 
@@ -19,6 +22,7 @@ ADaeva::ADaeva()
 	GetCharacterMovement()->bOrientRotationToMovement = true;
 	GetCharacterMovement()->RotationRate = FRotator(0.0f, 720.0f, 0.0f);
 	GetCharacterMovement()->MaxWalkSpeed = 600.0f;
+	GetCharacterMovement()->JumpZVelocity = 520.0f;
 
 	GetMesh()->SetRelativeLocationAndRotation(FVector(0.0f, 0.0f, -90.0f), FRotator(0.0f, -90.0f, 0.0f));
 	GetMesh()->SetVisibility(false);
@@ -44,6 +48,28 @@ ADaeva::ADaeva()
 	CreatePart(EDaevaPartType::Glove, TEXT("GlovePart"));
 	CreatePart(EDaevaPartType::Pants, TEXT("PantsPart"));
 	CreatePart(EDaevaPartType::Boots, TEXT("BootsPart"));
+
+	Wing = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Wing"));
+	Wing->SetupAttachment(GetMesh(), TEXT("Wing_Root"));
+	Wing->SetVisibility(false);
+}
+
+void ADaeva::Multicast_PlayWingMontage_Implementation(EMontageID MontageID, float PlayRate)
+{
+	if (!Wing || !WingMontages[MontageID])
+	{
+		return;
+	}
+
+	if (UAnimInstance* WingAnimInstance = Wing->GetAnimInstance())
+	{
+		WingAnimInstance->Montage_Play(WingMontages[MontageID], PlayRate);
+	}
+}
+
+void ADaeva::Multicast_SetWingVisibility_Implementation(bool NewVisible)
+{
+	SetWingVisibility(NewVisible);
 }
 
 void ADaeva::BeginPlay()
@@ -84,7 +110,8 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADaeva::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADaeva::Look);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADaeva::Zoom);
-		EnhancedInputComponent->BindAction(DashAction, ETriggerEvent::Started, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityInputID::Dash));
+		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ADaeva::InputShiftPressed);
+		EnhancedInputComponent->BindAction(SpaceAction, ETriggerEvent::Started, this, &ADaeva::InputSpacePressed);
 	}
 }
 
@@ -109,7 +136,6 @@ void ADaeva::Move(const FInputActionValue& Value)
 		return;
 	}
 
-	bHasCurrentMoveInput = true;
 	CurrentMoveInputDirection = NewMoveInputDirection.GetSafeNormal();
 	AddMovementInput(CurrentMoveInputDirection);
 }
@@ -174,9 +200,40 @@ void ADaeva::GASInputReleased(int32 InputId)
 	}
 }
 
+void ADaeva::InputShiftPressed()
+{
+	GASInputPressed(static_cast<int32>(EAbilityInputID::Dash));
+}
+
+void ADaeva::InputSpacePressed()
+{
+	if (GetCharacterMovement()->MovementMode == MOVE_Custom &&
+		GetCharacterMovement()->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityInputID::StopGlide));
+		return;
+	}
+
+	if (GetCharacterMovement()->IsFalling())
+	{
+		GASInputPressed(static_cast<int32>(EAbilityInputID::Glide));
+		return;
+	}
+
+	GASInputPressed(static_cast<int32>(EAbilityInputID::Jump));
+}
+
+void ADaeva::SetWingVisibility(bool NewVisible)
+{
+	if (Wing)
+	{
+		Wing->SetVisibility(NewVisible);
+	}
+}
+
 void ADaeva::CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName)
 {
-	auto* PartMesh = CreateDefaultSubobject<USkeletalMeshComponent>(ComponentName);
+	USkeletalMeshComponent* PartMesh = CreateDefaultSubobject<USkeletalMeshComponent>(ComponentName);
 
 	PartMesh->SetupAttachment(GetMesh());
 	PartMesh->SetLeaderPoseComponent(GetMesh());

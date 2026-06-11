@@ -1,6 +1,8 @@
 #include "Character/AOCharacter.h"
+#include "Character/AOCharacterMovementComponent.h"
 
-AAOCharacter::AAOCharacter()
+AAOCharacter::AAOCharacter(const FObjectInitializer& ObjectInitializer)
+	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAOCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
 }

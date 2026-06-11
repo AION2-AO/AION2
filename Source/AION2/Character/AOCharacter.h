@@ -11,7 +11,7 @@ class AION2_API AAOCharacter : public ACharacter, public IAbilitySystemInterface
 	GENERATED_BODY()
 
 public:
-	AAOCharacter();
+	AAOCharacter(const FObjectInitializer& ObjectInitializer);
 
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;

@@ -11,13 +11,15 @@ void UAOCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
         return;
     }
 
-    Speed = Pawn->GetVelocity().Length();
+    Speed = Pawn->GetVelocity().Size2D();
 
     ACharacter* Character = Cast<ACharacter>(Pawn);
     if (!Character)
     {
         return;
     }
+
+    bHasMoveInput = Character->GetCharacterMovement()->GetCurrentAcceleration().SizeSquared() > 0.f;
 
     bIsInAir = Character->GetMovementComponent()->IsFalling() || Character->GetMovementComponent()->IsFlying();
 }

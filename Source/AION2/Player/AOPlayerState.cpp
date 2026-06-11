@@ -5,7 +5,7 @@
 
 AAOPlayerState::AAOPlayerState()
 {
-    NetUpdateFrequency = 100.f;
+    SetNetUpdateFrequency(100.f);
 
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
 	ASC->SetIsReplicated(true);

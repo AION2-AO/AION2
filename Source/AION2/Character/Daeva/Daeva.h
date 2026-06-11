@@ -23,9 +23,21 @@ enum class EDaevaPartType : uint8
 };
 
 UENUM(BlueprintType)
+enum class EMontageID : uint8
+{
+	Dash UMETA(DisplayName = "Dash"),
+	Glide UMETA(DisplayName = "Glide"),
+	GlideLand UMETA(DisplayName = "GlideLand"),
+	StopGlide UMETA(DisplayName = "StopGlide")
+};
+
+UENUM(BlueprintType)
 enum class EAbilityInputID : uint8
 {
-	Dash UMETA(DisplayName = "Dash")
+	Dash UMETA(DisplayName = "Dash"),
+	Jump UMETA(DisplayName = "Jump"),
+	Glide UMETA(DisplayName = "Glide"),
+	StopGlide UMETA(DisplayName = "StopGlide")
 };
 
 UCLASS()
@@ -34,7 +46,14 @@ class AION2_API ADaeva : public AAOCharacter
 	GENERATED_BODY()
 
 public:
-	ADaeva();
+	ADaeva(const FObjectInitializer& ObjectInitializer);
+
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayWingMontage(EMontageID MontageID, float PlayRate);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetWingVisibility(bool NewVisible);
 
 protected:
 	virtual void BeginPlay() override;
@@ -57,14 +76,21 @@ protected:
 	void GASInputReleased(int32 InputId);
 
 private:
+	void InputShiftPressed();
+	void InputSpacePressed();
+
+private:
+	void SetWingVisibility(bool NewVisible);
+
+private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
 
 public:
-	FORCEINLINE UAnimMontage* GetDashMontage() const { return DashMontage; }
+	FORCEINLINE UAnimMontage* GetMontageByAbilityInputID(EMontageID Index) const { return Montages[Index]; }
+	FORCEINLINE USkeletalMeshComponent* GetWingMesh() const { return Wing; }
+	FORCEINLINE UAnimInstance* GetWingAnimInstance() const { return GetWingMesh()->GetAnimInstance(); }
 
 private:
-	bool bHasCurrentMoveInput = false;
-
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
 	FVector CurrentMoveInputDirection;
 
@@ -97,13 +123,22 @@ private:
 	TObjectPtr<UInputAction> ZoomAction;
 
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UInputAction> DashAction;
+	TObjectPtr<UInputAction> ShiftAction;
+
+	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> SpaceAction;
 
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAnimMontage> DashMontage;
+	TMap<EMontageID, TObjectPtr<UAnimMontage>> Montages;
+
+	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	TMap<EMontageID, TObjectPtr<UAnimMontage>> WingMontages;
 
 private:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TMap<EDaevaPartType, TObjectPtr<USkeletalMeshComponent>> Parts;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> Wing;
 };
