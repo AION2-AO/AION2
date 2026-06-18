@@ -7,8 +7,26 @@ public class AION2 : ModuleRules
 	public AION2(ReadOnlyTargetRules Target) : base(Target)
 	{
 		PCHUsage = PCHUsageMode.UseExplicitOrSharedPCHs;
-	
-		PublicDependencyModuleNames.AddRange(new string[] { "Core", "CoreUObject", "Engine", "InputCore", "EnhancedInput" });
+
+        PublicIncludePaths.AddRange(new string[] { "AION2" });
+
+        PublicDependencyModuleNames.AddRange(new string[]
+		{
+			"Core",
+			"CoreUObject",
+			"Engine",
+			"InputCore",
+			"EnhancedInput",
+			"Networking",
+			"Sockets",
+			"GameplayAbilities",
+			"GameplayTags",
+			"GameplayTasks",
+            "AIModule",
+			"StateTreeModule",
+            "GameplayStateTreeModule",
+            "Niagara"
+        });
 
 		PrivateDependencyModuleNames.AddRange(new string[] {  });
 
@@ -21,3 +39,10 @@ public class AION2 : ModuleRules
 		// To include OnlineSubsystemSteam, add it to the plugins section in your uproject file with the Enabled attribute set to true
 	}
 }
+
+
+
+//            "StateTreeModule",
+//            "GameplayStateTreeModule",
+//            "AIModule",
+//            "Niagara"
