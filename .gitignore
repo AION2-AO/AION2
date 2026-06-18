@@ -72,6 +72,19 @@ DerivedDataCache/*
 **/Plugins/**/Intermediate/*
 **/Plugins/**/Binaries/*
 **/Plugins/**/Saved/*
+Content/__ExternalActors__/Map/Untitled/*
 
 # Temp Files
 Config/DefaultEditorPerProjectUserSettings.ini
+
+# Visual Studio & JetBrains IDE
+.vs/
+.idea/
+*.VC.opendb
+*.VC.db
+
+# Server
+[Dd]ebug/
+[Rr]elease/
+x64/
+x86/
