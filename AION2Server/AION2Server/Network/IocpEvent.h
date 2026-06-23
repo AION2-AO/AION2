@@ -56,5 +56,5 @@ public:
 	SendEvent() : IocpEvent(EventType::Send) {}
 
 public:
-	vector<SendBufferRef> sendBuffers;
+	std::vector<SendBufferRef> sendBuffers;
 };

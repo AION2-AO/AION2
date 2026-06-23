@@ -2,12 +2,12 @@
 
 struct JobData
 {
-	JobData(weak_ptr<JobQueue> owner, JobRef job) : owner(owner), job(job)
+	JobData(std::weak_ptr<JobQueue> owner, JobRef job) : owner(owner), job(job)
 	{
 
 	}
 
-	weak_ptr<JobQueue>	owner;
+	std::weak_ptr<JobQueue>	owner;
 	JobRef				job;
 };
 
@@ -29,12 +29,12 @@ struct TimerItem
 class JobTimer
 {
 public:
-	void Reserve(uint64 tickAfter, weak_ptr<JobQueue> owner, JobRef job);
+	void Reserve(uint64 tickAfter, std::weak_ptr<JobQueue> owner, JobRef job);
 	void Distribute(uint64 now);
 	void Clear();
 
 private:
 	std::mutex					_lock;
-	priority_queue<TimerItem>	_items;
-	atomic<bool>				_distributing = false;
+	std::priority_queue<TimerItem>	_items;
+	std::atomic<bool>				_distributing = false;
 };

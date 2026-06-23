@@ -8,7 +8,7 @@ public:
 	ThreadManager();
 	~ThreadManager();
 
-	void Launch(function<void(void)> callback);
+	void Launch(std::function<void(void)> callback);
 	void Join();
 
 	static void InitTLS();
@@ -19,6 +19,6 @@ public:
 
 private:
 	std::mutex _lock;
-	vector<std::thread> _threads;
+	std::vector<std::thread> _threads;
 };
 

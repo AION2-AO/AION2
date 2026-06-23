@@ -10,7 +10,7 @@ public:
 	{
 	}
 	template<typename T, typename Ret, typename... Args>
-	Job(shared_ptr<T> owner, Ret(T::* memFunc)(Args...), Args&&... args)
+	Job(std::shared_ptr<T> owner, Ret(T::* memFunc)(Args...), Args&&... args)
 	{
 		_callback = [owner, memFunc, args...]()
 			{

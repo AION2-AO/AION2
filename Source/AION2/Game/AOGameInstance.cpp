@@ -2,15 +2,12 @@
 
 
 #include "AOGameInstance.h"
-
-#include <Networking.h>
 #include <Sockets.h>
 #include "Common/TcpSocketBuilder.h"
-#include "Serialization/ArrayWriter.h"
 #include "SocketSubsystem.h"
+#include "Manager/AONetworkManager.h"
 #include "Kismet/GameplayStatics.h"
-#include "Network/AONetworkSubsystem.h"
-#include "../Common/Protocol.h"
+#include "TimerManager.h"
 
 void UAOGameInstance::Init()
 {
@@ -32,7 +29,7 @@ void UAOGameInstance::TryAsyncConnect(const FString& Ip, int32 Port)
 				AsyncTask(ENamedThreads::GameThread, [WeakInstPtr]()
 					{
 						if (!WeakInstPtr.IsValid()) return;
-						WeakInstPtr->UNetworkManager = WeakInstPtr->GetSubsystem<UAONetworkSubsystem>();
+						WeakInstPtr->UNetworkManager = WeakInstPtr->GetSubsystem<UAONetworkManager>();
 						if (WeakInstPtr->UNetworkManager)
 						{
 							WeakInstPtr->UNetworkManager->SetSocket(WeakInstPtr->ClientSocket);
@@ -104,40 +101,42 @@ bool UAOGameInstance::IsServerConnected()
 void UAOGameInstance::SendSignUpPacket(const FString& Id, const FString& Password, int32 ClassType)
 {
 	UE_LOG(LogTemp, Display, TEXT("Send SignUp Packet: %s, %s, %d"), *Id, *Password, ClassType);
+	Protocol::C_SignUpPacket Pkt;
+	Pkt.set_id(TCHAR_TO_UTF8(*Id));
+	Pkt.set_password(TCHAR_TO_UTF8(*Password));
+	Pkt.set_classtype(static_cast<Protocol::ClassType>(ClassType));
 
-	C_SignUpPacket SignUpPacket;
-	SignUpPacket.header.packetType = EPacketType::C_SignUp;
-	SignUpPacket.header.packetSize = sizeof(C_SignUpPacket);
-
-	FTCHARToUTF8 ConvertId(*Id);
-	FCStringAnsi::Strncpy(SignUpPacket.id, (const char*)ConvertId.Get(), sizeof(SignUpPacket.id) - 1);
-	SignUpPacket.id[sizeof(SignUpPacket.id) - 1] = '\0';
-
-	FTCHARToUTF8 ConvertPassword(*Password);
-	FCStringAnsi::Strncpy(SignUpPacket.password, (const char*)ConvertPassword.Get(), sizeof(SignUpPacket.password) - 1);
-	SignUpPacket.password[sizeof(SignUpPacket.password) - 1] = '\0';
-
-	SignUpPacket.classType = static_cast<EClassType>(ClassType);
-
-	SendPacket(&SignUpPacket, sizeof(C_SignUpPacket));
-}
+	SendPacket(Pkt, PKT_C_SIGNUP);
+} 
 
 void UAOGameInstance::SendLoginPacket(const FString& Id, const FString& Password)
 {
-	UE_LOG(LogTemp, Display, TEXT("Send Login Packet: %s, %s"), *Id, *Password);
-	C_LoginPacket LoginPacket;
-	LoginPacket.header.packetType = EPacketType::C_Login;
-	LoginPacket.header.packetSize = sizeof(LoginPacket);
+	Protocol::C_LoginPacket Pkt;
+	Pkt.set_id(TCHAR_TO_UTF8(*Id));
+	Pkt.set_password(TCHAR_TO_UTF8(*Password));
 
-	FTCHARToUTF8 ConvertId(*Id);
-	FCStringAnsi::Strncpy(LoginPacket.id, (const char*)ConvertId.Get(), sizeof(LoginPacket.id) - 1);
-	LoginPacket.id[sizeof(LoginPacket.id) - 1] = '\0';
+	SendPacket(Pkt, PKT_C_LOGIN);
+}
 
-	FTCHARToUTF8 ConvertPassword(*Password);
-	FCStringAnsi::Strncpy(LoginPacket.password, (const char*)ConvertPassword.Get(), sizeof(LoginPacket.password) - 1);
-	LoginPacket.password[sizeof(LoginPacket.password) - 1] = '\0';
+void UAOGameInstance::SendMapLoadCompletePacket()
+{
+	Protocol::C_MapLoadCompletePacket Pkt;
+	SendPacket(Pkt, PKT_C_MAPLOADCOMPLETE);
+}
 
-	SendPacket(&LoginPacket, sizeof(C_LoginPacket));
+void UAOGameInstance::OpenVillageLevel()
+{
+	FString VillagePath = TEXT("/Game/Map/Village");
+	UGameplayStatics::OpenLevel(GetWorld(), *VillagePath, true);
+}
+
+void UAOGameInstance::OnReadyoOpenLevel()
+{
+	if (UWorld* World = GetWorld())
+	{
+		FTimerHandle Handle;
+		World->GetTimerManager().SetTimer(Handle, this, &UAOGameInstance::OpenVillageLevel, 1.0f, false);
+	}
 }
 
 void UAOGameInstance::SendPacket(void* Packet, int32 PacketSize)
@@ -157,4 +156,21 @@ void UAOGameInstance::SendPacket(void* Packet, int32 PacketSize)
 	{
 
 	}
+}
+
+void UAOGameInstance::SendPacket(google::protobuf::Message& Pkt, uint16 PacketId)
+{
+	const uint16 DataSize = static_cast<uint16>(Pkt.ByteSizeLong());
+	const uint16 PacketSize = DataSize + sizeof(FPacketHeader);
+
+	TArray<uint8> Buffer; 
+	Buffer.AddUninitialized(PacketSize);
+	
+	FPacketHeader* Header = reinterpret_cast<FPacketHeader*>(Buffer.GetData());
+	Header->PacketSize = PacketSize;
+	Header->PacketId = PacketId;
+
+	Pkt.SerializeToArray(Buffer.GetData() + sizeof(FPacketHeader), DataSize);
+
+	SendPacket(Buffer.GetData(), PacketSize);
 }

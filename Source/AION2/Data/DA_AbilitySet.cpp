@@ -16,7 +16,7 @@ void UDA_AbilitySet::GiveToASC(UAbilitySystemComponent* ASC, TArray<FGameplayAbi
             continue;
         }
 
-        FGameplayAbilitySpec Spec(Entry.Ability, Entry.AbilityLevel, Entry.InputID);
+        FGameplayAbilitySpec Spec(Entry.Ability, Entry.AbilityLevel, Entry.AbilityID);
         FGameplayAbilitySpecHandle Handle = ASC->GiveAbility(Spec);
         OutHandles.Add(Handle);
     }

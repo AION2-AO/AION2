@@ -14,6 +14,7 @@ enum class ETalythraState : uint8
 	Chase,
 	Ranged_Shot,
 	Melee_Attack_Skill_05, 
+	Charge_Attack,
 	Dead,
 
 };

@@ -24,14 +24,14 @@ int main()
 {
 	PacketHandler::Init();
 
-	// DB 연결
-	//ASSERT_CRASH(GDBConnectionPool->Connect(10, L"Driver={SQLServer}; Server = (localdb)\\MSSQLLocalDB; Database = AION2_DB; Trusted_Connection=yes;"));
-	IocpCoreRef iocpCore = make_shared<IocpCore>();
+	// DB Connect
+	ASSERT_CRASH(GDBConnectionPool->Connect(5, L"Driver={ODBC Driver 17 for SQL Server}; Server=localhost\\SQLEXPRESS03; Database=AION2_DB; Trusted_Connection=yes;"));
+	IocpCoreRef iocpCore = std::make_shared<IocpCore>();
 
 	MMOServerServiceRef service = make_shared<MMOServerService>(
 		NetAddress(L"127.0.0.1", 7777),
 		iocpCore,
-		[]() { return make_shared<GameSession>(); },
+		[]() { return  std::make_shared<GameSession>(); },
 		100
 	);
 

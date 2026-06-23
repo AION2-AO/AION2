@@ -53,7 +53,7 @@ bool MMOServerService::Start()
 	if (CanStart() == false)
 		return false;
 
-	_listener = make_shared<Listener>();
+	_listener = std::make_shared<Listener>();
 	if (_listener == nullptr)
 		return false;
 
@@ -75,7 +75,7 @@ bool DediService::Start()
 	if (CanStart() == false)
 		return false;
 
-	_listener = make_shared<Listener>();
+	_listener = std::make_shared<Listener>();
 	if (_listener == nullptr)
 		return false;
 

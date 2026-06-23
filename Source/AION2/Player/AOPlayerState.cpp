@@ -3,9 +3,11 @@
 #include "GAS/AttributeSet/AOAttributeSet.h"
 
 #include "AbilitySystemComponent.h"
+#include "Net/UnrealNetwork.h"
 
 AAOPlayerState::AAOPlayerState()
 {
+    bReplicates = true;
     SetNetUpdateFrequency(100.f);
 
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
@@ -13,6 +15,13 @@ AAOPlayerState::AAOPlayerState()
     ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
     AttributeSet = CreateDefaultSubobject<UAOAttributeSet>(TEXT("AttributeSet"));
+}
+
+void AAOPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+    Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+    DOREPLIFETIME(AAOPlayerState, ClassType);
 }
 
 UAbilitySystemComponent* AAOPlayerState::GetAbilitySystemComponent() const

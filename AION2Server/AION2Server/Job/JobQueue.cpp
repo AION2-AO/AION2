@@ -26,7 +26,7 @@ void JobQueue::Execute()
 	LCurrentJobQueue = this;
 	while (true)
 	{
-		vector<JobRef> jobs;
+		std::vector<JobRef> jobs;
 		_jobs.PopAll(jobs);
 
 		const int32 jobCount = static_cast<int32>(jobs.size());

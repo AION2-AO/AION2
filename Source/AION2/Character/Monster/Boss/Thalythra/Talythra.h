@@ -20,8 +20,12 @@ public:
 	ATalythra(const FObjectInitializer& ObjectInitializer);
 
 protected:
+
+	virtual void PostInitializeComponents() override;
+
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
 
 public:	
 	// Called every frame
@@ -36,7 +40,19 @@ public:
 	void FireProjectile(); 
 	void TurnToTarget(); 
 
-	void Set_RotationAble(bool _bRotationOnOff) { bRotationAble = _bRotationOnOff; }
+	void Set_RotationAble(bool RotationOnOff)   { RotationAble = RotationOnOff; }
+	void Set_AttackLineRenderOnOff(bool _OnOff) { AttackLineRenderOnOff = _OnOff; }
+
+
+	// Charge Attack 관련 
+	
+	FORCEINLINE void Set_LockPevis(bool _bLock) { bLockPelvis = _bLock; }
+	FORCEINLINE void Set_ChargeAttackMove(bool _bAttack) { bChargeAttack = _bAttack;}
+	FORCEINLINE void Set_ChargeAttackDir(FVector _vector) { ChargeDirection = _vector; }
+	void StartChargeMove();
+	void EndChargeMove();
+
+	
 
 #pragma region
 	void DoFireProjectile();
@@ -44,6 +60,9 @@ public:
 	void DoFireProjectile_3();
 
 #pragma endregion 
+
+	FORCEINLINE virtual class UAnimMontage* GetChargeAttackActionMontage() const { return ChargeAttackMontage; }
+
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -70,14 +89,16 @@ protected:
 	void Multicast_AttackLine_Pattern_2_Off();
 
 
-
+	
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_3();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_3_Off();
-
-
+	
+	UFUNCTION(NetMulticast, Unreliable)
+	void Multicast_SetChargeMovementParams(bool bChargeMode);
+	// EFFECT 관련 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	TSubclassOf<class ATalythraProjectile> ProjectileClass;
@@ -95,6 +116,24 @@ protected:
 #pragma endregion 
 
 
+	// GAS 관련
+protected:
+	UPROPERTY(EditAnywhere, Category = "GAS")
+	TMap<FName, TSubclassOf<class UGameplayAbility>> HasAbilities; 
+
+
+
+
+	// 몽타주 관련 
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
+	TObjectPtr<class UAnimMontage> ChargeAttackMontage; 
+
+
+
+
+
+	// 페이즈 및 상태 관련 
 public:
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Phase")
 	ETalythraPhase Phase;
@@ -103,13 +142,28 @@ public:
 	ETalythraState State;
 
 
-
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
+	bool bLockPelvis = false;
 
 private:
 	UPROPERTY(VisibleAnywhere)
 	int FireCount = 1;
 
 	UPROPERTY(VisibleAnywhere)
-	bool bRotationAble = false; 
+	bool RotationAble = false; 
+
+	UPROPERTY(VisibleAnywhere)
+	bool AttackLineRenderOnOff = false; 
+
+
+	UPROPERTY()
+	FVector ChargeDirection = FVector::ZeroVector;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bChargeAttack = false;
+
+	UPROPERTY(VisibleAnywhere)
+	bool bMovelAccel = false;
+
 
 };

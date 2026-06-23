@@ -6,13 +6,13 @@ class LockQueue
 public:
 	void Push(T item)
 	{
-		lock_guard<std::mutex>lock(_lock);
+		std::lock_guard<std::mutex>lock(_lock);
 		_items.push(item);
 	}
 
 	T Pop()
 	{
-		lock_guard<std::mutex>lock(_lock);
+		std::lock_guard<std::mutex>lock(_popLock);
 		if (_items.empty())
 			return T();
 
@@ -20,9 +20,9 @@ public:
 		_items.pop();
 		return ret;
 	}
-	void PopAll(vector<T>& items)
+	void PopAll(std::vector<T>& items)
 	{
-		lock_guard<std::mutex>lock(_lock);
+		std::lock_guard<std::mutex>lock(_lock);
 		while (T item = Pop())
 		{
 			items.push_back(item);
@@ -30,12 +30,13 @@ public:
 	}
 	void Clear()
 	{
-		lock_guard<std::mutex>lock(_lock);
-		_items = queue<T>();
+		std::lock_guard<std::mutex>lock(_lock);
+		_items = std::queue<T>();
 	}
 
 private:
 	std::mutex _lock;
-	queue<T>_items;
+	std::mutex _popLock;
+	std::queue<T>_items;
 };
 

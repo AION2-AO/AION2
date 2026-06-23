@@ -2,6 +2,7 @@
 #include "Player/AOPlayerState.h"
 #include "GAS/AOGameplayTags.h"
 #include "Character/AOCharacterMovementComponent.h"
+#include "Data/DA_AbilitySet.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -49,6 +50,12 @@ ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
 	CreatePart(EDaevaPartType::Pants, TEXT("PantsPart"));
 	CreatePart(EDaevaPartType::Boots, TEXT("BootsPart"));
 
+	Weapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Weapon"));
+	Weapon->SetVisibility(false);
+
+	SubWeapon = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("SubWeapon"));
+	SubWeapon->SetVisibility(false);
+
 	Wing = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("Wing"));
 	Wing->SetupAttachment(GetMesh(), TEXT("Wing_Root"));
 	Wing->SetVisibility(false);
@@ -93,6 +100,13 @@ void ADaeva::PossessedBy(AController* NewController)
 	InitGAS();
 }
 
+void ADaeva::UnPossessed()
+{
+	ClearGAS();
+
+	Super::UnPossessed();
+}
+
 void ADaeva::OnRep_PlayerState()
 {
 	Super::OnRep_PlayerState();
@@ -112,6 +126,7 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADaeva::Zoom);
 		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ADaeva::InputShiftPressed);
 		EnhancedInputComponent->BindAction(SpaceAction, ETriggerEvent::Started, this, &ADaeva::InputSpacePressed);
+		EnhancedInputComponent->BindAction(LBAction, ETriggerEvent::Triggered, this, &ADaeva::InputLBPressed);
 	}
 }
 
@@ -164,16 +179,34 @@ void ADaeva::InitGAS()
 		return;
 	}
 
-
 	ASC = GASPS->GetAbilitySystemComponent();
 	ASC->InitAbilityActorInfo(GASPS, this);
 
+	if (!bTagEventsRegistered)
+	{
+		ASC->RegisterGameplayTagEvent(STATE_COMBAT, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ADaeva::OnCombatStateChanged);
+
+		bTagEventsRegistered = true;
+	}
 
 	if (HasAuthority())
 	{
 		GASPS->GiveCommonAbilities();
-
+		CombatAbilitySet->GiveToASC(ASC, CombatAbilityHandles);
 		ApplyDashStaminaRegenEffect();
+	}
+}
+
+void ADaeva::ClearGAS()
+{
+	if (HasAuthority())
+	{
+		for (FGameplayAbilitySpecHandle Handle : CombatAbilityHandles)
+		{
+			ASC->ClearAbility(Handle);
+		}
+
+		CombatAbilityHandles.Empty();
 	}
 }
 
@@ -231,7 +264,7 @@ void ADaeva::ApplyDashStaminaRegenEffect()
 
 void ADaeva::InputShiftPressed()
 {
-	GASInputPressed(static_cast<int32>(EAbilityInputID::Dash));
+	GASInputPressed(static_cast<int32>(EAbilityID::Dash));
 }
 
 void ADaeva::InputSpacePressed()
@@ -239,17 +272,57 @@ void ADaeva::InputSpacePressed()
 	if (GetCharacterMovement()->MovementMode == MOVE_Custom &&
 		GetCharacterMovement()->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide))
 	{
-		GASInputPressed(static_cast<int32>(EAbilityInputID::StopGlide));
+		GASInputPressed(static_cast<int32>(EAbilityID::StopGlide));
 		return;
 	}
 
 	if (GetCharacterMovement()->IsFalling())
 	{
-		GASInputPressed(static_cast<int32>(EAbilityInputID::Glide));
+		GASInputPressed(static_cast<int32>(EAbilityID::Glide));
 		return;
 	}
 
-	GASInputPressed(static_cast<int32>(EAbilityInputID::Jump));
+	GASInputPressed(static_cast<int32>(EAbilityID::Jump));
+}
+
+void ADaeva::InputLBPressed()
+{
+	if (ASC->HasMatchingGameplayTag(COMBO_AVAILABLE_LB2))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::LB_2));
+	}
+	else if (ASC->HasMatchingGameplayTag(COMBO_AVAILABLE_LB3))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::LB_3));
+	}
+	else
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::LB_1));
+	}
+}
+
+void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
+{
+	const bool bIsCombat = NewCount > 0;
+
+	SetWeaponVisibility(bIsCombat);
+	SetSubWeaponVisibility(bIsCombat);
+}
+
+void ADaeva::SetWeaponVisibility(bool NewVisible)
+{
+	if (Weapon)
+	{
+		Weapon->SetVisibility(NewVisible);
+	}
+}
+
+void ADaeva::SetSubWeaponVisibility(bool NewVisible)
+{
+	if (SubWeapon)
+	{
+		SubWeapon->SetVisibility(NewVisible);
+	}
 }
 
 void ADaeva::SetWingVisibility(bool NewVisible)

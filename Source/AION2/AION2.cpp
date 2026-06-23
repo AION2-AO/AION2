@@ -1,6 +1,12 @@
 // Copyright Epic Games, Inc. All Rights Reserved.
 
 #include "AION2.h"
-#include "Modules/ModuleManager.h"
 
-IMPLEMENT_PRIMARY_GAME_MODULE( FDefaultGameModuleImpl, AION2, "AION2" );
+void FAION2Module::StartupModule()
+{
+}
+
+void FAION2Module::ShutdownModule()
+{
+}
+	IMPLEMENT_MODULE(FAION2Module, AION2)

@@ -10,6 +10,8 @@
 #include "AI/AITalythraAIController.h"
 #include "Components/DecalComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "AbilitySystemComponent.h"
+#include "Abilities/GameplayAbility.h"
 
 
 // Sets default values
@@ -46,14 +48,53 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	}
 
 
+	static ConstructorHelpers::FObjectFinder<UAnimMontage> ChargeAttackMontageRef(TEXT("/Game/Blueprint/Monster/Boss/Talythra/Montage/AM_Thalythra_ChargeAttack.AM_Thalythra_ChargeAttack"));
+	if(ChargeAttackMontageRef.Object != NULL)
+	{
+		ChargeAttackMontage = ChargeAttackMontageRef.Object;
+	}
+	
+
+
+	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	ASC->SetIsReplicated(true);
+	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+
+
+	
 	bReplicates = true; 
 	SetReplicateMovement(true);
+
+
+}
+
+void ATalythra::PostInitializeComponents()
+{
+	Super::PostInitializeComponents();
+	// Owner Actor와 AvatarActor 설정 
+	ASC->InitAbilityActorInfo(this, this);
+
+	// Owner Actor란? : ASC를 논리적으로 소유한 주체 ( 해당 주체가 죽어도 유지되며, 레벨 및 스텟 보존 )
+	// Avatar Actor란? : Character  (죽으면 바뀌는 물체, 실제로 데이터를 처리하지 않지만 비주얼만 수행해주는 엑터) 
+
+
 }
 
 // Called when the game starts or when spawned
 void ATalythra::BeginPlay()
 {
 	Super::BeginPlay();
+	
+	
+	if(HasAuthority()) // 서버인 경우 
+	{
+		for( const auto& Ability : HasAbilities) // 능력들 저장. 
+		{
+			FGameplayAbilitySpec AbilitySpec(Ability.Value);
+			ASC->GiveAbility(AbilitySpec);
+		}
+	}
+
 	
 
 #pragma region Decal_Line SceneComponents
@@ -81,18 +122,12 @@ void ATalythra::BeginPlay()
 
 #pragma endregion 
 
-
-	if (HasAuthority() == false) return;
-
-	// 현재 설정값 로그
-	UE_LOG(LogTemp, Warning, TEXT("VisibilityBasedAnimTickOption: %d"),
-		(int32)GetMesh()->VisibilityBasedAnimTickOption);
-	UE_LOG(LogTemp, Warning, TEXT("AnimScriptInstance: %s"),
-		GetMesh()->GetAnimInstance() ? TEXT("Valid") : TEXT("Null"));
-	UE_LOG(LogTemp, Warning, TEXT("bRecentlyRendered: %d"),
-		GetMesh()->bRecentlyRendered);
+	// ASC->GiveAbility()
 
 
+
+	if (HasAuthority() == false) 
+		return;
 }
 
 // Called every frame
@@ -100,6 +135,35 @@ void ATalythra::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	if (HasAuthority() == false)
+		return;
+
+	if (bChargeAttack)
+	{
+		const float ChargeSpeed = 2600.f;
+
+		FHitResult Hit;
+
+		AddActorWorldOffset(
+			ChargeDirection * ChargeSpeed * DeltaTime,
+			true,
+			&Hit
+		);
+
+		//if (Hit.bBlockingHit)
+		//{
+		//	UE_LOG(LogTemp, Warning,
+		//		TEXT("[Charge Blocked] HitActor=%s ImpactNormal=%s"),
+		//		*GetNameSafe(Hit.GetActor()),
+		//		*Hit.ImpactNormal.ToString()
+		//	);
+
+		//	// 벽에 박으면 멈추고 싶으면 여기서 EndChargeMove 호출
+		//	// EndChargeMove();
+		//}
+	}
+	
 
 }
 
@@ -167,6 +231,36 @@ void ATalythra::FireProjectile()
 
 void ATalythra::TurnToTarget()
 {
+
+	if (AttackLineRenderOnOff)
+	{
+		switch (FireCount)
+		{
+		case 1:
+		{
+			Multicast_AttackLine_Pattern_1();
+			AttackLineRenderOnOff = false;
+		}
+		break;
+		case 2:
+		{
+			Multicast_AttackLine_Pattern_2();
+			AttackLineRenderOnOff = false;
+		}
+		break;
+		case 3:
+		{
+			Multicast_AttackLine_Pattern_3();
+			AttackLineRenderOnOff = false;
+		}
+		break;
+		default:
+			break;
+		}
+	}
+
+
+
 	AAITalythraAIController* TalythraAIController = Cast <AAITalythraAIController>(GetController());
 	if (TalythraAIController == nullptr)
 		return;
@@ -207,14 +301,14 @@ void ATalythra::TurnToTarget()
 	{
 		// 여기서 회전 끄기 미세한 떨림 여기서 발생 bRotation 을 추가해서 그만 회전하게 하자!
 
-		bRotationAble = false; 
+		RotationAble = false; 
 
 		return;
 	}
 
 
 
-	if (bRotationAble == false)
+	if (RotationAble == false)
 		return; 
 
 	
@@ -240,48 +334,55 @@ void ATalythra::TurnToTarget()
 		AddActorWorldRotation(FRotator(0.0f, StepDegree * -1.f, 0.f));
 	}
 
-	//if (vDirToPlayer.IsNearlyZero())
-	//{
-	//	return;
-	//}
 
 
-	////월드 기준 방향 벡터를 보고, 그 방향을 바라보는 “절대 회전값”을 만들어주는 함수야.
-	//const FRotator TargetRotation = vDirToPlayer.Rotation();
-
-	//if (TargetRotation.Yaw <= KINDA_SMALL_NUMBER)
-	//	return; 
-
-
-	//
-	//SetActorRotation(FRotator(
-	//	0.f,
-	//	TargetRotation.Yaw,
-	//	0.f
-	//));
-
-
-	//switch (FireCount)
-	//{
-	//case 1:
-	//{
-	//	Multicast_AttackLine_Pattern_1();
-	//}
-	//	break;
-	//case 2:
-	//{
-	//	Multicast_AttackLine_Pattern_2();
-	//}
-	//	break;
-	//case 3:
-	//{
-	//	Multicast_AttackLine_Pattern_3();
-	//}
-	//	break;
-	//default:
-	//	break;
-	//}
 	
+	
+	
+}
+
+
+void ATalythra::StartChargeMove()
+{
+
+	if (HasAuthority() == false)
+		return;
+
+	if (AAIController* AIC = Cast<AAIController>(GetController()))
+	{
+		AIC->StopMovement();
+	}
+
+	UCharacterMovementComponent* CMC = GetCharacterMovement();
+	if (CMC)
+	{
+		CMC->StopMovementImmediately();
+	}
+
+	ChargeDirection = GetActorForwardVector();
+	ChargeDirection.Z = 0.f;
+	ChargeDirection = ChargeDirection.GetSafeNormal();
+
+	bChargeAttack = true;
+
+	Multicast_SetChargeMovementParams(true);
+
+	//GetCharacterMovement()->Velocity = ChargeDirection * 1800.f;
+}
+
+void ATalythra::EndChargeMove()
+{
+	if(HasAuthority() == false)
+		return;
+
+	bChargeAttack = false;
+
+	if (UCharacterMovementComponent* CMC = GetCharacterMovement())
+	{
+		CMC->StopMovementImmediately();
+	}
+
+	Multicast_SetChargeMovementParams(false);
 }
 
 void ATalythra::DoFireProjectile()
@@ -515,6 +616,7 @@ void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 	
 	DOREPLIFETIME(ATalythra, Phase);
 	DOREPLIFETIME(ATalythra, State);
+	DOREPLIFETIME(ATalythra, bLockPelvis);
 
 }
 
@@ -620,23 +722,27 @@ void ATalythra::Multicast_PlayMuzzleEffect_Implementation(FVector SpawnLocation,
 
 }
 
+void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMode)
+{
 
+	UCharacterMovementComponent* CMC = GetCharacterMovement();
+	if (!CMC)
+		return;
 
-
-
-
-// AnimInstance 
-
-//static ConstructorHelpers::FClassFinder<UAnimInstance> AnimInstanceRef(TEXT("/Game/Blueprint/Monster/Boss/Talythra/ABP_Talythra.ABP_Talythra_C"));
-////
-//if(AnimInstanceRef.Class != NULL)
-//{
-//	GetMesh()->SetAnimInstanceClass(AnimInstanceRef.Class);
-//}
-
-
-//GetMesh()->VisibilityBasedAnimTickOption =
-//	EVisibilityBasedAnimTickOption::AlwaysTickPoseAndRefreshBones;
-
-/*GetMesh()->VisibilityBasedAnimTickOption =
-	EVisibilityBasedAnimTickOption::AlwaysTickPose;*/
+	if (bChargeMode)
+	{
+		CMC->MaxWalkSpeed = 1800.f;
+		CMC->MaxAcceleration = 20000.f;
+		CMC->GroundFriction = 0.f;
+		CMC->BrakingDecelerationWalking = 0.f;
+		CMC->BrakingFrictionFactor = 0.f;
+	}
+	else
+	{
+		CMC->MaxWalkSpeed = 600.f;
+		CMC->MaxAcceleration = 2048.f;
+		CMC->GroundFriction = 8.f;
+		CMC->BrakingDecelerationWalking = 2048.f;
+		CMC->BrakingFrictionFactor = 2.f;
+	}
+}

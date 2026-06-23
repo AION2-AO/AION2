@@ -6,12 +6,12 @@
 	JobTimer
 ---------------*/
 
-void JobTimer::Reserve(uint64 tickAfter, weak_ptr<JobQueue> owner, JobRef job)
+void JobTimer::Reserve(uint64 tickAfter, std::weak_ptr<JobQueue> owner, JobRef job)
 {
 	const uint64 executeTick = ::GetTickCount64() + tickAfter;
 	JobData* jobData = new JobData(owner, job);
 
-	lock_guard<std::mutex> lock(_lock);
+	std::lock_guard<std::mutex> lock(_lock);
 	_items.push(TimerItem{ executeTick, jobData });
 }
 
@@ -20,9 +20,9 @@ void JobTimer::Distribute(uint64 now)
 	if (_distributing.exchange(true))
 		return;
 
-	vector<TimerItem> expired;
+	std::vector<TimerItem> expired;
 	{
-		lock_guard<std::mutex> lock(_lock);
+		std::lock_guard<std::mutex> lock(_lock);
 		while (_items.empty() == false)
 		{
 			const TimerItem& item = _items.top();
@@ -49,7 +49,7 @@ void JobTimer::Distribute(uint64 now)
 
 void JobTimer::Clear()
 {
-	lock_guard<std::mutex> lock(_lock);
+	std::lock_guard<std::mutex> lock(_lock);
 	while (_items.empty() == false)
 	{
 		const TimerItem& item = _items.top();

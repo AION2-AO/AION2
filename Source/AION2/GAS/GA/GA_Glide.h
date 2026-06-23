@@ -17,8 +17,8 @@ protected:
 	void OnLandedCallback();
 
 	UFUNCTION()
-	void OnLandMontageFinished();
+	void OnMontageTaskFinished();
 
 	UFUNCTION()
-	void OnLandMontageCancelled();
+	void OnMontageTaskCancelled();
 };

@@ -8,16 +8,18 @@ struct Vector3
 	float z;
 };
 
-enum class PacketType : uint8
+enum class EPacketType : uint16
 {
 	C_Login = 1,
-	S_LoginResult,
+	S_LoginResult = 2,
+	C_SignUp = 3,
+	S_SignUpResult = 4,
 };
 
 struct PacketHeader
 {
 	uint16 packetSize;
-	PacketType packetType;
+	EPacketType packetType;
 };
 
 struct C_LoginPacket

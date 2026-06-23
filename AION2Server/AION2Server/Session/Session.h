@@ -27,7 +27,7 @@ public:
 	void SetService(ServiceRef service) { _service = service; }
 	void SetNetAddress(NetAddress address) { _netAddress = address; }
 
-	shared_ptr<Service>	GetService() { return _service.lock(); }
+	std::shared_ptr<Service>	GetService() { return _service.lock(); }
 	NetAddress GetAddress() { return _netAddress; }
 	SOCKET GetSocket() { return _socket; }
 	SessionRef GetSessionRef() { return static_pointer_cast<Session>(shared_from_this()); }
@@ -39,7 +39,7 @@ private:
 	virtual void Dispatch(class IocpEvent* iocpEvent, int32 numBytes = 0) override;
 
 private:
-	void RegisterConnect();
+	bool RegisterConnect();
 	void RegisterDisConnect();
 	void RegisterRecv();
 	void RegisterSend();
@@ -60,13 +60,13 @@ protected:
 private:
 	SOCKET _socket;
 	NetAddress _netAddress;
-	weak_ptr<Service> _service;
-	atomic<bool>		_connected = false;
+	std::weak_ptr<Service> _service;
+	std::atomic<bool>		_connected = false;
 
 	RecvBuffer	_recvBuffer;
 
-	queue<SendBufferRef>	_sendQueue;
-	atomic<bool>			_sendRegistered = false;
+	std::queue<SendBufferRef>	_sendQueue;
+	std::atomic<bool>			_sendRegistered = false;
 
 	std::mutex _sendLock;
 private:
@@ -76,7 +76,13 @@ private:
 	SendEvent			_sendEvent;
 };
 
-#include "../../Common/Protocol.h"
+#pragma pack(push, 1)
+struct PacketHeader
+{
+	uint16 size;
+	uint16 id; // 프로토콜ID (ex. 1=로그인, 2=이동요청)
+};
+#pragma pack(pop)
 
 class PacketSession : public Session
 {
@@ -84,7 +90,7 @@ public:
 	PacketSession();
 	virtual ~PacketSession();
 
-	PacketSessionRef GetPacketSessionRef() { return static_pointer_cast<PacketSession>(shared_from_this()); }
+	PacketSessionRef GetPacketSessionRef() { return std::static_pointer_cast<PacketSession>(shared_from_this()); }
 
 protected:
 	virtual int32 OnRecv(BYTE* buffer, int32 len) sealed;

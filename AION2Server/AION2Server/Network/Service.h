@@ -11,7 +11,7 @@ enum class ServiceType : uint8
 	DediServer
 };
 
-using SessionFactory = function<SessionRef(void)>;
+using SessionFactory = std::function<SessionRef(void)>;
 
 
 class Service : public std::enable_shared_from_this<Service>
@@ -48,7 +48,7 @@ protected:
 	IocpCoreRef _iocpCore;
 	ListenerRef _listener;
 
-	set<SessionRef> _sessions;
+	std::set<SessionRef> _sessions;
 	int32 sessionCount = 0;
 	int32 _maxSessionCount = 0;
 

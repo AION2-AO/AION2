@@ -4,7 +4,7 @@
 	IocpObject
 -----------------*/
 
-class IocpObject : public enable_shared_from_this<IocpObject>
+class IocpObject : public  std::enable_shared_from_this<IocpObject>
 {
 public:
 	virtual HANDLE GetHandle() abstract;

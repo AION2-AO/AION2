@@ -12,6 +12,6 @@ public:
 	virtual void OnSend(int32 len) override;
 
 public:
-	shared_ptr<class Player> _currenyPlayer;
+	std::shared_ptr<Player> _player;
 };
 

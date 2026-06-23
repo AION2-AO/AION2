@@ -17,7 +17,7 @@ struct FGAData
     int32 AbilityLevel = 1;
 
     UPROPERTY(EditDefaultsOnly, Category = "Ability")
-    int32 InputID = -1;
+    int32 AbilityID = -1;
 };
 
 UCLASS()

@@ -3,6 +3,8 @@
 #include "CoreMinimal.h"
 #include "Character/AOCharacter.h"
 #include "InputActionValue.h"
+#include "GameplayTagContainer.h"
+#include "GameplayAbilitySpecHandle.h"
 #include "Daeva.generated.h"
 
 class USkeletalMeshComponent;
@@ -26,19 +28,24 @@ enum class EDaevaPartType : uint8
 UENUM(BlueprintType)
 enum class EMontageID : uint8
 {
-	Dash UMETA(DisplayName = "Dash"),
-	Glide UMETA(DisplayName = "Glide"),
-	GlideLand UMETA(DisplayName = "GlideLand"),
-	StopGlide UMETA(DisplayName = "StopGlide")
+	Dash,
+	CombatDash,
+	Glide,
+	GlideLand,
+	StopGlide,
+	LB
 };
 
 UENUM(BlueprintType)
-enum class EAbilityInputID : uint8
+enum class EAbilityID : uint8
 {
-	Dash UMETA(DisplayName = "Dash"),
-	Jump UMETA(DisplayName = "Jump"),
-	Glide UMETA(DisplayName = "Glide"),
-	StopGlide UMETA(DisplayName = "StopGlide")
+	Dash,
+	Jump,
+	Glide,
+	StopGlide,
+	LB_1,
+	LB_2,
+	LB_3
 };
 
 UCLASS()
@@ -60,10 +67,10 @@ protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	virtual void PossessedBy(AController* NewController) override;
+	virtual void UnPossessed() override;
 	virtual void OnRep_PlayerState() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 	
-
 private:
 	void Tick_Camera(float DeltaTime);
 
@@ -74,6 +81,7 @@ protected:
 
 protected:
 	virtual void InitGAS() override;
+	virtual void ClearGAS() override;
 	void GASInputPressed(int32 InputId);
 	void GASInputReleased(int32 InputId);
 
@@ -82,15 +90,23 @@ protected:
 private:
 	void InputShiftPressed();
 	void InputSpacePressed();
+	void InputLBPressed();
+
+protected:
+	void OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount);
 
 private:
+	void SetWeaponVisibility(bool NewVisible);
+	void SetSubWeaponVisibility(bool NewVisible);
 	void SetWingVisibility(bool NewVisible);
 
 private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
 
 public:
-	FORCEINLINE UAnimMontage* GetMontageByAbilityInputID(EMontageID Index) const { return Montages[Index]; }
+	FORCEINLINE UAnimMontage* GetMontageByID(EMontageID Index) const { return Montages[Index]; }
+	FORCEINLINE USkeletalMeshComponent* GetWeaponMesh() const { return Weapon; }
+	FORCEINLINE USkeletalMeshComponent* GetSubWeaponMesh() const { return SubWeapon; }
 	FORCEINLINE USkeletalMeshComponent* GetWingMesh() const { return Wing; }
 	FORCEINLINE UAnimInstance* GetWingAnimInstance() const { return GetWingMesh()->GetAnimInstance(); }
 
@@ -112,7 +128,7 @@ private:
 	float MinZoomDistance = 100.f;
 
 	UPROPERTY(EditAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
-	float MaxZoomDistance = 1000.f;
+	float MaxZoomDistance = 1200.f;
 
 	float TargetZoomDistance;
 
@@ -132,6 +148,9 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> SpaceAction;
 
+	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> LBAction;
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
 	TMap<EMontageID, TObjectPtr<UAnimMontage>> Montages;
@@ -144,9 +163,23 @@ private:
 	TMap<EDaevaPartType, TObjectPtr<USkeletalMeshComponent>> Parts;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> Weapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USkeletalMeshComponent> SubWeapon;
+
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> Wing;
 
-private :
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UDA_AbilitySet> CombatAbilitySet;
+
+	UPROPERTY()
+	TArray<FGameplayAbilitySpecHandle> CombatAbilityHandles;
+
 	UPROPERTY(EditDefaultsOnly, Category = "GAS")
 	TSubclassOf<UGameplayEffect> DashStaminaRegenEffect;
+
+	bool bTagEventsRegistered = false;
 };

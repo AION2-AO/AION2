@@ -9,4 +9,6 @@ class AION2_API AAssassin : public ADaeva
 {
 	GENERATED_BODY()
 	
+public:
+	AAssassin(const FObjectInitializer& ObjectInitializer);
 };

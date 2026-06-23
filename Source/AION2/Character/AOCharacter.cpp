@@ -15,3 +15,7 @@ UAbilitySystemComponent* AAOCharacter::GetAbilitySystemComponent() const
 void AAOCharacter::InitGAS()
 {
 }
+
+void AAOCharacter::ClearGAS()
+{
+}

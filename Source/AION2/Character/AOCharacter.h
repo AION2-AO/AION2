@@ -18,6 +18,7 @@ public:
 
 protected:
 	virtual void InitGAS();
+	virtual void ClearGAS();
 
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS", meta = (AllowPrivateAccess = "true"))

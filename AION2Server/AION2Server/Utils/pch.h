@@ -1,12 +1,13 @@
 #pragma once
 
+#define _HAS_STD_BYTE 0
+
 #include "Types.h"
 #include "CoreTLS.h"
 #include "CoreGlobal.h"
 
 #include <iostream>
 #include <assert.h>
-using namespace std;
 
 #include <winsock2.h>
 #include <mswsock.h>
@@ -18,6 +19,7 @@ using namespace std;
 #include <set>
 #include <queue>
 #include <functional>
+#include <memory>
 
 #include "JobQueue.h"
 #include "Session.h"

@@ -25,6 +25,13 @@
     <ClCompile Include="DB\DBBind.cpp" />
     <ClCompile Include="DB\DBConnection.cpp" />
     <ClCompile Include="DB\DBConnectionPool.cpp" />
+    <ClCompile Include="Enum.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="ItemData.cpp" />
     <ClCompile Include="Job\Job.cpp" />
     <ClCompile Include="Job\JobQueue.cpp" />
     <ClCompile Include="Job\JobTimer.cpp" />
@@ -36,12 +43,26 @@
     <ClCompile Include="Network\NetAddress.cpp" />
     <ClCompile Include="Network\PacketHandler.cpp" />
     <ClCompile Include="Network\Service.cpp" />
+    <ClCompile Include="ObjectUtils.cpp" />
     <ClCompile Include="Player.cpp" />
+    <ClCompile Include="Protocol.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
+    <ClCompile Include="Room.cpp" />
     <ClCompile Include="Session\DedicateSession.cpp" />
     <ClCompile Include="Session\GameSession.cpp" />
     <ClCompile Include="Session\GameSessionManager.cpp" />
     <ClCompile Include="Session\Session.cpp" />
     <ClCompile Include="Source.cpp" />
+    <ClCompile Include="Struct.pb.cc">
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
+      <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
+    </ClCompile>
     <ClCompile Include="Utils\pch.cpp">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">Create</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">Create</PrecompiledHeader>
@@ -59,6 +80,8 @@
     <ClInclude Include="DB\DBBind.h" />
     <ClInclude Include="DB\DBConnection.h" />
     <ClInclude Include="DB\DBConnectionPool.h" />
+    <ClInclude Include="Enum.pb.h" />
+    <ClInclude Include="ItemData.h" />
     <ClInclude Include="Job\Job.h" />
     <ClInclude Include="Job\JobQueue.h" />
     <ClInclude Include="Job\JobTimer.h" />
@@ -70,11 +93,15 @@
     <ClInclude Include="Network\NetAddress.h" />
     <ClInclude Include="Network\PacketHandler.h" />
     <ClInclude Include="Network\Service.h" />
+    <ClInclude Include="ObjectUtils.h" />
     <ClInclude Include="Player.h" />
+    <ClInclude Include="Protocol.pb.h" />
+    <ClInclude Include="Room.h" />
     <ClInclude Include="Session\DedicateSession.h" />
     <ClInclude Include="Session\GameSession.h" />
     <ClInclude Include="Session\GameSessionManager.h" />
     <ClInclude Include="Session\Session.h" />
+    <ClInclude Include="Struct.pb.h" />
     <ClInclude Include="Utils\pch.h" />
     <ClInclude Include="Utils\RecvBuffer.h" />
     <ClInclude Include="Utils\SendBuffer.h" />
@@ -141,13 +168,14 @@
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -156,7 +184,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -164,7 +192,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -173,13 +202,14 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
       <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -188,7 +218,7 @@
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <ClCompile>
-      <WarningLevel>Level3</WarningLevel>
+      <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
@@ -196,7 +226,8 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>

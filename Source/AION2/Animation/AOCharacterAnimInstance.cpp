@@ -5,6 +5,8 @@
 
 void UAOCharacterAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 {
+    Super::NativeUpdateAnimation(DeltaSeconds);
+
     APawn* Pawn = TryGetPawnOwner();
     if (!Pawn)
     {
