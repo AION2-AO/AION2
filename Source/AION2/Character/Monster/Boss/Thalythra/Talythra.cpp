@@ -12,6 +12,8 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
+#include "AI/AITalythraAIController.h"
+#include "GAS/AOGameplayTags.h"
 
 
 // Sets default values
@@ -74,6 +76,12 @@ void ATalythra::PostInitializeComponents()
 	// Owner Actor와 AvatarActor 설정 
 	ASC->InitAbilityActorInfo(this, this);
 
+
+	if (!ASC->HasMatchingGameplayTag(TEAM_MONSTER))
+	{
+		ASC->AddLooseGameplayTag(TEAM_MONSTER);
+	}
+
 	// Owner Actor란? : ASC를 논리적으로 소유한 주체 ( 해당 주체가 죽어도 유지되며, 레벨 및 스텟 보존 )
 	// Avatar Actor란? : Character  (죽으면 바뀌는 물체, 실제로 데이터를 처리하지 않지만 비주얼만 수행해주는 엑터) 
 
@@ -97,7 +105,7 @@ void ATalythra::BeginPlay()
 
 	
 
-#pragma region Decal_Line SceneComponents
+#pragma region Attack_Line SceneComponents
 
 	TArray<USceneComponent*> SceneComponents;
 	GetComponents<USceneComponent>(SceneComponents);
@@ -112,22 +120,34 @@ void ATalythra::BeginPlay()
 		const FString NameString = SceneComp->GetName();
 
 
-		if (NameString.Contains(TEXT("DeadAttackLine")))
+		if (NameString.Contains(TEXT("ProjectileLine")))
 		{
-			ArrayDecalSceneComponent.Add(SceneComp);
+			ArrayProjectileLineSceneComponent.Add(SceneComp);
 			SceneComp->SetVisibility(false, true);
+			// 앞의 false는 root 부모 설정 , 뒤의 true는 부모 설정을 따라갈지를 선택
+			// ex) root -> false 이므로 자식도 false로 설정하고 싶으면 뒤를 true로 설정.
 
 		}
+
+
+		else if (NameString.Contains(TEXT("AoeIndicator")))
+		{
+			AttackRangeSceneComponent = SceneComp;
+			SceneComp->SetVisibility(false, true);
+		}
+
+
+		else if (NameString.Contains(TEXT("AOE Warning Circle")))
+		{
+			AttackWarningRangeSceneComponent = SceneComp; 
+			SceneComp->SetVisibility(false, true);
+		}
+
+
 	}
 
 #pragma endregion 
 
-	// ASC->GiveAbility()
-
-
-
-	if (HasAuthority() == false) 
-		return;
 }
 
 // Called every frame
@@ -141,27 +161,36 @@ void ATalythra::Tick(float DeltaTime)
 
 	if (bChargeAttack)
 	{
-		const float ChargeSpeed = 2600.f;
+		AddMovementInput(ChargeDirection, 1.0f, false);
+	}
 
-		FHitResult Hit;
 
-		AddActorWorldOffset(
-			ChargeDirection * ChargeSpeed * DeltaTime,
-			true,
-			&Hit
+	if (AttackWarningRangeSceneComponent->GetVisibleFlag() == true)
+	{
+
+		AttackWarningElapsedTime += DeltaTime;
+
+		const float Alpha = FMath::Clamp(
+			AttackWarningElapsedTime / AttackWarningDuration,
+			0.0f,
+			1.0f
+		);
+		
+		const float CurrentScale = FMath::Lerp(
+			0.01f,
+			AttackWarningTargetScale,
+			Alpha
 		);
 
-		//if (Hit.bBlockingHit)
-		//{
-		//	UE_LOG(LogTemp, Warning,
-		//		TEXT("[Charge Blocked] HitActor=%s ImpactNormal=%s"),
-		//		*GetNameSafe(Hit.GetActor()),
-		//		*Hit.ImpactNormal.ToString()
-		//	);
 
-		//	// 벽에 박으면 멈추고 싶으면 여기서 EndChargeMove 호출
-		//	// EndChargeMove();
-		//}
+		AttackWarningRangeSceneComponent->SetRelativeScale3D(FVector(CurrentScale, CurrentScale, 1.f));
+
+
+		if(AttackWarningElapsedTime > AttackWarningDuration)
+		{
+			// 여기서 다시 재생시키면 될듯 
+			AttackWarningRangeSceneComponent->SetVisibility(false, true);
+		}
 	}
 	
 
@@ -348,17 +377,6 @@ void ATalythra::StartChargeMove()
 	if (HasAuthority() == false)
 		return;
 
-	if (AAIController* AIC = Cast<AAIController>(GetController()))
-	{
-		AIC->StopMovement();
-	}
-
-	UCharacterMovementComponent* CMC = GetCharacterMovement();
-	if (CMC)
-	{
-		CMC->StopMovementImmediately();
-	}
-
 	ChargeDirection = GetActorForwardVector();
 	ChargeDirection.Z = 0.f;
 	ChargeDirection = ChargeDirection.GetSafeNormal();
@@ -366,8 +384,6 @@ void ATalythra::StartChargeMove()
 	bChargeAttack = true;
 
 	Multicast_SetChargeMovementParams(true);
-
-	//GetCharacterMovement()->Velocity = ChargeDirection * 1800.f;
 }
 
 void ATalythra::EndChargeMove()
@@ -377,13 +393,45 @@ void ATalythra::EndChargeMove()
 
 	bChargeAttack = false;
 
-	if (UCharacterMovementComponent* CMC = GetCharacterMovement())
-	{
-		CMC->StopMovementImmediately();
-	}
-
 	Multicast_SetChargeMovementParams(false);
 }
+
+void ATalythra::Teleport_To_Player()
+{
+
+	if (HasAuthority() == false)
+		return; 
+
+
+	AAITalythraAIController* pAITalythraAIController = Cast<AAITalythraAIController>(GetController());
+	
+	AActor* pTargetActor = pAITalythraAIController->Get_CurrentTargetPlayer(); 
+	
+
+	// replicated는 위에 생성자에서 해줬으므로 mulit rpc 필요 x 
+	TeleportTo(pTargetActor->GetActorLocation(),GetActorRotation(),false,false);
+
+
+}
+
+void ATalythra::Attack_RangeRender(bool _bRenderOnOff)
+{
+	if (HasAuthority() == false)
+		return; 
+
+	if(_bRenderOnOff == true)
+	{
+		AttackRangeSceneComponent->SetRelativeScale3D(FVector(AttackAoeScale, AttackAoeScale, 1.f));
+		AttackWarningRangeSceneComponent->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
+		
+	}
+
+	Multicast_AttackRangeRender(_bRenderOnOff);
+
+
+}
+
+
 
 void ATalythra::DoFireProjectile()
 {
@@ -621,33 +669,45 @@ void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetim
 }
 
 
+void ATalythra::Multicast_AttackRangeRender_Implementation(bool _bRendrOnOff)
+{
+	AttackRangeSceneComponent->SetVisibility(_bRendrOnOff, true);
+	AttackWarningRangeSceneComponent->SetVisibility(_bRendrOnOff, true);
+
+	if (_bRendrOnOff == false)
+	{
+		AttackWarningRangeSceneComponent->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
+		AttackWarningElapsedTime = 0.0f;
+	}
+}
+
 void ATalythra::Multicast_AttackLine_Pattern_1_Off_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(false, true);
 }
 
 void ATalythra::Multicast_AttackLine_Pattern_2_Off_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(false, true);
-	ArrayDecalSceneComponent[1]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[1]->SetVisibility(false, true);
 }
 
 void ATalythra::Multicast_AttackLine_Pattern_3_Off_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(false, true);
-	ArrayDecalSceneComponent[1]->SetVisibility(false, true);
-	ArrayDecalSceneComponent[2]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[1]->SetVisibility(false, true);
+	ArrayProjectileLineSceneComponent[2]->SetVisibility(false, true);
 }
 
 void ATalythra::Multicast_AttackLine_Pattern_1_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(true, true);
 }
 
 void ATalythra::Multicast_AttackLine_Pattern_2_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(true, true);
-	ArrayDecalSceneComponent[1]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[1]->SetVisibility(true, true);
 
 
 	const FName SocketName = TEXT("WP_Center");
@@ -661,22 +721,22 @@ void ATalythra::Multicast_AttackLine_Pattern_2_Implementation()
 	const FVector BaseDirection =
 		-SocketTransform.GetUnitAxis(EAxis::Y).GetSafeNormal();
 
-	FRotator DecalRotation;
+	FRotator AttackLineRotation;
 
-	DecalRotation = BaseDirection.RotateAngleAxis(10.0f, FVector::UpVector).Rotation();
-	ArrayDecalSceneComponent[0]->SetWorldRotation(DecalRotation);
+	AttackLineRotation = BaseDirection.RotateAngleAxis(10.0f, FVector::UpVector).Rotation();
+	ArrayProjectileLineSceneComponent[0]->SetWorldRotation(AttackLineRotation);
 
 
-	DecalRotation = BaseDirection.RotateAngleAxis(-10.0f, FVector::UpVector).Rotation();
-	ArrayDecalSceneComponent[1]->SetWorldRotation(DecalRotation);
+	AttackLineRotation = BaseDirection.RotateAngleAxis(-10.0f, FVector::UpVector).Rotation();
+	ArrayProjectileLineSceneComponent[1]->SetWorldRotation(AttackLineRotation);
 
 }
 
 void ATalythra::Multicast_AttackLine_Pattern_3_Implementation()
 {
-	ArrayDecalSceneComponent[0]->SetVisibility(true, true);
-	ArrayDecalSceneComponent[1]->SetVisibility(true, true);
-	ArrayDecalSceneComponent[2]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[0]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[1]->SetVisibility(true, true);
+	ArrayProjectileLineSceneComponent[2]->SetVisibility(true, true);
 
 
 	const FName SocketName = TEXT("WP_Center");
@@ -690,19 +750,17 @@ void ATalythra::Multicast_AttackLine_Pattern_3_Implementation()
 	const FVector BaseDirection =
 		-SocketTransform.GetUnitAxis(EAxis::Y).GetSafeNormal();
 
-	FRotator DecalRotation;
+	FRotator AttackLineRotation;
 
-	DecalRotation = BaseDirection.RotateAngleAxis(0.0f, FVector::UpVector).Rotation();
-	ArrayDecalSceneComponent[0]->SetWorldRotation(DecalRotation);
+	AttackLineRotation = BaseDirection.RotateAngleAxis(0.0f, FVector::UpVector).Rotation();
+	ArrayProjectileLineSceneComponent[0]->SetWorldRotation(AttackLineRotation);
 
-	DecalRotation = BaseDirection.RotateAngleAxis(-15.0f, FVector::UpVector).Rotation();
-	ArrayDecalSceneComponent[1]->SetWorldRotation(DecalRotation);
+	AttackLineRotation = BaseDirection.RotateAngleAxis(-15.0f, FVector::UpVector).Rotation();
+	ArrayProjectileLineSceneComponent[1]->SetWorldRotation(AttackLineRotation);
 
-	DecalRotation = BaseDirection.RotateAngleAxis(15.0f, FVector::UpVector).Rotation();
-	ArrayDecalSceneComponent[2]->SetWorldRotation(DecalRotation);
+	AttackLineRotation = BaseDirection.RotateAngleAxis(15.0f, FVector::UpVector).Rotation();
+	ArrayProjectileLineSceneComponent[2]->SetWorldRotation(AttackLineRotation);
 }
-
-
 
 
 void ATalythra::Multicast_PlayMuzzleEffect_Implementation(FVector SpawnLocation, FRotator SpawnRotation)
@@ -731,8 +789,8 @@ void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMod
 
 	if (bChargeMode)
 	{
-		CMC->MaxWalkSpeed = 1800.f;
-		CMC->MaxAcceleration = 20000.f;
+		CMC->MaxWalkSpeed = 6000.f;
+		CMC->MaxAcceleration = 60000.f;
 		CMC->GroundFriction = 0.f;
 		CMC->BrakingDecelerationWalking = 0.f;
 		CMC->BrakingFrictionFactor = 0.f;
@@ -746,3 +804,18 @@ void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMod
 		CMC->BrakingFrictionFactor = 2.f;
 	}
 }
+
+
+
+
+//const float ChargeSpeed = 2600.f;
+
+	//GetCharacterMovement()->Velocity = ChargeDirection * 1800.f;
+
+		/*FHitResult Hit;
+
+	AddActorWorldOffset(
+		ChargeDirection * ChargeSpeed * DeltaTime,
+		true,
+		&Hit
+	);*/

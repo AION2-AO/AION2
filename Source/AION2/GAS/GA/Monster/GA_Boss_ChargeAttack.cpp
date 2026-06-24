@@ -8,6 +8,7 @@
 
 
 
+
 UGA_Boss_ChargeAttack::UGA_Boss_ChargeAttack()
 {
 	// Ability 자체에 태그를 붙이는 의미 
@@ -124,6 +125,8 @@ void UGA_Boss_ChargeAttack::EndAbility(
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
 }
+
+
 
 void UGA_Boss_ChargeAttack::OnCompleteCallback()
 {

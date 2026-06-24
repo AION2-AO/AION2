@@ -3,6 +3,8 @@
 #include "GAS/AOGameplayTags.h"
 #include "Character/AOCharacterMovementComponent.h"
 #include "Data/DA_AbilitySet.h"
+#include "Physics/Collision.h"
+#include "Player/AOPlayerController.h"
 
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
@@ -10,6 +12,8 @@
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
+
+const float TargetTraceRadius = 2000.0f;
 
 ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer)
@@ -61,24 +65,6 @@ ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
 	Wing->SetVisibility(false);
 }
 
-void ADaeva::Multicast_PlayWingMontage_Implementation(EMontageID MontageID, float PlayRate)
-{
-	if (!Wing || !WingMontages[MontageID])
-	{
-		return;
-	}
-
-	if (UAnimInstance* WingAnimInstance = Wing->GetAnimInstance())
-	{
-		WingAnimInstance->Montage_Play(WingMontages[MontageID], PlayRate);
-	}
-}
-
-void ADaeva::Multicast_SetWingVisibility_Implementation(bool NewVisible)
-{
-	SetWingVisibility(NewVisible);
-}
-
 void ADaeva::BeginPlay()
 {
 	Super::BeginPlay();
@@ -89,6 +75,13 @@ void ADaeva::BeginPlay()
 void ADaeva::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	//ValidateTarget();
+	//if (!CurrentTarget)
+	//{
+	//	SearchTarget();
+	//	//GetWorldTimerManager().SetTimer(TargetSearchTimer, this, &ThisClass::SearchTarget, 1.0f, true);
+	//}
 
 	Tick_Camera(DeltaTime);
 }
@@ -124,15 +117,117 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &ADaeva::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &ADaeva::Look);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &ADaeva::Zoom);
-		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ADaeva::InputShiftPressed);
+		EnhancedInputComponent->BindAction(ShiftAction, ETriggerEvent::Started, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Dash));
 		EnhancedInputComponent->BindAction(SpaceAction, ETriggerEvent::Started, this, &ADaeva::InputSpacePressed);
 		EnhancedInputComponent->BindAction(LBAction, ETriggerEvent::Triggered, this, &ADaeva::InputLBPressed);
+		EnhancedInputComponent->BindAction(RBAction, ETriggerEvent::Triggered, this, &ADaeva::InputRBPressed);
+		EnhancedInputComponent->BindAction(Key1Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key1));
+		EnhancedInputComponent->BindAction(Key2Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key2));
+		EnhancedInputComponent->BindAction(Key3Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key3));
+		EnhancedInputComponent->BindAction(Key4Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key4));
+		EnhancedInputComponent->BindAction(KeyQAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyQ));
+		EnhancedInputComponent->BindAction(KeyEAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyE));
 	}
 }
 
 void ADaeva::Tick_Camera(float DeltaTime)
 {
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, TargetZoomDistance, DeltaTime, 10.f);
+}
+
+void ADaeva::Multicast_PlayWingMontage_Implementation(EMontageID MontageID, float PlayRate)
+{
+	if (!Wing || !WingMontages[MontageID])
+	{
+		return;
+	}
+
+	if (UAnimInstance* WingAnimInstance = Wing->GetAnimInstance())
+	{
+		WingAnimInstance->Montage_Play(WingMontages[MontageID], PlayRate);
+	}
+}
+
+void ADaeva::Multicast_SetWingVisibility_Implementation(bool NewVisible)
+{
+	SetWingVisibility(NewVisible);
+}
+
+void ADaeva::Client_PlayCameraShake_Implementation()
+{
+	APlayerController* PC = Cast<APlayerController>(GetController());
+	if (!PC || !CameraShakeClass)
+	{
+		return;
+	}
+
+	PC->ClientStartCameraShake(CameraShakeClass);
+}
+
+bool ADaeva::SearchTarget()
+{
+	TArray<FHitResult> OutHitResults;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(TargetingTrace), false, this);
+
+	FVector SweepStart = GetActorLocation();
+	FVector SweepEnd = SweepStart;
+	bool bHitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, SweepStart, SweepEnd, FQuat::Identity, CCHANNEL_TARGETING, FCollisionShape::MakeSphere(TargetTraceRadius), Params);
+
+	if (!bHitDetected)
+	{
+		return false;
+	}
+
+	struct FTargetCandidate
+	{
+		TObjectPtr<AAOCharacter> Target;
+		float ScreenDistanceSquared;
+		float WorldDistanceSquared;
+	};
+
+	TArray<FTargetCandidate> Candidates;
+	for (const FHitResult& HitResult : OutHitResults)
+	{
+		AAOCharacter* HitActor = Cast<AAOCharacter>(HitResult.GetActor());
+		if (!IsValid(HitActor))
+		{
+			continue;
+		}
+
+		//if (!IsEnemy(HitActor))
+		//{
+		//	continue;
+		//}
+
+		if (!IsFrontOfCamera(HitActor))
+		{
+			continue;
+		}
+
+		Candidates.Emplace(HitActor, CalcDistanceSquaredToScreenCenter(HitActor), FVector::DistSquared(GetActorLocation(), HitActor->GetActorLocation()));
+	}
+
+	if (Candidates.IsEmpty())
+	{
+		return false;
+	}
+
+	Candidates.Sort(
+		[](const FTargetCandidate& A, const FTargetCandidate& B)
+		{
+			if (!FMath::IsNearlyEqual(A.ScreenDistanceSquared, B.ScreenDistanceSquared, 100.f))
+			{
+				return A.ScreenDistanceSquared < B.ScreenDistanceSquared;
+			}
+
+			return A.WorldDistanceSquared < B.WorldDistanceSquared;
+		}
+	);
+
+	CurrentTarget = Candidates[0].Target;
+
+	return true;
 }
 
 void ADaeva::Move(const FInputActionValue& Value)
@@ -181,6 +276,11 @@ void ADaeva::InitGAS()
 
 	ASC = GASPS->GetAbilitySystemComponent();
 	ASC->InitAbilityActorInfo(GASPS, this);
+
+	if (!ASC->HasMatchingGameplayTag(TEAM_DAEVA))
+	{
+		ASC->AddLooseGameplayTag(TEAM_DAEVA);
+	}
 
 	if (!bTagEventsRegistered)
 	{
@@ -262,9 +362,21 @@ void ADaeva::ApplyDashStaminaRegenEffect()
 	}
 }
 
-void ADaeva::InputShiftPressed()
+void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
 {
-	GASInputPressed(static_cast<int32>(EAbilityID::Dash));
+	Super::OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
+
+	PlayCameraShake(bDidShakeCamera);
+}
+
+void ADaeva::TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser)
+{
+	// Todo: 회피 & 리턴 처리
+	
+	Super::TakeDamageAO(AttackData, DamageCauser);
+
+	bool bDidShakeCamera = false;
+	PlayCameraShake(bDidShakeCamera);
 }
 
 void ADaeva::InputSpacePressed()
@@ -301,6 +413,22 @@ void ADaeva::InputLBPressed()
 	}
 }
 
+void ADaeva::InputRBPressed()
+{
+	if (ASC->HasMatchingGameplayTag(COMBO_AVAILABLE_RB2))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::RB_2));
+	}
+	else if (ASC->HasMatchingGameplayTag(COMBO_AVAILABLE_RB3))
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::RB_3));
+	}
+	else
+	{
+		GASInputPressed(static_cast<int32>(EAbilityID::RB_1));
+	}
+}
+
 void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
 {
 	const bool bIsCombat = NewCount > 0;
@@ -331,6 +459,11 @@ void ADaeva::SetWingVisibility(bool NewVisible)
 	{
 		Wing->SetVisibility(NewVisible);
 	}
+
+	if (Parts[EDaevaPartType::Cape])
+	{
+		Parts[EDaevaPartType::Cape]->SetVisibility(!NewVisible);
+	}
 }
 
 void ADaeva::CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName)
@@ -341,4 +474,58 @@ void ADaeva::CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName)
 	PartMesh->SetLeaderPoseComponent(GetMesh());
 
 	Parts.Add(PartType, PartMesh);
+}
+
+void ADaeva::PlayCameraShake(bool& bDidShakeCamera)
+{
+	if (!bDidShakeCamera)
+	{
+		Client_PlayCameraShake();
+
+		bDidShakeCamera = true;
+	}
+}
+
+void ADaeva::ValidateTarget()
+{
+	if (!IsValid(CurrentTarget))
+	{
+		CurrentTarget = nullptr;
+		return;
+	}
+
+	//if (CurrentTarget->IsDead())
+	//{
+	//	CurrentTarget = nullptr;
+	//	return;
+	//}
+
+	if (FVector::DistSquared(GetActorLocation(), CurrentTarget->GetActorLocation()) > FMath::Square(TargetTraceRadius))
+	{
+		CurrentTarget = nullptr;
+	}
+}
+
+bool ADaeva::IsFrontOfCamera(AActor* Other)
+{
+	const FVector CameraLocation = Camera->GetComponentLocation();
+	const FVector CameraForward = Camera->GetForwardVector();
+	const FVector ToTarget = (Other->GetActorLocation() - CameraLocation).GetSafeNormal();
+	const float Dot = FVector::DotProduct(CameraForward, ToTarget);
+	return Dot > 0.0f;
+}
+
+float ADaeva::CalcDistanceSquaredToScreenCenter(AActor* Other)
+{
+	APlayerController* PC = GetWorld()->GetFirstPlayerController();
+
+	FVector2D ScreenPosition;
+	PC->ProjectWorldLocationToScreen(Other->GetActorLocation(), ScreenPosition);
+
+	int32 ViewportX, ViewportY;
+	PC->GetViewportSize(ViewportX, ViewportY);
+
+	FVector2D ScreenCenter(ViewportX * 0.5f, ViewportY * 0.5f);
+
+	return FVector2D::DistSquared(ScreenPosition, ScreenCenter);
 }

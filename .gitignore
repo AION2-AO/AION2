@@ -89,6 +89,7 @@ Config/DefaultEditorPerProjectUserSettings.ini
 x64/
 x86/
 
+/ProtoBufCore/
 /Protobuf/
 /Common/
 

@@ -9,4 +9,5 @@ void FAION2Module::StartupModule()
 void FAION2Module::ShutdownModule()
 {
 }
-	IMPLEMENT_MODULE(FAION2Module, AION2)
+
+IMPLEMENT_PRIMARY_GAME_MODULE(FAION2Module, AION2, "AION2");

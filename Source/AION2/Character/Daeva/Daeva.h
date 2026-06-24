@@ -33,7 +33,14 @@ enum class EMontageID : uint8
 	Glide,
 	GlideLand,
 	StopGlide,
-	LB
+	LB,
+	RB,
+	Key1,
+	Key2,
+	Key3,
+	Key4,
+	KeyQ,
+	KeyE
 };
 
 UENUM(BlueprintType)
@@ -45,7 +52,16 @@ enum class EAbilityID : uint8
 	StopGlide,
 	LB_1,
 	LB_2,
-	LB_3
+	LB_3,
+	RB_1,
+	RB_2,
+	RB_3,
+	Key1,
+	Key2,
+	Key3,
+	Key4,
+	KeyQ,
+	KeyE
 };
 
 UCLASS()
@@ -55,13 +71,6 @@ class AION2_API ADaeva : public AAOCharacter
 
 public:
 	ADaeva(const FObjectInitializer& ObjectInitializer);
-
-public:
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_PlayWingMontage(EMontageID MontageID, float PlayRate);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SetWingVisibility(bool NewVisible);
 
 protected:
 	virtual void BeginPlay() override;
@@ -73,6 +82,19 @@ protected:
 	
 private:
 	void Tick_Camera(float DeltaTime);
+
+public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayWingMontage(EMontageID MontageID, float PlayRate);
+
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_SetWingVisibility(bool NewVisible);
+
+	UFUNCTION(Client, Unreliable)
+	void Client_PlayCameraShake();
+
+public:
+	virtual bool SearchTarget() override;
 
 protected:
 	virtual void Move(const FInputActionValue& Value);
@@ -87,10 +109,14 @@ protected:
 
 	virtual void ApplyDashStaminaRegenEffect();
 
+protected:
+	virtual void OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera) override;
+	virtual void TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser) override;
+
 private:
-	void InputShiftPressed();
 	void InputSpacePressed();
 	void InputLBPressed();
+	void InputRBPressed();
 
 protected:
 	void OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount);
@@ -102,6 +128,10 @@ private:
 
 private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
+	void PlayCameraShake(bool& bDidShakeCamera);
+	void ValidateTarget();
+	bool IsFrontOfCamera(AActor* Other);
+	float CalcDistanceSquaredToScreenCenter(AActor* Other);
 
 public:
 	FORCEINLINE UAnimMontage* GetMontageByID(EMontageID Index) const { return Montages[Index]; }
@@ -121,54 +151,75 @@ private:
 	UPROPERTY(VisibleAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UCameraComponent> Camera;
 
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float ZoomSpeed = 100.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float MinZoomDistance = 100.f;
 
-	UPROPERTY(EditAnywhere, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
 	float MaxZoomDistance = 1200.f;
 
 	float TargetZoomDistance;
 
 private:
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> MoveAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> LookAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> ZoomAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> ShiftAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> SpaceAction;
 
-	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> LBAction;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> RBAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Key1Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Key2Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Key3Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> Key4Action;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> KeyQAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> KeyEAction;
+
 private:
-	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
 	TMap<EMontageID, TObjectPtr<UAnimMontage>> Montages;
 
-	UPROPERTY(EditAnywhere, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
 	TMap<EMontageID, TObjectPtr<UAnimMontage>> WingMontages;
 
 private:
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TMap<EDaevaPartType, TObjectPtr<USkeletalMeshComponent>> Parts;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> Weapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> SubWeapon;
 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
+	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> Wing;
 
 private:
@@ -182,4 +233,11 @@ private:
 	TSubclassOf<UGameplayEffect> DashStaminaRegenEffect;
 
 	bool bTagEventsRegistered = false;
+
+private:
+	UPROPERTY(EditDefaultsOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UCameraShakeBase> CameraShakeClass;
+
+private:
+	FTimerHandle TargetSearchTimer;
 };
