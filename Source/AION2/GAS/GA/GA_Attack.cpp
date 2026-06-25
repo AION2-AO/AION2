@@ -1,4 +1,5 @@
 #include "GAS/GA/GA_Attack.h"
+#include "GAS/GA/AT/AT_RotateToTarget.h"
 #include "GAS/AOGameplayTags.h"
 #include "Character/Daeva/Daeva.h"
 
@@ -36,6 +37,17 @@ void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const 
     UAbilityTask_WaitGameplayEvent* WaitHitCheckTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, EVENT_CHECKATTACKHIT);
     WaitHitCheckTask->EventReceived.AddDynamic(this, &UGA_Attack::OnCheckAttackHitEvent);
     WaitHitCheckTask->ReadyForActivation();
+
+    AAOCharacter* Target = Daeva->GetCurrentTarget();
+    if (IsValid(Target))
+    {
+        FVector Direction = Target->GetActorLocation() - Daeva->GetActorLocation();
+        Direction.Z = 0.f;
+        Daeva->SetActorRotation(Direction.Rotation());
+    }
+
+    UAT_RotateToTarget* RotateTask = UAT_RotateToTarget::RotateToTarget(this, AttackData.AvailableRange, 15.f);
+    RotateTask->ReadyForActivation();
 }
 
 void UGA_Attack::OnMontageTaskFinished()

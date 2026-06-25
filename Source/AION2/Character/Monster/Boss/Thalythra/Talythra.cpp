@@ -12,7 +12,6 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "AbilitySystemComponent.h"
 #include "Abilities/GameplayAbility.h"
-#include "AI/AITalythraAIController.h"
 #include "GAS/AOGameplayTags.h"
 
 
@@ -44,18 +43,18 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 
 	static ConstructorHelpers::FObjectFinder<UNiagaraSystem> LanuchMazzleEffectRef(TEXT("/Game/Asset/MagicProjectiles/Niagara/Poison_Glob/PG_Ver3/NS_PoisonGlob_Muzzle_03.NS_PoisonGlob_Muzzle_03"));
 
-	if(LanuchMazzleEffectRef.Object != NULL)
+	if (LanuchMazzleEffectRef.Object != NULL)
 	{
 		LanchMuzzleEffect = LanuchMazzleEffectRef.Object;
 	}
 
 
 	static ConstructorHelpers::FObjectFinder<UAnimMontage> ChargeAttackMontageRef(TEXT("/Game/Blueprint/Monster/Boss/Talythra/Montage/AM_Thalythra_ChargeAttack.AM_Thalythra_ChargeAttack"));
-	if(ChargeAttackMontageRef.Object != NULL)
+	if (ChargeAttackMontageRef.Object != NULL)
 	{
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
-	
+
 
 
 	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
@@ -63,8 +62,8 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 
-	
-	bReplicates = true; 
+
+	bReplicates = true;
 	SetReplicateMovement(true);
 
 
@@ -92,18 +91,18 @@ void ATalythra::PostInitializeComponents()
 void ATalythra::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
-	if(HasAuthority()) // 서버인 경우 
+
+
+	if (HasAuthority()) // 서버인 경우 
 	{
-		for( const auto& Ability : HasAbilities) // 능력들 저장. 
+		for (const auto& Ability : HasAbilities) // 능력들 저장. 
 		{
 			FGameplayAbilitySpec AbilitySpec(Ability.Value);
 			ASC->GiveAbility(AbilitySpec);
 		}
 	}
 
-	
+
 
 #pragma region Attack_Line SceneComponents
 
@@ -139,7 +138,7 @@ void ATalythra::BeginPlay()
 
 		else if (NameString.Contains(TEXT("AOE Warning Circle")))
 		{
-			AttackWarningRangeSceneComponent = SceneComp; 
+			AttackWarningRangeSceneComponent = SceneComp;
 			SceneComp->SetVisibility(false, true);
 		}
 
@@ -161,7 +160,17 @@ void ATalythra::Tick(float DeltaTime)
 
 	if (bChargeAttack)
 	{
-		AddMovementInput(ChargeDirection, 1.0f, false);
+		if (CanMoveOnNavMesh(ChargeDirection, DeltaTime * 3.f))
+		{
+			AddMovementInput(ChargeDirection, 1.0f, false);
+		}
+
+		else
+		{
+			GetCharacterMovement()->StopMovementImmediately();
+			EndChargeMove();
+		}
+
 	}
 
 
@@ -175,7 +184,7 @@ void ATalythra::Tick(float DeltaTime)
 			0.0f,
 			1.0f
 		);
-		
+
 		const float CurrentScale = FMath::Lerp(
 			0.01f,
 			AttackWarningTargetScale,
@@ -186,13 +195,13 @@ void ATalythra::Tick(float DeltaTime)
 		AttackWarningRangeSceneComponent->SetRelativeScale3D(FVector(CurrentScale, CurrentScale, 1.f));
 
 
-		if(AttackWarningElapsedTime > AttackWarningDuration)
+		if (AttackWarningElapsedTime > AttackWarningDuration)
 		{
 			// 여기서 다시 재생시키면 될듯 
 			AttackWarningRangeSceneComponent->SetVisibility(false, true);
 		}
 	}
-	
+
 
 }
 
@@ -213,7 +222,7 @@ void ATalythra::FireProjectile()
 
 	//---
 	// 서버에서만 발사체 생성
-	if(HasAuthority() == false)
+	if (HasAuthority() == false)
 	{
 		return;
 	}
@@ -227,10 +236,10 @@ void ATalythra::FireProjectile()
 		GetWorld()->GetTimerManager().SetTimerForNextTick(
 			FTimerDelegate::CreateUObject(this, &ATalythra::DoFireProjectile)
 		);
-		
+
 		FireCount += 1;
 	}
-		break;
+	break;
 	case 2:
 	{
 		// 노티파이는 애님 평가 중 → 다음 틱으로 미뤄서 안전하게 처리
@@ -238,9 +247,9 @@ void ATalythra::FireProjectile()
 			FTimerDelegate::CreateUObject(this, &ATalythra::DoFireProjectile_2)
 		);
 
-		FireCount += 1; 
+		FireCount += 1;
 	}
-		break;
+	break;
 
 	case 3:
 	{
@@ -249,9 +258,9 @@ void ATalythra::FireProjectile()
 			FTimerDelegate::CreateUObject(this, &ATalythra::DoFireProjectile_3)
 		);
 
-		FireCount = 1; 
+		FireCount = 1;
 	}
-		break;
+	break;
 	}
 
 
@@ -296,7 +305,7 @@ void ATalythra::TurnToTarget()
 
 	AActor* pPlayer = TalythraAIController->Get_CurrentTargetPlayer();
 	if (pPlayer == nullptr)
-		return; 
+		return;
 
 
 
@@ -316,21 +325,21 @@ void ATalythra::TurnToTarget()
 
 
 	// 두 벡터를 외적하여 회전 방향 구하기 
-	
+
 	// 라디안 각도
 	const float Radian = FMath::Acos(Dot);
 
 	// 도 단위 각도
 	const float Degree = FMath::RadiansToDegrees(Radian);
-	
+
 	FVector Cross = FVector::CrossProduct(vDirMonsterFowradVector, vDirNoramlToPlayer);
 
-	
-	if(FMath::Abs(Degree) < 2.0f)
+
+	if (FMath::Abs(Degree) < 2.0f)
 	{
 		// 여기서 회전 끄기 미세한 떨림 여기서 발생 bRotation 을 추가해서 그만 회전하게 하자!
 
-		RotationAble = false; 
+		RotationAble = false;
 
 		return;
 	}
@@ -338,9 +347,9 @@ void ATalythra::TurnToTarget()
 
 
 	if (RotationAble == false)
-		return; 
+		return;
 
-	
+
 	const float DeltaTime = GetWorld()->GetDeltaSeconds();
 	const float TurnSpeed = GetCharacterMovement()->RotationRate.Yaw;
 
@@ -349,7 +358,7 @@ void ATalythra::TurnToTarget()
 	const float StepDegree = FMath::Min(abs(Degree), DeltaTime * TurnSpeed);
 
 
-	if(Cross.Z > 0.f)
+	if (Cross.Z > 0.f)
 	{
 		// 시계 방향 → 오른쪽 회전
 		// 여기서 현재 포워트 벡터 기준으로 회전!
@@ -365,9 +374,9 @@ void ATalythra::TurnToTarget()
 
 
 
-	
-	
-	
+
+
+
 }
 
 
@@ -388,7 +397,7 @@ void ATalythra::StartChargeMove()
 
 void ATalythra::EndChargeMove()
 {
-	if(HasAuthority() == false)
+	if (HasAuthority() == false)
 		return;
 
 	bChargeAttack = false;
@@ -400,16 +409,16 @@ void ATalythra::Teleport_To_Player()
 {
 
 	if (HasAuthority() == false)
-		return; 
+		return;
 
 
 	AAITalythraAIController* pAITalythraAIController = Cast<AAITalythraAIController>(GetController());
-	
-	AActor* pTargetActor = pAITalythraAIController->Get_CurrentTargetPlayer(); 
-	
+
+	AActor* pTargetActor = pAITalythraAIController->Get_CurrentTargetPlayer();
+
 
 	// replicated는 위에 생성자에서 해줬으므로 mulit rpc 필요 x 
-	TeleportTo(pTargetActor->GetActorLocation(),GetActorRotation(),false,false);
+	TeleportTo(pTargetActor->GetActorLocation(), GetActorRotation(), false, false);
 
 
 }
@@ -417,13 +426,13 @@ void ATalythra::Teleport_To_Player()
 void ATalythra::Attack_RangeRender(bool _bRenderOnOff)
 {
 	if (HasAuthority() == false)
-		return; 
+		return;
 
-	if(_bRenderOnOff == true)
+	if (_bRenderOnOff == true)
 	{
 		AttackRangeSceneComponent->SetRelativeScale3D(FVector(AttackAoeScale, AttackAoeScale, 1.f));
 		AttackWarningRangeSceneComponent->SetRelativeScale3D(FVector(1.f, 1.f, 1.f));
-		
+
 	}
 
 	Multicast_AttackRangeRender(_bRenderOnOff);
@@ -472,8 +481,8 @@ void ATalythra::DoFireProjectile()
 
 	if (Projectile == nullptr)
 	{
-		return; 
-    }
+		return;
+	}
 
 
 	Projectile->InitVelocityAndDirection(BaseDirection);
@@ -537,7 +546,7 @@ void ATalythra::DoFireProjectile_2()
 	);
 
 
-	
+
 
 
 	if (Projectile_1)
@@ -661,7 +670,7 @@ void ATalythra::DoFireProjectile_3()
 void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
-	
+
 	DOREPLIFETIME(ATalythra, Phase);
 	DOREPLIFETIME(ATalythra, State);
 	DOREPLIFETIME(ATalythra, bLockPelvis);
@@ -765,7 +774,7 @@ void ATalythra::Multicast_AttackLine_Pattern_3_Implementation()
 
 void ATalythra::Multicast_PlayMuzzleEffect_Implementation(FVector SpawnLocation, FRotator SpawnRotation)
 {
-	if(LanchMuzzleEffect == nullptr)
+	if (LanchMuzzleEffect == nullptr)
 	{
 		return;
 	}
@@ -776,7 +785,7 @@ void ATalythra::Multicast_PlayMuzzleEffect_Implementation(FVector SpawnLocation,
 		SpawnLocation,
 		SpawnRotation,
 		FVector(4.5f, 4.5f, 4.5f)  // Scale
-	); 
+	);
 
 }
 
@@ -789,8 +798,8 @@ void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMod
 
 	if (bChargeMode)
 	{
-		CMC->MaxWalkSpeed = 6000.f;
-		CMC->MaxAcceleration = 60000.f;
+		CMC->MaxWalkSpeed = 5000.f;
+		CMC->MaxAcceleration = 50000.f;
 		CMC->GroundFriction = 0.f;
 		CMC->BrakingDecelerationWalking = 0.f;
 		CMC->BrakingFrictionFactor = 0.f;
@@ -804,18 +813,3 @@ void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMod
 		CMC->BrakingFrictionFactor = 2.f;
 	}
 }
-
-
-
-
-//const float ChargeSpeed = 2600.f;
-
-	//GetCharacterMovement()->Velocity = ChargeDirection * 1800.f;
-
-		/*FHitResult Hit;
-
-	AddActorWorldOffset(
-		ChargeDirection * ChargeSpeed * DeltaTime,
-		true,
-		&Hit
-	);*/

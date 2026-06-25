@@ -15,6 +15,9 @@ public:
 	int32 GetHp() { return _hp; }
 	int32 GetExp() { return _exp; }
 
+	void SetPos(Protocol::Vector3 inPos) { _playerPos = inPos; }
+	void SetRot(Protocol::Rotator3 inRot) { _playerRot = inRot; }
+
 	Protocol::Vector3 GetPos() { return _playerPos; }
 	Protocol::Rotator3 GetRot() { return _playerRot; }
 

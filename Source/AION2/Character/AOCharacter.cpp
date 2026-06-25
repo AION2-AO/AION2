@@ -18,9 +18,8 @@ void AAOCharacter::Multicast_DrawDebugCapsuleCollider_Implementation(const FVect
 	DrawDebugCapsuleCollider(CapsuleOrigin, CapsuleHalfHeight, AttackRadius, DrawColor);
 }
 
-bool AAOCharacter::SearchTarget()
+void AAOCharacter::SearchTarget()
 {
-	return false;
 }
 
 void AAOCharacter::CheckAttackHit(const FAttackData& AttackData)
@@ -60,10 +59,10 @@ void AAOCharacter::CheckAttackHit(const FAttackData& AttackData)
 			continue;
 		}
 		
-		if (!IsEnemy(HitActor))
-		{
-			continue;
-		}
+		//if (!IsEnemy(HitActor))
+		//{
+		//	continue;
+		//}
 
 		OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
 	}
@@ -85,7 +84,7 @@ void AAOCharacter::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitA
 		return;
 	}
 
-	// Target->TakeDamageAO(AttackData, this);
+	Target->TakeDamageAO(AttackData, this);
 	// gc
 }
 
@@ -98,9 +97,9 @@ void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, AAOCharacter* Dam
 		return;
 	}
 
-	FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
-	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffect, 1, Context);
-	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+	//FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
+	//FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffect, 1, Context);
+	//SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 }
 
 bool AAOCharacter::IsEnemy(AActor* TargetActor)

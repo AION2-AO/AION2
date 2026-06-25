@@ -110,7 +110,6 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 			loginSuccess = true;
 			if (isFirstRow)
 			{
-
 				GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 				PlayerRef player = ObjectUtils::CreatePlayer(gameSession);
 				player->SetPlayerInfo(playerClass, exp, gold, hp);
@@ -166,9 +165,23 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 
 bool PacketHandler::HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt)
 {
+	std::cout << "Handle Map Complete\n";
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	PlayerRef player = gameSession->_player;
 	GRoom->DoAsync(&Room::HandleEnterPlayer, player);
 
 	return false;
+}
+
+bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+
+	PlayerRef player = gameSession->_player;
+	if (player == nullptr)
+		return false;
+
+	GRoom->DoAsync(&Room::HandleMove, pkt, player);
+
+	return true;
 }

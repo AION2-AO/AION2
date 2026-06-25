@@ -22,7 +22,6 @@ void AAOGameMode::BeginPlay()
 void AAOGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	NetworkManager = GameInst->GetNetworkManager();
 	if (NetworkManager)
 		NetworkManager->ProcessQueuePackets();
 }

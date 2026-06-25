@@ -3,13 +3,9 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Modules/ModuleManager.h"
+#include "Game/AOGameInstance.h"
 
-class FAION2Module : public IModuleInterface
-{
-public:
-    virtual void StartupModule() override;
-    virtual void ShutdownModule() override;
-};
-
-
+#define SEND_PACKET(pkt, pktId)\
+UAOGameInstance* GameInstance = Cast<UAOGameInstance>(GetWorld()->GetGameInstance());\
+if(!GameInstance)return;\
+GameInstance->SendPacket(pkt, pktId);

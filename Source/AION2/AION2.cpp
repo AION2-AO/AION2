@@ -2,12 +2,4 @@
 
 #include "AION2.h"
 
-void FAION2Module::StartupModule()
-{
-}
-
-void FAION2Module::ShutdownModule()
-{
-}
-
-IMPLEMENT_PRIMARY_GAME_MODULE(FAION2Module, AION2, "AION2");
+IMPLEMENT_PRIMARY_GAME_MODULE(FDefaultGameModuleImpl, AION2, "AION2");

@@ -6,6 +6,7 @@
 #include "Interface/CombatInterface.h"
 #include "AOCharacter.generated.h"
 
+
 UCLASS(Abstract)
 class AION2_API AAOCharacter : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
 {
@@ -19,7 +20,7 @@ public:
 	void Multicast_DrawDebugCapsuleCollider(const FVector& CapsuleOrigin, const float CapsuleHalfHeight, const float AttackRadius, const FColor DrawColor);
 
 public:
-	virtual bool SearchTarget();
+	virtual void SearchTarget();
 
 public:
 	virtual void CheckAttackHit(const FAttackData& AttackData) override;
@@ -39,6 +40,9 @@ protected:
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	FORCEINLINE AAOCharacter* GetCurrentTarget() const { return CurrentTarget; }
+
+public:
+	FORCEINLINE void SetCurrentTarget(AAOCharacter* NewTarget) { CurrentTarget = NewTarget; }
 
 protected:
 	UPROPERTY()

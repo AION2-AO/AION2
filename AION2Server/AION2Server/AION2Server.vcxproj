@@ -170,16 +170,17 @@
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions);DT_POLYREF64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\AION2\Source\ProtoBufCore\libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -188,32 +189,34 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DT_POLYREF64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\AION2\Source\ProtoBufCore\libprotobuf.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;DT_POLYREF64;%(PreprocessorDefinitions);DT_POLYREF64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\AION2\Source\ProtoBufCore\libprotobufd.lib;%(AdditionalDependencies)</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -222,16 +225,17 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions);DT_POLYREF64</PreprocessorDefinitions>
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\vcpkg\installed\x64-windows\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
       <GenerateDebugInformation>true</GenerateDebugInformation>
+      <AdditionalDependencies>C:\AION2\Source\ProtoBufCore\libprotobuf.lib;%(AdditionalDependencies);C:\AION2\Source\ProtoBufCore\libprotobuf$(DebugSuffix).lib</AdditionalDependencies>
     </Link>
   </ItemDefinitionGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

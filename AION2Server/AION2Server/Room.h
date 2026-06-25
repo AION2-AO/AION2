@@ -1,5 +1,7 @@
 #pragma once
 #include "JobQueue.h"
+#include "Protocol.pb.h"
+
 #include <map>
 
 // ´øÀü
@@ -15,7 +17,7 @@ public:
 
 	bool HandleEnterPlayer(PlayerRef player);
 	bool HandleLeavePlayer(PlayerRef player);
-	void HandleMove(/*Protocol::C_MOVE pkt*/);
+	void HandleMove(Protocol::C_MovePacket pkt, PlayerRef player);
 
 	void AddPlayer(PlayerRef player);
 

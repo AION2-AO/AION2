@@ -3,15 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Character.h"
-#include "Character/AOCharacter.h"
-#include "AI/Types/AIPhaseFlag.h"
+#include "Character/Monster/AOMonsterBase.h"
 #include "Talythra.generated.h"
 
 
 
 UCLASS()
-class AION2_API ATalythra : public AAOCharacter
+class AION2_API ATalythra : public AAOMonsterBase
 {
 	GENERATED_BODY()
 
@@ -27,7 +25,7 @@ protected:
 	virtual void BeginPlay() override;
 
 
-public:	
+public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -43,13 +41,13 @@ public:
 
 #pragma region Projectile
 	// 투사체 발사 함수( Animnotify와 같은 프레임에 발사하면 오류발생함 주의!) 
-	void FireProjectile(); 
+	void FireProjectile();
 	// 투사체 발사 전에 타겟 플레이어를 바라보도록 하는 함수
-	void TurnToTarget(); 
+	void TurnToTarget();
 
 
 	// 회전을 할때 미세한 각도로 인한 떨림 방지 현상을 위한 bool
-	void Set_RotationAble(bool RotationOnOff)   { RotationAble = RotationOnOff; }
+	void Set_RotationAble(bool RotationOnOff) { RotationAble = RotationOnOff; }
 	// 투사체 발사 Line 렌더링 On/Off
 	void Set_AttackLineRenderOnOff(bool _OnOff) { AttackLineRenderOnOff = _OnOff; }
 
@@ -63,17 +61,17 @@ public:
 	// 보스 Charge 골반뼈 고정 bool 함수 
 	FORCEINLINE void Set_LockPevis(bool _bLock) { bLockPelvis = _bLock; }
 	// 보스 Charge는 루트모션이 x -> 직접 이동을 주는 함수
-	FORCEINLINE void Set_ChargeAttackMove(bool _bAttack) { bChargeAttack = _bAttack;}
+	FORCEINLINE void Set_ChargeAttackMove(bool _bAttack) { bChargeAttack = _bAttack; }
 	// 보스 Charge 방향 설정
 	FORCEINLINE void Set_ChargeAttackDir(FVector _vector) { ChargeDirection = _vector; }
-	void StartChargeMove();	
+	void StartChargeMove();
 	void EndChargeMove();
 #pragma endregion 
-	
+
 
 #pragma region  Teleport 
 	// Teleport 기능 
-	void Teleport_To_Player(); 
+	void Teleport_To_Player();
 	void Attack_RangeRender(bool _bRenderOnOff);
 #pragma endregion 
 
@@ -82,13 +80,13 @@ public:
 #pragma region AOE Setting 
 	FORCEINLINE void Set_AoeScale(float _fscale) { AttackAoeScale = _fscale; }
 	FORCEINLINE void Set_AoeWaringTargetScale(float _fscale) { AttackWarningTargetScale = _fscale; }
-	FORCEINLINE void Set_AoeWaringDuartion(float _fDuration) {AttackWarningDuration = _fDuration;}
+	FORCEINLINE void Set_AoeWaringDuartion(float _fDuration) { AttackWarningDuration = _fDuration; }
 #pragma endregion 
 
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
-	
+
 	// 투사체 발사 이펙트. 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_PlayMuzzleEffect(FVector SpawnLocation, FRotator SpawnRotation);
@@ -97,7 +95,7 @@ protected:
 #pragma region Attack of Area Effect Component ( MutiCast )
 	// Attack Line On/Off 기능. 
 	UFUNCTION(NetMulticast, Unreliable)
-	void Multicast_AttackLine_Pattern_1(); 
+	void Multicast_AttackLine_Pattern_1();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_1_Off();
@@ -111,13 +109,13 @@ protected:
 	void Multicast_AttackLine_Pattern_2_Off();
 
 
-	
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_3();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_3_Off();
-	
+
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_SetChargeMovementParams(bool bChargeMode);
 
@@ -134,7 +132,7 @@ protected:
 	FName ProjectileSocketName = TEXT("WP_Center");
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "VFX")
-	TObjectPtr<class UNiagaraSystem> LanchMuzzleEffect; 
+	TObjectPtr<class UNiagaraSystem> LanchMuzzleEffect;
 
 #pragma region AOE_Indicator_Line
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "RangeEffect")
@@ -151,13 +149,13 @@ protected:
 	// GAS 관련
 protected:
 	UPROPERTY(EditAnywhere, Category = "GAS")
-	TMap<FName, TSubclassOf<class UGameplayAbility>> HasAbilities; 
+	TMap<FName, TSubclassOf<class UGameplayAbility>> HasAbilities;
 
 
 	// 몽타주 관련 
 protected:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = Animation)
-	TObjectPtr<class UAnimMontage> ChargeAttackMontage; 
+	TObjectPtr<class UAnimMontage> ChargeAttackMontage;
 
 
 
@@ -178,10 +176,10 @@ private:
 	int FireCount = 1;
 
 	UPROPERTY(VisibleAnywhere)
-	bool RotationAble = false; 
+	bool RotationAble = false;
 
 	UPROPERTY(VisibleAnywhere)
-	bool AttackLineRenderOnOff = false; 
+	bool AttackLineRenderOnOff = false;
 
 
 	UPROPERTY()
@@ -203,8 +201,8 @@ private:
 	float AttackWarningTargetScale = 10.f;
 
 	UPROPERTY(VisibleAnywhere)
-	float AttackWarningDuration = 1.3f; 
+	float AttackWarningDuration = 1.3f;
 
 	UPROPERTY(VisibleAnywhere)
-	float AttackWarningElapsedTime = 0.0f; 
+	float AttackWarningElapsedTime = 0.0f;
 };

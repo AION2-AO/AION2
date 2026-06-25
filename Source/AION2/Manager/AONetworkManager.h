@@ -5,7 +5,9 @@
 #include "CoreMinimal.h"
 #include "Subsystems/GameInstanceSubsystem.h"
 #include <Sockets.h>
+#include "Network/AONetworkReceiverWorker.h"
 #include "AONetworkManager.generated.h"
+
 
 UCLASS()
 class AION2_API UAONetworkManager : public UGameInstanceSubsystem
@@ -24,15 +26,15 @@ public:
 	void ResetBuffer();
 	void ProcessQueuePackets();
 	
+public:
+	class UAOGameInstance* GameInstance; 
+	class UAOPlayerManager* PlayerMng;
+
 private:
 	FSocket* ClientSocket;
 
-	TQueue<TArray<uint8>, EQueueMode::Spsc> ReceiveQueue;
-	FCriticalSection QueueLock;
+	// 리시버 워커 스레드를 소유할 고유 포인터 선언함
+	TUniquePtr<AONetworkReceiverWorker> ReceiverWorker;
 
-	TArray<uint8> ReceiverBuffer;
-
-	class UAOGameInstance* GameInstance;
-	class UAOPlayerManager* PlayerMng;
 	const int32 MAX_PACKET_SIZE = 65535;	
 };

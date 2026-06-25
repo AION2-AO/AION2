@@ -9,12 +9,20 @@ enum : uint16
 {
 	PKT_C_SIGNUP = 1000,
 	PKT_S_SIGNUP = 1001,
+
 	PKT_C_LOGIN = 1002,
 	PKT_S_SLOGIN = 1003,
 	PKT_S_FLOGIN = 1004,
 	PKT_S_ITEM = 1005,
+
 	PKT_C_MAPLOADCOMPLETE = 1006,
 	PKT_S_SPAWN = 1007,
+
+	PKT_C_MOVE = 1008,
+	PKT_S_MOVE = 1009,
+
+	PKT_C_DUNGEON_CREATE = 1010,
+	PKT_S_DUNZEON = 1011,
 
 
 };
@@ -32,11 +40,14 @@ public:
 		GPacketHandler[PKT_C_SIGNUP] = [](PacketSessionRef& session, BYTE* buffer, int len) { return HandlePacket<Protocol::C_SignUpPacket>(HandleSignUp, session, buffer, len); };
 		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_LoginPacket>(HandleLogin, session, buffer, len); };
 		GPacketHandler[PKT_C_MAPLOADCOMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
+		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MovePacket>(HandleMove, session, buffer, len); };
 	}
 
 	static bool HandleSignUp(PacketSessionRef& session, Protocol::C_SignUpPacket& pkt);
 	static bool HandleLogin(PacketSessionRef& session, Protocol::C_LoginPacket& pkt);
 	static bool HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt);
+	static bool HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt);
+
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
@@ -61,6 +72,7 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_LoginFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_FLOGIN); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_ItemDataPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_ITEM); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_SpawnPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SPAWN); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_MovePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MOVE); };
 
 private:
 	template<typename PacketType, typename ProcessFunc> 

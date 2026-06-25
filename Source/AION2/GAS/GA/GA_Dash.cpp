@@ -1,91 +1,171 @@
 #include "GAS/GA/GA_Dash.h"
+
 #include "Character/Daeva/Daeva.h"
-#include "GAS/AOGameplayTags.h"
-
-#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Character/AOCharacterMovementComponent.h"
-
-#include "AbilitySystemComponent.h"
+#include "GAS/AOGameplayTags.h"
 #include "GAS/AttributeSet/AOAttributeSet.h"
 
-void UGA_Dash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+#include "AbilitySystemComponent.h"
+#include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "GameFramework/Character.h"
+#include "GameFramework/CharacterMovementComponent.h"
+
+void UGA_Dash::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-    Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-    UAbilitySystemComponent* ASC = ActorInfo ? ActorInfo->AbilitySystemComponent.Get() : nullptr;
-    const UAOAttributeSet* AttributeSet = ASC ? ASC->GetSet<UAOAttributeSet>() : nullptr;
+	if (!ActorInfo || !ActorInfo->AbilitySystemComponent.IsValid())
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    if (AttributeSet)
-    {
-        UE_LOG(LogTemp, Warning, TEXT("[Dash Start] Stamina: %.1f / %.1f"),
-            AttributeSet->GetStamina(),
-            AttributeSet->GetMaxStamina());
-    }
-    else
-    {
-        UE_LOG(LogTemp, Error, TEXT("[Dash Start] AttributeSet is null"));
-    }
+	UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
 
-    if (ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get()))
-    {
-        if (Character->GetMovementComponent()->IsFalling() || Character->GetMovementComponent()->IsFlying() || (Character->GetCharacterMovement()->MovementMode == MOVE_Custom && Character->GetCharacterMovement()->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide)))
-        {
-            UE_LOG(LogTemp, Warning, TEXT("[Dash Failed - Movement State] Stamina: %.1f / %.1f"),
-                AttributeSet ? AttributeSet->GetStamina() : -1.f,
-                AttributeSet ? AttributeSet->GetMaxStamina() : -1.f);
+	const UAOAttributeSet* AttributeSet = ASC->GetSet<UAOAttributeSet>();
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] AttributeSet is null"));
 
-            EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-            return;
-        }
-    }
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    UE_LOG(LogTemp, Warning, TEXT("[Dash Before Commit] Stamina: %.1f / %.1f"),
-        AttributeSet ? AttributeSet->GetStamina() : -1.f,
-        AttributeSet ? AttributeSet->GetMaxStamina() : -1.f);
+	// Dash Cost GE를 CommitAbility에서 사용 중이라면
+	// 대시 시작 전에 스태미나를 먼저 검사한다.
+	if (AttributeSet->GetStamina() <= 0.0f)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Dash] Not enough stamina"));
 
-    if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
-    {
-        UE_LOG(LogTemp, Warning, TEXT("[Dash Commit Failed] Stamina: %.1f / %.1f"),
-            AttributeSet ? AttributeSet->GetStamina() : -1.f,
-            AttributeSet ? AttributeSet->GetMaxStamina() : -1.f);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-        EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
-        return;
-    }
+	ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
+	if (!Character)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] Character is null"));
 
-    UE_LOG(LogTemp, Warning, TEXT("[Dash After Commit] Stamina: %.1f / %.1f"),
-        AttributeSet ? AttributeSet->GetStamina() : -1.f,
-        AttributeSet ? AttributeSet->GetMaxStamina() : -1.f);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
-    UAbilityTask_PlayMontageAndWait* MontageTask;
-    if (GetAbilitySystemComponentFromActorInfo()->HasMatchingGameplayTag(STATE_COMBAT))
-    {
-        MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::CombatDash), 1.3f);
-    }
-    else
-    {
-        MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::Dash), 1.0f);
-    }
+	UCharacterMovementComponent* MovementComp = Character->GetCharacterMovement();
+	if (!MovementComp)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] MovementComponent is null"));
 
-    MontageTask->OnCompleted.AddDynamic(this, &UGA_Dash::OnDashFinished);
-    MontageTask->OnBlendOut.AddDynamic(this, &UGA_Dash::OnDashFinished);
-    MontageTask->OnInterrupted.AddDynamic(this, &UGA_Dash::OnDashCancelled);
-    MontageTask->OnCancelled.AddDynamic(this, &UGA_Dash::OnDashCancelled);
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    MontageTask->ReadyForActivation();
+	// 공중 / 비행 / 글라이드 중에는 순간 대시 불가
+	if (MovementComp->IsFalling() ||
+		MovementComp->IsFlying() ||
+		(MovementComp->MovementMode == MOVE_Custom &&
+			MovementComp->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide)))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Dash] Dash unavailable in current movement mode"));
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	// Cost / Cooldown GameplayEffect 적용
+	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Dash] CommitAbility failed"));
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
+	if (!Daeva)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] Daeva is null"));
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	UAnimMontage* DashMontage = nullptr;
+
+	if (ASC->HasMatchingGameplayTag(STATE_COMBAT))
+	{
+		DashMontage = Daeva->GetMontageByID(EMontageID::CombatDash);
+	}
+	else
+	{
+		DashMontage = Daeva->GetMontageByID(EMontageID::Dash);
+	}
+
+	if (!DashMontage)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] Dash montage is null"));
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	UAbilityTask_PlayMontageAndWait* MontageTask =
+		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+			this,
+			NAME_None,
+			DashMontage,
+			1.0f
+		);
+
+	if (!MontageTask)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dash] Failed to create montage task"));
+
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	MontageTask->OnCompleted.AddDynamic(this, &UGA_Dash::OnDashFinished);
+	MontageTask->OnInterrupted.AddDynamic(this, &UGA_Dash::OnDashCancelled);
+	MontageTask->OnCancelled.AddDynamic(this, &UGA_Dash::OnDashCancelled);
+
+	MontageTask->ReadyForActivation();
+
+	UE_LOG(
+		LogTemp,
+		Log,
+		TEXT("[Dash Start] Stamina: %.1f / %.1f"),
+		AttributeSet->GetStamina(),
+		AttributeSet->GetMaxStamina()
+	);
 }
 
 void UGA_Dash::OnDashFinished()
 {
-    UE_LOG(LogTemp, Warning, TEXT("[Dash Finished]"));
+	UE_LOG(LogTemp, Log, TEXT("[Dash Finished]"));
 
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	EndAbility(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		true,
+		false
+	);
 }
 
 void UGA_Dash::OnDashCancelled()
 {
-    UE_LOG(LogTemp, Warning, TEXT("[Dash Cancelled]"));
+	UE_LOG(LogTemp, Warning, TEXT("[Dash Cancelled]"));
 
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+	EndAbility(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		true,
+		true
+	);
 }

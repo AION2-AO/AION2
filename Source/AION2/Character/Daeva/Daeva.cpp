@@ -6,12 +6,16 @@
 #include "Physics/Collision.h"
 #include "Player/AOPlayerController.h"
 
+#include "GameplayTagContainer.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
+#include "GAS/AttributeSet/AOAttributeSet.h"
+
+#include "AION2.h"
 
 const float TargetTraceRadius = 2000.0f;
 
@@ -69,21 +73,31 @@ void ADaeva::BeginPlay()
 {
 	Super::BeginPlay();
 
+	LastLoc = GetActorLocation();
+	LastRot = GetActorRotation();
+	bWasMovingLastSend = false;
+
 	TargetZoomDistance = SpringArm->TargetArmLength;
+	GetWorldTimerManager().SetTimer(TargetSearchTimer, this, &ThisClass::SearchTarget, 1.0f, true);
 }
 
 void ADaeva::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	//ValidateTarget();
-	//if (!CurrentTarget)
-	//{
-	//	SearchTarget();
-	//	//GetWorldTimerManager().SetTimer(TargetSearchTimer, this, &ThisClass::SearchTarget, 1.0f, true);
-	//}
-
 	Tick_Camera(DeltaTime);
+	Tick_Combat(DeltaTime);
+
+	//if (!IsLocallyControlled())
+	//{
+	//	FVector NewLocation = FMath::VInterpTo(GetActorLocation(), TargetLoc, DeltaTime, 10.f);
+	//	FRotator NewRotation = FMath::RInterpTo(GetActorRotation(), TargetRot, DeltaTime, 10.f);
+
+	//	SetActorLocation(NewLocation);
+	//	SetActorRotation(NewRotation);
+
+	//	GetCharacterMovement()->Velocity = TargetVel;
+	//}
 }
 
 void ADaeva::PossessedBy(AController* NewController)
@@ -91,6 +105,12 @@ void ADaeva::PossessedBy(AController* NewController)
 	Super::PossessedBy(NewController);
 
 	InitGAS();
+
+	//if (!IsLocallyControlled()) return;
+	//{
+	//	UE_LOG(LogTemp, Log, TEXT(" ADaeva::BeginPlay() - SetTimer"));
+	//	GetWorldTimerManager().SetTimer(SendMoveHandle, this, &ADaeva::SendMovePacket, SendMoveTimer, true);
+	//}
 }
 
 void ADaeva::UnPossessed()
@@ -127,12 +147,41 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(Key4Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key4));
 		EnhancedInputComponent->BindAction(KeyQAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyQ));
 		EnhancedInputComponent->BindAction(KeyEAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyE));
+
+		/*EnhancedInputComponent->BindAction(
+			ShiftAction,
+			ETriggerEvent::Completed,
+			this,
+			&ADaeva::InputShiftReleased
+		);*/
+
+		EnhancedInputComponent->BindAction(
+			MoveAction,
+			ETriggerEvent::Completed,
+			this,
+			&ADaeva::InputMoveReleased
+		);
 	}
+
+
 }
 
 void ADaeva::Tick_Camera(float DeltaTime)
 {
 	SpringArm->TargetArmLength = FMath::FInterpTo(SpringArm->TargetArmLength, TargetZoomDistance, DeltaTime, 10.f);
+}
+
+void ADaeva::Tick_Combat(float DeltaTime)
+{
+	if (!HasAuthority() && IsLocallyControlled())
+	{
+		SearchTarget();
+		if (IsValid(CurrentTarget) && PreviousTarget != CurrentTarget)
+		{
+			Server_SetCurrentTarget(CurrentTarget);
+			UE_LOG(LogTemp, Log, TEXT("%s"), *GetNameSafe(CurrentTarget));
+		}
+	}
 }
 
 void ADaeva::Multicast_PlayWingMontage_Implementation(EMontageID MontageID, float PlayRate)
@@ -164,8 +213,15 @@ void ADaeva::Client_PlayCameraShake_Implementation()
 	PC->ClientStartCameraShake(CameraShakeClass);
 }
 
-bool ADaeva::SearchTarget()
+void ADaeva::Server_SetCurrentTarget_Implementation(AAOCharacter* NewTarget)
 {
+	SetCurrentTarget(NewTarget);
+}
+
+void ADaeva::SearchTarget()
+{
+	PreviousTarget = CurrentTarget;
+
 	TArray<FHitResult> OutHitResults;
 
 	FCollisionQueryParams Params(SCENE_QUERY_STAT(TargetingTrace), false, this);
@@ -176,7 +232,8 @@ bool ADaeva::SearchTarget()
 
 	if (!bHitDetected)
 	{
-		return false;
+		CurrentTarget = nullptr;
+		return;
 	}
 
 	struct FTargetCandidate
@@ -210,7 +267,8 @@ bool ADaeva::SearchTarget()
 
 	if (Candidates.IsEmpty())
 	{
-		return false;
+		CurrentTarget = nullptr;
+		return;
 	}
 
 	Candidates.Sort(
@@ -226,8 +284,6 @@ bool ADaeva::SearchTarget()
 	);
 
 	CurrentTarget = Candidates[0].Target;
-
-	return true;
 }
 
 void ADaeva::Move(const FInputActionValue& Value)
@@ -240,14 +296,25 @@ void ADaeva::Move(const FInputActionValue& Value)
 	FVector ForwardVector = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	FVector RightVector = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	FVector NewMoveInputDirection = ForwardVector * Movement.Y + RightVector * Movement.X;
+	FVector NewMoveInputDirection =
+		ForwardVector * Movement.Y +
+		RightVector * Movement.X;
+
 	if (NewMoveInputDirection.IsNearlyZero())
 	{
 		return;
 	}
 
+	bHasMoveInput = true;
+
 	CurrentMoveInputDirection = NewMoveInputDirection.GetSafeNormal();
 	AddMovementInput(CurrentMoveInputDirection);
+
+	
+	/*if (bSprintInputHeld)
+	{
+		RequestStartSprint();
+	}*/
 }
 
 void ADaeva::Look(const FInputActionValue& Value)
@@ -282,6 +349,16 @@ void ADaeva::InitGAS()
 		ASC->AddLooseGameplayTag(TEAM_DAEVA);
 	}
 
+	if (!SprintStaminaChangedDelegateHandle.IsValid())
+	{
+		SprintStaminaChangedDelegateHandle =
+			ASC->GetGameplayAttributeValueChangeDelegate(
+				UAOAttributeSet::GetStaminaAttribute()
+			).AddUObject(this, &ADaeva::OnStaminaChangedForSprint);
+	}
+
+	BindMoveSpeedAttribute();
+
 	if (!bTagEventsRegistered)
 	{
 		ASC->RegisterGameplayTagEvent(STATE_COMBAT, EGameplayTagEventType::NewOrRemoved).AddUObject(this, &ADaeva::OnCombatStateChanged);
@@ -299,6 +376,16 @@ void ADaeva::InitGAS()
 
 void ADaeva::ClearGAS()
 {
+	if (ASC && bMoveSpeedDelegateRegistered)
+	{
+		ASC->GetGameplayAttributeValueChangeDelegate(
+			UAOAttributeSet::GetMoveSpeedAttribute()
+		).Remove(MoveSpeedChangedDelegateHandle);
+
+		MoveSpeedChangedDelegateHandle.Reset();
+		bMoveSpeedDelegateRegistered = false;
+	}
+
 	if (HasAuthority())
 	{
 		for (FGameplayAbilitySpecHandle Handle : CombatAbilityHandles)
@@ -362,6 +449,46 @@ void ADaeva::ApplyDashStaminaRegenEffect()
 	}
 }
 
+void ADaeva::BindMoveSpeedAttribute()
+{
+	if (!ASC || bMoveSpeedDelegateRegistered)
+	{
+		return;
+	}
+
+	MoveSpeedChangedDelegateHandle =
+		ASC->GetGameplayAttributeValueChangeDelegate(
+			UAOAttributeSet::GetMoveSpeedAttribute()
+		).AddUObject(this, &ADaeva::OnMoveSpeedChanged);
+
+	bMoveSpeedDelegateRegistered = true;
+
+	const float CurrentMoveSpeed =
+		ASC->GetNumericAttribute(UAOAttributeSet::GetMoveSpeedAttribute());
+
+	GetCharacterMovement()->MaxWalkSpeed = CurrentMoveSpeed;
+
+	UE_LOG(LogTemp, Log, TEXT("[MoveSpeed] Initial Apply: %.1f"), CurrentMoveSpeed);
+}
+
+void ADaeva::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
+{
+	if (!GetCharacterMovement())
+	{
+		return;
+	}
+
+	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
+
+	UE_LOG(
+		LogTemp,
+		Log,
+		TEXT("[MoveSpeed] %.1f -> %.1f"),
+		Data.OldValue,
+		Data.NewValue
+	);
+}
+
 void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
 {
 	Super::OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
@@ -371,12 +498,27 @@ void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, 
 
 void ADaeva::TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser)
 {
-	// Todo: ȸ�� & ���� ó��
-	
+	// Todo: 회피 & 리턴 처리
+
 	Super::TakeDamageAO(AttackData, DamageCauser);
 
 	bool bDidShakeCamera = false;
 	PlayCameraShake(bDidShakeCamera);
+}
+
+void ADaeva::InputShiftPressed()
+{
+	if (IsSprinting())
+	{
+		return;
+	}
+
+	GASInputPressed(static_cast<int32>(EAbilityID::Dash));
+
+	if (bHasMoveInput)
+	{
+		RequestStartSprint();
+	}
 }
 
 void ADaeva::InputSpacePressed()
@@ -399,6 +541,8 @@ void ADaeva::InputSpacePressed()
 
 void ADaeva::InputLBPressed()
 {
+	GASInputReleased(static_cast<int32>(EAbilityID::Dash));
+
 	if (ASC->HasMatchingGameplayTag(COMBO_AVAILABLE_LB2))
 	{
 		GASInputPressed(static_cast<int32>(EAbilityID::LB_2));
@@ -429,12 +573,173 @@ void ADaeva::InputRBPressed()
 	}
 }
 
+void ADaeva::InputMoveReleased()
+{
+	bHasMoveInput = false;
+	RequestStopSprint();
+}
+
 void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
 {
 	const bool bIsCombat = NewCount > 0;
 
 	SetWeaponVisibility(bIsCombat);
 	SetSubWeaponVisibility(bIsCombat);
+}
+
+void ADaeva::StartSprint()
+{
+	if (!ASC || !HasAuthority())
+	{
+		return;
+	}
+
+	if (SprintEffectHandle.IsValid())
+	{
+		return;
+	}
+
+	const UAOAttributeSet* AttributeSet = ASC->GetSet<UAOAttributeSet>();
+	if (!AttributeSet || AttributeSet->GetStamina() <= 0.0f)
+	{
+		return;
+	}
+
+	if (!SprintEffect || !SprintDrainEffect)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Sprint] Sprint GE reference missing"));
+		return;
+	}
+
+	FGameplayEffectContextHandle SprintContext = ASC->MakeEffectContext();
+	SprintContext.AddSourceObject(this);
+
+	FGameplayEffectSpecHandle SprintSpec =
+		ASC->MakeOutgoingSpec(SprintEffect, 1.0f, SprintContext);
+
+	if (!SprintSpec.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Sprint] SprintSpec invalid"));
+		return;
+	}
+
+	SprintEffectHandle =
+		ASC->ApplyGameplayEffectSpecToSelf(*SprintSpec.Data.Get());
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("[Sprint] Sprint applied / HandleValid=%d / Speed=%.1f"),
+		SprintEffectHandle.IsValid(),
+		ASC->GetNumericAttribute(UAOAttributeSet::GetMoveSpeedAttribute())
+	);
+
+	FGameplayEffectContextHandle DrainContext = ASC->MakeEffectContext();
+	DrainContext.AddSourceObject(this);
+
+	FGameplayEffectSpecHandle DrainSpec =
+		ASC->MakeOutgoingSpec(SprintDrainEffect, 1.0f, DrainContext);
+
+	if (!DrainSpec.IsValid())
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Sprint] DrainSpec invalid"));
+		return;
+	}
+
+	SprintDrainEffectHandle =
+		ASC->ApplyGameplayEffectSpecToSelf(*DrainSpec.Data.Get());
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("[Sprint] Drain applied / HandleValid=%d"),
+		SprintDrainEffectHandle.IsValid()
+	);
+}
+
+void ADaeva::StopSprint()
+{
+	if (!ASC || !HasAuthority())
+	{
+		return;
+	}
+
+	if (SprintEffectHandle.IsValid())
+	{
+		ASC->RemoveActiveGameplayEffect(SprintEffectHandle);
+		SprintEffectHandle.Invalidate();
+	}
+
+	if (SprintDrainEffectHandle.IsValid())
+	{
+		ASC->RemoveActiveGameplayEffect(SprintDrainEffectHandle);
+		SprintDrainEffectHandle.Invalidate();
+	}
+
+	UE_LOG(LogTemp, Warning, TEXT("[Sprint] Stopped"));
+}
+
+bool ADaeva::IsSprinting() const
+{
+	if (!ASC)
+	{
+		return false;
+	}
+
+	const FGameplayTag SprintTag =
+		FGameplayTag::RequestGameplayTag(FName("State.Sprint"));
+
+	return ASC->HasMatchingGameplayTag(SprintTag);
+}
+
+void ADaeva::OnStaminaChangedForSprint(const FOnAttributeChangeData& Data)
+{
+	if (Data.NewValue > 0.0f)
+	{
+		return;
+	}
+
+	StopSprint();
+}
+
+void ADaeva::InputShiftReleased()
+{
+	//bSprintInputHeld = false;
+	RequestStopSprint();
+}
+
+void ADaeva::ServerStartSprint_Implementation()
+{
+	StartSprint();
+}
+
+void ADaeva::ServerStopSprint_Implementation()
+{
+	StopSprint();
+}
+
+void ADaeva::RequestStartSprint()
+{
+	if (HasAuthority())
+	{
+		StartSprint();
+	}
+	else
+	{
+		ServerStartSprint();
+	}
+}
+
+void ADaeva::RequestStopSprint()
+{
+	if (HasAuthority())
+	{
+		StopSprint();
+	}
+	else
+	{
+		ServerStopSprint();
+	}
 }
 
 void ADaeva::SetWeaponVisibility(bool NewVisible)
@@ -476,6 +781,102 @@ void ADaeva::CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName)
 	Parts.Add(PartType, PartMesh);
 }
 
+void ADaeva::SendMovePacket()
+{
+	bool bCurrentMovement = HasMovement();
+
+	bool bShouldSend = false;
+
+	if (bCurrentMovement)
+	{
+		bShouldSend = true;
+
+		bWasMovingLastSend = true;
+	}
+
+	else
+	{
+		// ���� ����
+		if (bWasMovingLastSend)
+		{
+			// ��Ŷ ������
+			bShouldSend = true;
+			bWasMovingLastSend = false;
+		}
+		else
+		{
+			// ��� ���� ����
+			return;
+		}
+	}
+
+	if (bShouldSend) 
+	{
+		FVector CurrLoc = GetActorLocation();
+		FRotator CurrRot = GetActorRotation();
+
+		Protocol::C_MovePacket MovePacket;
+		MovePacket.set_playerid(MyId);
+
+		Protocol::Vector3* Location = MovePacket.mutable_playerlocation();
+		Location->set_x(CurrLoc.X);
+		Location->set_y(CurrLoc.Y);
+		Location->set_z(CurrLoc.Z);
+
+		FVector CurrVelocity = GetCharacterMovement()->Velocity;
+
+		Protocol::Vector3* Velocity = MovePacket.mutable_playervelocity();
+		Velocity->set_x(CurrVelocity.X);
+		Velocity->set_y(CurrVelocity.Y);
+		Velocity->set_z(CurrVelocity.Z);
+
+		Protocol::Rotator3* Rotation = MovePacket.mutable_playerrotation();
+		Rotation->set_pitch(CurrRot.Pitch);
+		Rotation->set_yaw(CurrRot.Yaw);
+		Rotation->set_roll(CurrRot.Roll);
+
+		SEND_PACKET(MovePacket, PKT_C_MOVE);
+
+		LastLoc = CurrLoc;
+		LastRot = CurrRot;
+	}
+}
+
+bool ADaeva::HasMovement()
+{
+	FVector CurrentLoc = GetActorLocation();
+	FRotator CurrentRot = GetActorRotation();
+
+	// ĳ���� ��ġ�� ���� �Ÿ� �̻� ����������
+	float Distance = FVector::DistSquared(CurrentLoc, LastLoc);
+
+	// ĳ���� ������ ���� ���� ����������
+	float YawDiff = FRotator::NormalizeAxis(CurrentRot.Yaw - LastRot.Yaw);
+	bool bRotated = FMath::Abs(YawDiff) >= 10.0f;
+
+	// ĳ���͹����Ʈ�� ��ȭ�� �־�����
+	bool bIsMoving = GetCharacterMovement()->Velocity.SizeSquared() > 0.f;
+
+	return (Distance > 25.f) || bRotated || bIsMoving;
+}
+
+bool ADaeva::IsCurrentMoving()
+{
+	if (!GetCharacterMovement()) return false;
+	bool bHasVelocity = GetCharacterMovement()->Velocity.SizeSquared() > 100.f;
+
+	bool bHasInput = !GetPendingMovementInputVector().IsNearlyZero();
+
+	return bHasVelocity || bHasInput;
+}
+
+void ADaeva::ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel)
+{
+	TargetLoc = NewLoc;
+	TargetRot = NewRot;
+	TargetVel = NewVel;
+}
+
 void ADaeva::PlayCameraShake(bool& bDidShakeCamera)
 {
 	if (!bDidShakeCamera)
@@ -483,26 +884,6 @@ void ADaeva::PlayCameraShake(bool& bDidShakeCamera)
 		Client_PlayCameraShake();
 
 		bDidShakeCamera = true;
-	}
-}
-
-void ADaeva::ValidateTarget()
-{
-	if (!IsValid(CurrentTarget))
-	{
-		CurrentTarget = nullptr;
-		return;
-	}
-
-	//if (CurrentTarget->IsDead())
-	//{
-	//	CurrentTarget = nullptr;
-	//	return;
-	//}
-
-	if (FVector::DistSquared(GetActorLocation(), CurrentTarget->GetActorLocation()) > FMath::Square(TargetTraceRadius))
-	{
-		CurrentTarget = nullptr;
 	}
 }
 

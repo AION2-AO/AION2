@@ -34,8 +34,6 @@ void Session::Send(SendBufferRef sendBuffer)
 
 	if (registerSend)
 	{
-		std::cout << "registerSend true\n";
-
 		RegisterSend();
 	}
 }
@@ -51,6 +49,9 @@ void Session::Disconnect(const WCHAR* cause)
 		return;
 
 	// TODO: Logout logic
+	std::wcout << "Disconnected: " << cause << "\n";
+
+
 	RegisterDisConnect();
 }
 
@@ -127,7 +128,6 @@ void Session::RegisterSend()
 {
 	if (IsConnected() == false)
 		return;
-	std::cout << "registerSend start\n";
 
 	_sendEvent.Init();
 	_sendEvent.owner = shared_from_this();
@@ -135,6 +135,13 @@ void Session::RegisterSend()
 	std::vector<WSABUF> wsaBufs;
 	{
 		std::lock_guard<std::mutex> lock(_sendLock);
+		if (_sendQueue.empty())
+		{
+			_sendRegistered.store(false);
+			_sendEvent.owner = nullptr;
+			return;
+		}
+
 		int32 writeSize = 0;
 		while (_sendQueue.empty() == false)
 		{
@@ -143,9 +150,9 @@ void Session::RegisterSend()
 
 			_sendQueue.pop();
 			_sendEvent.sendBuffers.push_back(sendBuffer);
-
 		}
 	}
+
 	wsaBufs.reserve(_sendEvent.sendBuffers.size());
 	for (SendBufferRef sendBuffer : _sendEvent.sendBuffers)
 	{
@@ -171,7 +178,7 @@ void Session::RegisterSend()
 
 void Session::ProcessConnect()
 {
-//	_connectEvent.owner = nullptr;
+	//	_connectEvent.owner = nullptr;
 	_connected.store(true);
 
 	GetService()->AddSession(GetSessionRef());
@@ -205,39 +212,31 @@ void Session::ProcessRecv(int32 numBytes)
 	}
 
 	int32 dataSize = _recvBuffer.DataSize();
-	// TODO: Packet processing logic
-	// For now, just echo or print
-	std::cout << "Received " << numBytes << " bytes" << std::endl;
-	//_recvBuffer.OnRead(dataSize);
 
 	int32 processLen = OnRecv(_recvBuffer.ReadPos(), dataSize);
-	RegisterRecv(); 
 	if (processLen < 0 || dataSize < processLen || _recvBuffer.OnRead(processLen) == false)
 	{
 		Disconnect(L"OnReadError");
 		return;
 	}
+
+	_recvBuffer.Clean();
+
+	RegisterRecv();
 }
 
 void Session::ProcessSend(int32 numBytes)
 {
+	_sendEvent.owner = nullptr;
+	_sendEvent.sendBuffers.clear(); 
+	
 	if (numBytes == 0)
 	{
 		Disconnect(L"SendZero");
 		return;
 	}
 
-	_sendEvent.sendBuffers.clear();
-
-	std::lock_guard<std::mutex> lock(_sendLock);
-	if (_sendQueue.empty())
-	{
-		_sendRegistered.store(false);
-	}
-	else
-	{
-		RegisterSend();
-	}
+	RegisterSend();
 }
 
 void Session::HandleError(int32 errorCode)
@@ -276,7 +275,6 @@ int32 PacketSession::OnRecv(BYTE* buffer, int32 len)
 			break;
 		}
 		PacketHeader header = *(reinterpret_cast<PacketHeader*>(&buffer[processLen]));
-		std::cout << "Parsing Packet: ID=" << static_cast<uint16>(header.id) << ", Size=" << header.size << std::endl;
 		if (dataSize < header.size)
 		{
 			break;

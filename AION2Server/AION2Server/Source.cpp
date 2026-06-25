@@ -24,6 +24,12 @@ int main()
 {
 	PacketHandler::Init();
 
+	//if (!GNavMeshService.LoadMapData())
+	//{
+	//	std::cout << "Failed to load NavMesh map data!" << std::endl;
+	//	return 0;
+	//}
+
 	// DB Connect
 	ASSERT_CRASH(GDBConnectionPool->Connect(5, L"Driver={ODBC Driver 17 for SQL Server}; Server=localhost\\SQLEXPRESS03; Database=AION2_DB; Trusted_Connection=yes;"));
 	IocpCoreRef iocpCore = std::make_shared<IocpCore>();

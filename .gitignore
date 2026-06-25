@@ -89,7 +89,10 @@ Config/DefaultEditorPerProjectUserSettings.ini
 x64/
 x86/
 
+
+# Google Proto
 /ProtoBufCore/
 /Protobuf/
 /Common/
+*/ProtoBufCore/
 
