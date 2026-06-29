@@ -58,34 +58,6 @@ void UAnimNotifyState_TH_TurnToTarget::NotifyTick(
 	Super::NotifyTick(MeshComp, Animation, FrameDeltaTime, EventReference);
 
 
-	if (!MeshComp)
-	{
-		return;
-	}
-
-	AActor* OwnerActor = MeshComp->GetOwner();
-
-	if (OwnerActor == nullptr)
-	{
-		return;
-	}
-
-	if (OwnerActor->HasAuthority() == false)
-	{
-		return;
-	}
-
-
-	ATalythra* Talythra = Cast<ATalythra>(OwnerActor);
-	if (!Talythra)
-	{
-		return;
-	}
-
-
-
-	Talythra->TurnToTarget();
-
 }
 
 void UAnimNotifyState_TH_TurnToTarget::NotifyEnd(

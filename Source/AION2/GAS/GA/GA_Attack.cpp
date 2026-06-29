@@ -6,72 +6,216 @@
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "AbilitySystemComponent.h"
+#include "Animation/AnimMontage.h"
+#include "GameplayEffect.h"
 
-void UGA_Attack::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
+void UGA_Attack::ActivateAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	const FGameplayEventData* TriggerEventData
+)
 {
-    Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
-    for (const TSubclassOf<UGameplayEffect> GameplayEffect : GameplayEffectsToApply)
-    {
-        FGameplayEffectSpecHandle SpecHandle = MakeOutgoingGameplayEffectSpec(GameplayEffect, 1.f);
-        ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, SpecHandle);
-    }
+	if (!ActorInfo)
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    if (!RemoveTagsOnActivate.IsEmpty())
-    {
-        if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
-        {
-            ASC->RemoveActiveEffectsWithGrantedTags(RemoveTagsOnActivate);
-        }
-    }
+	ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
 
-    ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
+	if (!Daeva)
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(MontageIDToPlay), MontagePlayRate, StartSectionName);
-    MontageTask->OnCompleted.AddDynamic(this, &UGA_Attack::OnMontageTaskFinished);
-    MontageTask->OnBlendOut.AddDynamic(this, &UGA_Attack::OnMontageTaskFinished);
-    MontageTask->OnInterrupted.AddDynamic(this, &UGA_Attack::OnMontageTaskCancelled);
-    MontageTask->OnCancelled.AddDynamic(this, &UGA_Attack::OnMontageTaskCancelled);
-    MontageTask->ReadyForActivation();
+	UAnimMontage* AttackMontage =
+		Daeva->GetMontageByID(MontageIDToPlay);
 
-    UAbilityTask_WaitGameplayEvent* WaitHitCheckTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, EVENT_CHECKATTACKHIT);
-    WaitHitCheckTask->EventReceived.AddDynamic(this, &UGA_Attack::OnCheckAttackHitEvent);
-    WaitHitCheckTask->ReadyForActivation();
+	if (!AttackMontage)
+	{
+		UE_LOG(
+			LogTemp,
+			Error,
+			TEXT("[Attack] Montage is null. MontageID=%d"),
+			static_cast<int32>(MontageIDToPlay)
+		);
 
-    AAOCharacter* Target = Daeva->GetCurrentTarget();
-    if (IsValid(Target))
-    {
-        FVector Direction = Target->GetActorLocation() - Daeva->GetActorLocation();
-        Direction.Z = 0.f;
-        Daeva->SetActorRotation(Direction.Rotation());
-    }
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
 
-    UAT_RotateToTarget* RotateTask = UAT_RotateToTarget::RotateToTarget(this, AttackData.AvailableRange, 15.f);
+	const float SafePlayRate =
+		FMath::Max(MontagePlayRate, 0.01f);
+
+	const float AttackDuration =
+		AttackMontage->GetPlayLength() / SafePlayRate;
+
+	const FGameplayTag AttackSlowDurationTag =
+		FGameplayTag::RequestGameplayTag(
+			FName("Data.AttackSlowDuration")
+		);
+
+	const FGameplayTag AttackingTag =
+		FGameplayTag::RequestGameplayTag(
+			FName("State.Attacking")
+		);
+
+	// GameplayEffectsToApply 안에 있는 모든 GE 적용
+	for (const TSubclassOf<UGameplayEffect> GameplayEffect : GameplayEffectsToApply)
+	{
+		if (!GameplayEffect)
+		{
+			continue;
+		}
+
+		FGameplayEffectSpecHandle SpecHandle =
+			MakeOutgoingGameplayEffectSpec(GameplayEffect, 1.0f);
+
+		if (!SpecHandle.IsValid())
+		{
+			continue;
+		}
+
+		/*
+			GE_AttackSlow은 Granted Tag에 State.Attacking이 들어있다.
+			그 GE만 Duration을 몽타주 길이로 설정한다.
+		*/
+		const UGameplayEffect* EffectCDO =
+			GameplayEffect->GetDefaultObject<UGameplayEffect>();
+
+		if (EffectCDO &&
+			EffectCDO->InheritableOwnedTagsContainer.CombinedTags.HasTagExact(AttackingTag))
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(
+				AttackSlowDurationTag,
+				AttackDuration
+			);
+
+			UE_LOG(
+				LogTemp,
+				Log,
+				TEXT("[AttackSlow] Duration=%.2f / GE=%s"),
+				AttackDuration,
+				*GameplayEffect->GetName()
+			);
+		}
+
+		ApplyGameplayEffectSpecToOwner(
+			Handle,
+			ActorInfo,
+			ActivationInfo,
+			SpecHandle
+		);
+	}
+
+	// 공격 시작 시 Sprint GE 제거
+	if (!RemoveTagsOnActivate.IsEmpty())
+	{
+		if (UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo())
+		{
+			ASC->RemoveActiveEffectsWithGrantedTags(RemoveTagsOnActivate);
+		}
+	}
+
+	// 공격 몽타주 재생
+	UAbilityTask_PlayMontageAndWait* MontageTask =
+		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
+			this,
+			NAME_None,
+			AttackMontage,
+			SafePlayRate,
+			StartSectionName
+		);
+
+	if (!MontageTask)
+	{
+		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+		return;
+	}
+
+	MontageTask->OnCompleted.AddDynamic(
+		this,
+		&UGA_Attack::OnMontageTaskFinished
+	);
+
+	MontageTask->OnBlendOut.AddDynamic(
+		this,
+		&UGA_Attack::OnMontageTaskFinished
+	);
+
+	MontageTask->OnInterrupted.AddDynamic(
+		this,
+		&UGA_Attack::OnMontageTaskCancelled
+	);
+
+	MontageTask->OnCancelled.AddDynamic(
+		this,
+		&UGA_Attack::OnMontageTaskCancelled
+	);
+
+	MontageTask->ReadyForActivation();
+
+	// 공격 타격 Notify 이벤트 대기
+	UAbilityTask_WaitGameplayEvent* WaitHitCheckTask =
+		UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(
+			this,
+			EVENT_CHECKATTACKHIT
+		);
+
+	if (WaitHitCheckTask)
+	{
+		WaitHitCheckTask->EventReceived.AddDynamic(
+			this,
+			&UGA_Attack::OnCheckAttackHitEvent
+		);
+
+		WaitHitCheckTask->ReadyForActivation();
+	}
+
+    UAT_RotateToTarget* RotateTask = UAT_RotateToTarget::RotateToTarget(this, AttackData.AvailableRange, 15.0f);
     RotateTask->ReadyForActivation();
 }
 
 void UGA_Attack::OnMontageTaskFinished()
 {
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
+	EndAbility(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		true,
+		false
+	);
 }
 
 void UGA_Attack::OnMontageTaskCancelled()
 {
-    EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);
+	EndAbility(
+		CurrentSpecHandle,
+		CurrentActorInfo,
+		CurrentActivationInfo,
+		true,
+		true
+	);
 }
 
 void UGA_Attack::OnCheckAttackHitEvent(FGameplayEventData Payload)
 {
-    if (!HasAuthority(&CurrentActivationInfo))
-    {
-        return;
-    }
+	if (!HasAuthority(&CurrentActivationInfo))
+	{
+		return;
+	}
 
-    AAOCharacter* AOCharacter = Cast<AAOCharacter>(GetAvatarActorFromActorInfo());
-    if (!AOCharacter)
-    {
-        return;
-    }
+	AAOCharacter* AOCharacter =
+		Cast<AAOCharacter>(GetAvatarActorFromActorInfo());
 
-    AOCharacter->CheckAttackHit(AttackData);
+	if (!AOCharacter)
+	{
+		return;
+	}
+
+	AOCharacter->CheckAttackHit(AttackData);
 }

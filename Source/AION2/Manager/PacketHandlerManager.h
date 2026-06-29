@@ -20,6 +20,12 @@ bool Handle_S_FLOGIN(UAONetworkManager* NetworkMng, Protocol::S_LoginFailPacket&
 bool Handle_S_ITEM(UAONetworkManager* NetworkMng, Protocol::S_ItemDataPacket& Pkt);
 bool Handle_S_SPAWN(UAONetworkManager* NetworkMng, Protocol::S_SpawnPacket& Pkt);
 bool Handle_S_MOVE(UAONetworkManager* NetworkMng, Protocol::S_MovePacket& Pkt);
+bool Handle_S_CREATE(UAONetworkManager* NetworkMng, Protocol::S_DungeonCreatePacket& Pkt);
+bool Handle_S_ENTER(UAONetworkManager* NetworkMng, Protocol::S_DungeonEnterPacket& Pkt);
+bool Handle_S_READY(UAONetworkManager* NetworkMng, Protocol::S_DungeonReadyPacket& Pkt);
+bool Handle_S_START(UAONetworkManager* NetworkMng, Protocol::S_DungeonStartPacket& Pkt);
+
+// 데디 서버용 패킷
 
 // 패킷 변환 및 파싱을 대행해줄 템플릿 헬퍼 함수임
 template<typename T, typename HandlerFunc>

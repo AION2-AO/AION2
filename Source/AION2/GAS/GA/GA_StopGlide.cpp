@@ -20,11 +20,10 @@ void UGA_StopGlide::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
     Character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 
     ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::StopGlide), 2.0f);
+    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::StopGlide), 1.5f);
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(true);
-        Daeva->Multicast_PlayWingMontage(EMontageID::StopGlide, 2.0f);
+        Daeva->Multicast_PlayWingMontage(EMontageID::StopGlide, 1.8f);
     }
 
     MontageTask->OnCompleted.AddDynamic(this, &UGA_StopGlide::OnMontageTaskFinished);

@@ -4,8 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "Character/AOCharacter.h"
-#include "AI/Types/AIPhaseFlag.h"
+#include "AbilitySystemComponent.h"
+#include "GameplayAbilitySpecHandle.h"
+#include "GameplayTagContainer.h"
 #include "AOMonsterBase.generated.h"
+
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAbilityFinishedEvent);
 
 UCLASS()
 class AION2_API AAOMonsterBase : public AAOCharacter
@@ -19,6 +24,13 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+	virtual void PossessedBy(AController* NewController) override;
+
+	virtual void InitGAS() override;
+	virtual void ClearGAS() override;
+
+
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
 
 	// Navigation Mesh의 범위 밖에 이동인지 아닌지를 판단하는 함수 
@@ -30,11 +42,73 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
-	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
+	UFUNCTION(BlueprintCallable, Category = "Montage")
+	UAnimMontage* GetMontageByTag(const FGameplayTag& MontageTag) const;
+
+
+	// 몬스터 AI 컨트롤러에서 Phase 설정 뒤 Replicate. 
+	FORCEINLINE void Set_Phase(FGameplayTag _PhaseFlag) { Phase = _PhaseFlag; }
+	FORCEINLINE void Set_State(FGameplayTag _StateFlag) { State = _StateFlag; }
+
+
+protected:
+	// AttributeSet
+	UPROPERTY(EditAnywhere, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAOAttributeSet> AttributeSet;
+
+	virtual void InitAttributeSet();
+
+
+private:
+	// GAS 관련 
+	UPROPERTY()
+	TArray<FGameplayAbilitySpecHandle> AbilityHandles;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	TMap<FGameplayTag, TObjectPtr<UAnimMontage>> MontageMap;
 
 
 
 
+	// 몬스터 페이즈 및 상태 설정 
 
+	//  EditAnywhere 에디터 Details 패널에서 값을 수정할 수 있냐를 정합니다.
+	//  BlueprintReadWrite 루프린트 그래프에서 Get/Set 노드로 접근할 수 있냐를 정합니다.
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "AI State", meta = (AllowPrivateAccess = "true"))
+	FGameplayTag Phase;
+
+	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "AI State", meta = (AllowPrivateAccess = "true"))
+	FGameplayTag State;
+
+
+
+	// AODungeonGameMode -> TEST
+	UFUNCTION(BlueprintCallable, Category = "Dungeon")
+	void HandleBossDeath();
+
+	UPROPERTY(EditDefaultsOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UDA_AbilitySet> AbilitySet;
+
+public:
+	/*
+	* 0 = 일반 몬스터
+	* 1 = b1
+	* 2 = b2
+	* 3 = b3
+	*/
+	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
+	int32 DungeonBossIndex = 0;
+
+
+	UFUNCTION(BlueprintCallable, Category = "Dungeon")
+	void SetDungeonBossActive(bool bActive);
+
+	void Die();
+
+protected :
+	void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+protected :
+	FDelegateHandle HealthChangedDelegateHandle;
 };

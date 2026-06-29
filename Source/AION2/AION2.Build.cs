@@ -36,7 +36,10 @@ public class AION2 : ModuleRules
             "Niagara",
             "UMG",
             "NavigationSystem",
-            "Navmesh"
+            "Navmesh",
+            "HTTP",
+            "StateTreeModule",
+            "GameplayStateTreeModule"
         });
 
         PrivateDependencyModuleNames.AddRange(new string[] {

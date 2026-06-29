@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
+#include "Interface/CombatInterface.h"
 #include "GA_Boss_ChargeAttack.generated.h"
 
 /**
@@ -24,11 +25,35 @@ public:
 
 protected:
 	UFUNCTION()
-	void OnCompleteCallback();
+	void OnMontageTaskFinished();
 
 	UFUNCTION()
-	void OnInterruptedCallback();
-	
+	void OnMontageTaskCancelled();
+
+	UFUNCTION()
+	void OnCheckAttackHitEvent(FGameplayEventData Payload);
+
+	UFUNCTION()
+	void AbilityEnd();
+
+
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
+	FAttackData AttackData;
+
+
+private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	FGameplayTag MontageTag;
+
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	float MontagePlayRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
+	FName StartSectionName;
+
 
 
 };

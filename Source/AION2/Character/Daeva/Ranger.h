@@ -8,5 +8,7 @@ UCLASS()
 class AION2_API ARanger : public ADaeva
 {
 	GENERATED_BODY()
-	
+
+public :
+	ARanger(const FObjectInitializer& ObjectInitializer);
 };

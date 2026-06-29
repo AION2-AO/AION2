@@ -10,7 +10,7 @@
 // Sets default values
 ATalythraProjectile::ATalythraProjectile()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
@@ -19,11 +19,19 @@ ATalythraProjectile::ATalythraProjectile()
 
 	RootComponent = Collision;
 
+	// 네트워크 보간 설정
+	ProjectileMovement->bInterpMovement = true;          // 이동 보간 설정 
+	ProjectileMovement->bInterpRotation = true;          // 회전 보간 설정
+	ProjectileMovement->InterpLocationTime = 0.05f;      // Min Net Update(30Hz) 기준 안전값
+	ProjectileMovement->InterpRotationTime = 0.025f;     // 회전 보간 시간 설정
+	ProjectileMovement->InterpLocationMaxLagDistance = 300.f; // 일정이상 거리 멀어지면 보간 포기하고 스냅하는 설정 
 
 
-	bReplicates = true;
-	SetReplicateMovement(true);
-
+	// Replication 설정 
+	bReplicates = true;					// 이 Actor를 클라이언트에도 만들어지도록 설정
+	SetReplicateMovement(true);			// 이 Actor의 위치/회전/속도를 클라이언트에 동기화 설정
+	SetNetUpdateFrequency(100.f);		// 초당 최대 100번까지 클라에게 패킷을 보내라.
+	SetMinNetUpdateFrequency(30.f);     // 변화가 없거나 우선순위가 낮아도 초당 최소 30번은 체크 보장해라. 
 
 }
 
@@ -33,16 +41,7 @@ void ATalythraProjectile::BeginPlay()
 	Super::BeginPlay();
 
 
-	if (HasAuthority() == false)
-	{
-		if (ProjectileMovement)
-		{
-			ProjectileMovement->StopMovementImmediately();
-			ProjectileMovement->SetComponentTickEnabled(false);
-		}
-	}
 
-	
 }
 
 // Called every frame
@@ -59,6 +58,9 @@ void ATalythraProjectile::OnProjectileHit(
 	FVector NormalImpulse,
 	const FHitResult& Hit)
 {
+
+
+
 
 }
 

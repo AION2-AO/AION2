@@ -11,11 +11,16 @@
 			"AdditionalDependencies": [
 				"Engine",
 				"GameplayAbilities",
-				"AIModule"
+				"AIModule",
+				"UMG"
 			]
 		}
 	],
 	"Plugins": [
+		{
+			"Name": "LoadingScreenModule",
+			"Enabled": true
+		},
 		{
 			"Name": "GameplayAbilities",
 			"Enabled": true
@@ -49,6 +54,10 @@
 		},
 		{
 			"Name": "GameplayStateTree",
+			"Enabled": true
+		},
+		{
+			"Name": "BinkMedia",
 			"Enabled": true
 		}
 	]

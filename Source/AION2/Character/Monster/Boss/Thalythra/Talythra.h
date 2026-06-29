@@ -4,7 +4,11 @@
 
 #include "CoreMinimal.h"
 #include "Character/Monster/AOMonsterBase.h"
+#include "Types/TalythraTypes.h"
 #include "Talythra.generated.h"
+
+
+
 
 
 
@@ -29,14 +33,9 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// 보스 AI 컨트롤러에서 State, Phase 설정 뒤 Replicate. 
-	FORCEINLINE void Set_Phase(ETalythraPhase _PhaseFlag) { Phase = _PhaseFlag; }
-	FORCEINLINE void Set_State(ETalythraState _StateFlag) { State = _StateFlag; }
-
 	// State Tree에서 몽타주를 실행하기 위해 만든 함수
 	UFUNCTION(BlueprintCallable, NetMulticast, Unreliable)
 	void Multicast_PlayAttackMontage(class UAnimMontage* MontageToPlay);
-
 
 
 #pragma region Projectile
@@ -84,6 +83,10 @@ public:
 #pragma endregion 
 
 
+#pragma region Attribute Setting 
+	virtual void InitAttributeSet() override;
+#pragma endregion 
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -101,13 +104,11 @@ protected:
 	void Multicast_AttackLine_Pattern_1_Off();
 
 
-
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_2();
 
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackLine_Pattern_2_Off();
-
 
 
 	UFUNCTION(NetMulticast, Unreliable)
@@ -161,13 +162,6 @@ protected:
 
 	// 페이즈 및 상태 관련 
 public:
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "Phase")
-	ETalythraPhase Phase;
-
-	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite, Category = "State")
-	ETalythraState State;
-
-
 	UPROPERTY(Replicated, EditAnywhere, BlueprintReadWrite)
 	bool bLockPelvis = false;
 
@@ -205,4 +199,6 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float AttackWarningElapsedTime = 0.0f;
+
+
 };

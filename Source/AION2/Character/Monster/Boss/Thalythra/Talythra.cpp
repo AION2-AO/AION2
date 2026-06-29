@@ -7,12 +7,9 @@
 #include "Animation/AnimMontage.h"
 #include "Character/Monster/Boss/Thalythra/Projectile/TalythraProjectile.h"
 #include "NiagaraFunctionLibrary.h"
-#include "AI/AITalythraAIController.h"
-#include "Components/DecalComponent.h"
+#include "AI/Talythra/AITalythraAIController.h"
 #include "GameFramework/CharacterMovementComponent.h"
-#include "AbilitySystemComponent.h"
-#include "Abilities/GameplayAbility.h"
-#include "GAS/AOGameplayTags.h"
+#include "GAS/AttributeSet/AOAttributeSet.h"
 
 
 // Sets default values
@@ -55,34 +52,12 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
 
-
-
-	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-	ASC->SetIsReplicated(true);
-	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
-
-
-
-	bReplicates = true;
-	SetReplicateMovement(true);
-
-
 }
 
 void ATalythra::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-	// Owner Actor와 AvatarActor 설정 
-	ASC->InitAbilityActorInfo(this, this);
 
-
-	if (!ASC->HasMatchingGameplayTag(TEAM_MONSTER))
-	{
-		ASC->AddLooseGameplayTag(TEAM_MONSTER);
-	}
-
-	// Owner Actor란? : ASC를 논리적으로 소유한 주체 ( 해당 주체가 죽어도 유지되며, 레벨 및 스텟 보존 )
-	// Avatar Actor란? : Character  (죽으면 바뀌는 물체, 실제로 데이터를 처리하지 않지만 비주얼만 수행해주는 엑터) 
 
 
 }
@@ -92,16 +67,18 @@ void ATalythra::BeginPlay()
 {
 	Super::BeginPlay();
 
+	InitAttributeSet();
 
-	if (HasAuthority()) // 서버인 경우 
-	{
-		for (const auto& Ability : HasAbilities) // 능력들 저장. 
-		{
-			FGameplayAbilitySpec AbilitySpec(Ability.Value);
-			ASC->GiveAbility(AbilitySpec);
-		}
-	}
 
+	//@PLZTODO : 이거 위치 바꿔줘야함. 
+	//if (HasAuthority()) // 서버인 경우 
+	//{
+	//	for (const auto& Ability : HasAbilities) // 능력들 저장. 
+	//	{
+	//		FGameplayAbilitySpec AbilitySpec(Ability.Value);
+	//		ASC->GiveAbility(AbilitySpec);
+	//	}
+	//}
 
 
 #pragma region Attack_Line SceneComponents
@@ -147,6 +124,10 @@ void ATalythra::BeginPlay()
 
 #pragma endregion 
 
+#pragma region 
+	AttackWarningRangeSceneComponent->SetIsReplicated(true);
+#pragma endregion 
+
 }
 
 // Called every frame
@@ -160,7 +141,7 @@ void ATalythra::Tick(float DeltaTime)
 
 	if (bChargeAttack)
 	{
-		if (CanMoveOnNavMesh(ChargeDirection, DeltaTime * 3.f))
+		if (CanMoveOnNavMesh(ChargeDirection, 100.f)) // 이 부분도 수정 
 		{
 			AddMovementInput(ChargeDirection, 1.0f, false);
 		}
@@ -200,8 +181,20 @@ void ATalythra::Tick(float DeltaTime)
 			// 여기서 다시 재생시키면 될듯 
 			AttackWarningRangeSceneComponent->SetVisibility(false, true);
 		}
+
 	}
 
+	if (RotationAble)
+	{
+		TurnToTarget();
+	}
+
+	//GEngine->AddOnScreenDebugMessage(
+	//	-1,                  // Key (-1이면 매번 새 줄)
+	//	2.f,                 // 표시 시간 (초)
+	//	FColor::Yellow,      // 색상
+	//	FString::Printf(TEXT("Health: %.1f"), AttributeSet->GetHealth())
+	//);
 
 }
 
@@ -418,7 +411,10 @@ void ATalythra::Teleport_To_Player()
 
 
 	// replicated는 위에 생성자에서 해줬으므로 mulit rpc 필요 x 
-	TeleportTo(pTargetActor->GetActorLocation(), GetActorRotation(), false, false);
+	TeleportTo(pTargetActor->GetActorLocation(),
+		GetActorRotation(),
+		false, // true면 실제 이동 없이 가능 여부만 테스트
+		true); // true면 충돌 무시하고 강제 이동
 
 
 }
@@ -667,12 +663,22 @@ void ATalythra::DoFireProjectile_3()
 
 }
 
+void ATalythra::InitAttributeSet()
+{
+	// AttributeSet설정
+	AttributeSet->InitHealth(1000.f);
+	AttributeSet->InitMaxHealth(1000.f);
+
+	AttributeSet->InitStamina(100.f);
+	AttributeSet->InitMaxStamina(100.f);
+
+}
+
 void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {
 	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
-	DOREPLIFETIME(ATalythra, Phase);
-	DOREPLIFETIME(ATalythra, State);
+
 	DOREPLIFETIME(ATalythra, bLockPelvis);
 
 }
@@ -792,24 +798,21 @@ void ATalythra::Multicast_PlayMuzzleEffect_Implementation(FVector SpawnLocation,
 void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMode)
 {
 
-	UCharacterMovementComponent* CMC = GetCharacterMovement();
-	if (!CMC)
-		return;
 
 	if (bChargeMode)
 	{
-		CMC->MaxWalkSpeed = 5000.f;
-		CMC->MaxAcceleration = 50000.f;
-		CMC->GroundFriction = 0.f;
-		CMC->BrakingDecelerationWalking = 0.f;
-		CMC->BrakingFrictionFactor = 0.f;
+		GetCharacterMovement()->MaxWalkSpeed = 5000.f;
+		GetCharacterMovement()->MaxAcceleration = 50000.f;
+		GetCharacterMovement()->GroundFriction = 0.f;
+		GetCharacterMovement()->BrakingDecelerationWalking = 0.f;
+		GetCharacterMovement()->BrakingFrictionFactor = 0.f;
 	}
 	else
 	{
-		CMC->MaxWalkSpeed = 600.f;
-		CMC->MaxAcceleration = 2048.f;
-		CMC->GroundFriction = 8.f;
-		CMC->BrakingDecelerationWalking = 2048.f;
-		CMC->BrakingFrictionFactor = 2.f;
+		GetCharacterMovement()->MaxWalkSpeed = 600.f;
+		GetCharacterMovement()->MaxAcceleration = 2048.f;
+		GetCharacterMovement()->GroundFriction = 8.f;
+		GetCharacterMovement()->BrakingDecelerationWalking = 2048.f;
+		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 	}
 }

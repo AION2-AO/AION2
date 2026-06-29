@@ -2,11 +2,12 @@
 #include <iostream>
 #include "Service.h"
 #include "GameSession.h"
+#include "DedicatedSession.h"
 #include "ThreadManager.h"
 #include "DB/DBConnectionPool.h"
 #include "PacketHandler.h"
 
-void DoWorkerJob(MMOServerServiceRef& service)
+void DoWorkerJob(const ServiceRef& service)
 {
 	while (true)
 	{
@@ -33,6 +34,7 @@ int main()
 	// DB Connect
 	ASSERT_CRASH(GDBConnectionPool->Connect(5, L"Driver={ODBC Driver 17 for SQL Server}; Server=localhost\\SQLEXPRESS03; Database=AION2_DB; Trusted_Connection=yes;"));
 	IocpCoreRef iocpCore = std::make_shared<IocpCore>();
+	IocpCoreRef dediIocpCore = std::make_shared<IocpCore>();
 
 	MMOServerServiceRef service = make_shared<MMOServerService>(
 		NetAddress(L"127.0.0.1", 7777),
@@ -41,21 +43,37 @@ int main()
 		100
 	);
 
+	DediServiceRef dediService = make_shared<DediService>(
+		NetAddress(L"172.16.15.116", 9999),
+		dediIocpCore,
+		[]() { return  std::make_shared<DedicatedSession>(); },
+		10
+	);
+
 	if (service->Start())
 	{
 		std::cout << "Server Started on Port 7777" << std::endl;
 	}
-	else
+
+	if (dediService->Start())
 	{
-		std::cout << "Server Start Failed" << std::endl;
-		return 0;
+		std::cout << "Dedi Server Started on Port 9999" << std::endl;
 	}
 
-	for (int32 i = 0; i < 5; i++)
+	int32 maxCore = std::thread::hardware_concurrency();
+	for (int32 i = 0; i < maxCore - 5; i++)
 	{
 		GThreadManager->Launch([&service]()
 			{
 				DoWorkerJob(service);
+			});
+	}
+
+	for (int32 i = 0; i < 5; i++)
+	{
+		GThreadManager->Launch([&dediService]()
+			{
+				DoWorkerJob(dediService);
 			});
 	}
 

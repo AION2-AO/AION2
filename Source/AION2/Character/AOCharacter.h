@@ -15,34 +15,45 @@ class AION2_API AAOCharacter : public ACharacter, public IAbilitySystemInterface
 public:
 	AAOCharacter(const FObjectInitializer& ObjectInitializer);
 
+protected:
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 public:
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_DrawDebugCapsuleCollider(const FVector& CapsuleOrigin, const float CapsuleHalfHeight, const float AttackRadius, const FColor DrawColor);
 
 public:
 	virtual void SearchTarget();
+	virtual void TeleportBackToTarget();
 
 public:
-	virtual void CheckAttackHit(const FAttackData& AttackData) override;
+	virtual void CheckAttackHit(const FAttackData& AttackData);
+	virtual void OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera);
+	virtual void TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitResult, AAOCharacter* DamageCauser);
+	virtual void SpawnAttackProjectile(const FAttackData& AttackData, TSubclassOf<class AAOProjectile> ProjectileClass, const FName& SpawnSocket);
+	bool IsEnemy(AActor* TargetActor);
+
+protected:
+	void DrawDebugCapsuleCollider(const FVector& CapsuleOrigin, const float CapsuleHalfHeight, const float AttackRadius, const FColor DrawColor);
 
 protected:
 	virtual void InitGAS();
 	virtual void ClearGAS();
 
-protected:
-	virtual void OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera);
-	virtual void TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser);
-
-protected:
-	bool IsEnemy(AActor* TargetActor);
-	void DrawDebugCapsuleCollider(const FVector& CapsuleOrigin, const float CapsuleHalfHeight, const float AttackRadius, const FColor DrawColor);
-
 public:
 	virtual class UAbilitySystemComponent* GetAbilitySystemComponent() const override;
 	FORCEINLINE AAOCharacter* GetCurrentTarget() const { return CurrentTarget; }
+	virtual TArray<class USkeletalMeshComponent*> GetAllMeshes();
 
 public:
 	FORCEINLINE void SetCurrentTarget(AAOCharacter* NewTarget) { CurrentTarget = NewTarget; }
+
+protected:
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "State")
+	bool bIsDead = false;
+
+public:
+	bool IsDead() const { return bIsDead; }
 
 protected:
 	UPROPERTY()

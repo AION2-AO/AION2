@@ -27,8 +27,8 @@ UGE_Cooldown_Monster_ChargeAttack::UGE_Cooldown_Monster_ChargeAttack()
 
 	// 5. 이 GE가 적용되는 동안 Target ASC에 부여할 태그 설정
 	FInheritedTagContainer GrantedTags;
-	GrantedTags.Added.AddTag(COOLDOWN_MONSTER_CHARGEATTACK);
-	GrantedTags.CombinedTags.AddTag(COOLDOWN_MONSTER_CHARGEATTACK);
+	GrantedTags.Added.AddTag(COOLDOWN_MONSTER_TH_CHARGEATTACK);
+	GrantedTags.CombinedTags.AddTag(COOLDOWN_MONSTER_TH_CHARGEATTACK);
 
 	TargetTagsComponent->SetAndApplyTargetTagChanges(GrantedTags);
 

@@ -102,8 +102,41 @@ struct PlayerStateDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 PlayerStateDefaultTypeInternal _PlayerState_default_instance_;
+PROTOBUF_CONSTEXPR DungeonPlayerInfo::DungeonPlayerInfo(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.membername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.memberid_)*/uint64_t{0u}
+  , /*decltype(_impl_.memberclass_)*/0
+  , /*decltype(_impl_.isready_)*/false
+  , /*decltype(_impl_.index_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct DungeonPlayerInfoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR DungeonPlayerInfoDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~DungeonPlayerInfoDefaultTypeInternal() {}
+  union {
+    DungeonPlayerInfo _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DungeonPlayerInfoDefaultTypeInternal _DungeonPlayerInfo_default_instance_;
+PROTOBUF_CONSTEXPR DungeonInfo::DungeonInfo(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.members_)*/{}
+  , /*decltype(_impl_.leaderinfo_)*/nullptr
+  , /*decltype(_impl_.dungeonid_)*/0
+  , /*decltype(_impl_.status_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct DungeonInfoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR DungeonInfoDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~DungeonInfoDefaultTypeInternal() {}
+  union {
+    DungeonInfo _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DungeonInfoDefaultTypeInternal _DungeonInfo_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_Struct_2eproto[5];
+static ::_pb::Metadata file_level_metadata_Struct_2eproto[7];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_Struct_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Struct_2eproto = nullptr;
 
@@ -154,6 +187,27 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerState, _impl_.playerclass_),
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerState, _impl_.playerlocation_),
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerState, _impl_.playerrotation_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _impl_.memberid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _impl_.membername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _impl_.memberclass_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _impl_.isready_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonPlayerInfo, _impl_.index_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonInfo, _impl_.dungeonid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonInfo, _impl_.status_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonInfo, _impl_.leaderinfo_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DungeonInfo, _impl_.members_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::ItemData)},
@@ -161,6 +215,8 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 19, -1, -1, sizeof(::Protocol::Rotator3)},
   { 28, -1, -1, sizeof(::Protocol::PlayerInfo)},
   { 36, -1, -1, sizeof(::Protocol::PlayerState)},
+  { 46, -1, -1, sizeof(::Protocol::DungeonPlayerInfo)},
+  { 57, -1, -1, sizeof(::Protocol::DungeonInfo)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -169,6 +225,8 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::Protocol::_Rotator3_default_instance_._instance,
   &::Protocol::_PlayerInfo_default_instance_._instance,
   &::Protocol::_PlayerState_default_instance_._instance,
+  &::Protocol::_DungeonPlayerInfo_default_instance_._instance,
+  &::Protocol::_DungeonInfo_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -183,16 +241,24 @@ const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "\020\n\010playerId\030\001 \001(\004\022(\n\013playerClass\030\002 \001(\0162\023"
   ".Protocol.ClassType\022)\n\016playerLocation\030\003 "
   "\001(\0132\021.Protocol.Vector3\022*\n\016playerRotation"
-  "\030\004 \001(\0132\022.Protocol.Rotator3b\006proto3"
+  "\030\004 \001(\0132\022.Protocol.Rotator3\"\203\001\n\021DungeonPl"
+  "ayerInfo\022\020\n\010memberId\030\001 \001(\004\022\022\n\nmemberName"
+  "\030\002 \001(\t\022(\n\013memberClass\030\003 \001(\0162\023.Protocol.C"
+  "lassType\022\017\n\007isReady\030\004 \001(\010\022\r\n\005index\030\005 \001(\005"
+  "\"\245\001\n\013DungeonInfo\022\021\n\tdungeonId\030\001 \001(\005\022$\n\006s"
+  "tatus\030\002 \001(\0162\024.Protocol.RoomStatus\022/\n\nlea"
+  "derInfo\030\003 \001(\0132\033.Protocol.DungeonPlayerIn"
+  "fo\022,\n\007members\030\004 \003(\0132\033.Protocol.DungeonPl"
+  "ayerInfob\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Struct_2eproto_deps[1] = {
   &::descriptor_table_Enum_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_Struct_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Struct_2eproto = {
-    false, false, 474, descriptor_table_protodef_Struct_2eproto,
+    false, false, 776, descriptor_table_protodef_Struct_2eproto,
     "Struct.proto",
-    &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 5,
+    &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 7,
     schemas, file_default_instances, TableStruct_Struct_2eproto::offsets,
     file_level_metadata_Struct_2eproto, file_level_enum_descriptors_Struct_2eproto,
     file_level_service_descriptors_Struct_2eproto,
@@ -1516,6 +1582,609 @@ void PlayerState::InternalSwap(PlayerState* other) {
       file_level_metadata_Struct_2eproto[4]);
 }
 
+// ===================================================================
+
+class DungeonPlayerInfo::_Internal {
+ public:
+};
+
+DungeonPlayerInfo::DungeonPlayerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.DungeonPlayerInfo)
+}
+DungeonPlayerInfo::DungeonPlayerInfo(const DungeonPlayerInfo& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  DungeonPlayerInfo* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.membername_){}
+    , decltype(_impl_.memberid_){}
+    , decltype(_impl_.memberclass_){}
+    , decltype(_impl_.isready_){}
+    , decltype(_impl_.index_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.membername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.membername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_membername().empty()) {
+    _this->_impl_.membername_.Set(from._internal_membername(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.memberid_, &from._impl_.memberid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.index_) -
+    reinterpret_cast<char*>(&_impl_.memberid_)) + sizeof(_impl_.index_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.DungeonPlayerInfo)
+}
+
+inline void DungeonPlayerInfo::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.membername_){}
+    , decltype(_impl_.memberid_){uint64_t{0u}}
+    , decltype(_impl_.memberclass_){0}
+    , decltype(_impl_.isready_){false}
+    , decltype(_impl_.index_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.membername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.membername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+DungeonPlayerInfo::~DungeonPlayerInfo() {
+  // @@protoc_insertion_point(destructor:Protocol.DungeonPlayerInfo)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void DungeonPlayerInfo::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.membername_.Destroy();
+}
+
+void DungeonPlayerInfo::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void DungeonPlayerInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.DungeonPlayerInfo)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.membername_.ClearToEmpty();
+  ::memset(&_impl_.memberid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.index_) -
+      reinterpret_cast<char*>(&_impl_.memberid_)) + sizeof(_impl_.index_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DungeonPlayerInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 memberId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.memberid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string memberName = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_membername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.DungeonPlayerInfo.memberName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.ClassType memberClass = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 24)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_memberclass(static_cast<::Protocol::ClassType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // bool isReady = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.isready_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 index = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          _impl_.index_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* DungeonPlayerInfo::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.DungeonPlayerInfo)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 memberId = 1;
+  if (this->_internal_memberid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_memberid(), target);
+  }
+
+  // string memberName = 2;
+  if (!this->_internal_membername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_membername().data(), static_cast<int>(this->_internal_membername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.DungeonPlayerInfo.memberName");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_membername(), target);
+  }
+
+  // .Protocol.ClassType memberClass = 3;
+  if (this->_internal_memberclass() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      3, this->_internal_memberclass(), target);
+  }
+
+  // bool isReady = 4;
+  if (this->_internal_isready() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(4, this->_internal_isready(), target);
+  }
+
+  // int32 index = 5;
+  if (this->_internal_index() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(5, this->_internal_index(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.DungeonPlayerInfo)
+  return target;
+}
+
+size_t DungeonPlayerInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.DungeonPlayerInfo)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string memberName = 2;
+  if (!this->_internal_membername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_membername());
+  }
+
+  // uint64 memberId = 1;
+  if (this->_internal_memberid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_memberid());
+  }
+
+  // .Protocol.ClassType memberClass = 3;
+  if (this->_internal_memberclass() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_memberclass());
+  }
+
+  // bool isReady = 4;
+  if (this->_internal_isready() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // int32 index = 5;
+  if (this->_internal_index() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_index());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData DungeonPlayerInfo::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    DungeonPlayerInfo::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*DungeonPlayerInfo::GetClassData() const { return &_class_data_; }
+
+
+void DungeonPlayerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<DungeonPlayerInfo*>(&to_msg);
+  auto& from = static_cast<const DungeonPlayerInfo&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.DungeonPlayerInfo)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_membername().empty()) {
+    _this->_internal_set_membername(from._internal_membername());
+  }
+  if (from._internal_memberid() != 0) {
+    _this->_internal_set_memberid(from._internal_memberid());
+  }
+  if (from._internal_memberclass() != 0) {
+    _this->_internal_set_memberclass(from._internal_memberclass());
+  }
+  if (from._internal_isready() != 0) {
+    _this->_internal_set_isready(from._internal_isready());
+  }
+  if (from._internal_index() != 0) {
+    _this->_internal_set_index(from._internal_index());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DungeonPlayerInfo::CopyFrom(const DungeonPlayerInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.DungeonPlayerInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DungeonPlayerInfo::IsInitialized() const {
+  return true;
+}
+
+void DungeonPlayerInfo::InternalSwap(DungeonPlayerInfo* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.membername_, lhs_arena,
+      &other->_impl_.membername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(DungeonPlayerInfo, _impl_.index_)
+      + sizeof(DungeonPlayerInfo::_impl_.index_)
+      - PROTOBUF_FIELD_OFFSET(DungeonPlayerInfo, _impl_.memberid_)>(
+          reinterpret_cast<char*>(&_impl_.memberid_),
+          reinterpret_cast<char*>(&other->_impl_.memberid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DungeonPlayerInfo::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Struct_2eproto_getter, &descriptor_table_Struct_2eproto_once,
+      file_level_metadata_Struct_2eproto[5]);
+}
+
+// ===================================================================
+
+class DungeonInfo::_Internal {
+ public:
+  static const ::Protocol::DungeonPlayerInfo& leaderinfo(const DungeonInfo* msg);
+};
+
+const ::Protocol::DungeonPlayerInfo&
+DungeonInfo::_Internal::leaderinfo(const DungeonInfo* msg) {
+  return *msg->_impl_.leaderinfo_;
+}
+DungeonInfo::DungeonInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.DungeonInfo)
+}
+DungeonInfo::DungeonInfo(const DungeonInfo& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  DungeonInfo* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.members_){from._impl_.members_}
+    , decltype(_impl_.leaderinfo_){nullptr}
+    , decltype(_impl_.dungeonid_){}
+    , decltype(_impl_.status_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  if (from._internal_has_leaderinfo()) {
+    _this->_impl_.leaderinfo_ = new ::Protocol::DungeonPlayerInfo(*from._impl_.leaderinfo_);
+  }
+  ::memcpy(&_impl_.dungeonid_, &from._impl_.dungeonid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.status_) -
+    reinterpret_cast<char*>(&_impl_.dungeonid_)) + sizeof(_impl_.status_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.DungeonInfo)
+}
+
+inline void DungeonInfo::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.members_){arena}
+    , decltype(_impl_.leaderinfo_){nullptr}
+    , decltype(_impl_.dungeonid_){0}
+    , decltype(_impl_.status_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+DungeonInfo::~DungeonInfo() {
+  // @@protoc_insertion_point(destructor:Protocol.DungeonInfo)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void DungeonInfo::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.members_.~RepeatedPtrField();
+  if (this != internal_default_instance()) delete _impl_.leaderinfo_;
+}
+
+void DungeonInfo::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void DungeonInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.DungeonInfo)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.members_.Clear();
+  if (GetArenaForAllocation() == nullptr && _impl_.leaderinfo_ != nullptr) {
+    delete _impl_.leaderinfo_;
+  }
+  _impl_.leaderinfo_ = nullptr;
+  ::memset(&_impl_.dungeonid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.status_) -
+      reinterpret_cast<char*>(&_impl_.dungeonid_)) + sizeof(_impl_.status_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* DungeonInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // int32 dungeonId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.dungeonid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.RoomStatus status = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+          _internal_set_status(static_cast<::Protocol::RoomStatus>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // .Protocol.DungeonPlayerInfo leaderInfo = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          ptr = ctx->ParseMessage(_internal_mutable_leaderinfo(), ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .Protocol.DungeonPlayerInfo members = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_members(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<34>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* DungeonInfo::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.DungeonInfo)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // int32 dungeonId = 1;
+  if (this->_internal_dungeonid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(1, this->_internal_dungeonid(), target);
+  }
+
+  // .Protocol.RoomStatus status = 2;
+  if (this->_internal_status() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteEnumToArray(
+      2, this->_internal_status(), target);
+  }
+
+  // .Protocol.DungeonPlayerInfo leaderInfo = 3;
+  if (this->_internal_has_leaderinfo()) {
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+      InternalWriteMessage(3, _Internal::leaderinfo(this),
+        _Internal::leaderinfo(this).GetCachedSize(), target, stream);
+  }
+
+  // repeated .Protocol.DungeonPlayerInfo members = 4;
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_members_size()); i < n; i++) {
+    const auto& repfield = this->_internal_members(i);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(4, repfield, repfield.GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.DungeonInfo)
+  return target;
+}
+
+size_t DungeonInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.DungeonInfo)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .Protocol.DungeonPlayerInfo members = 4;
+  total_size += 1UL * this->_internal_members_size();
+  for (const auto& msg : this->_impl_.members_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  // .Protocol.DungeonPlayerInfo leaderInfo = 3;
+  if (this->_internal_has_leaderinfo()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(
+        *_impl_.leaderinfo_);
+  }
+
+  // int32 dungeonId = 1;
+  if (this->_internal_dungeonid() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_dungeonid());
+  }
+
+  // .Protocol.RoomStatus status = 2;
+  if (this->_internal_status() != 0) {
+    total_size += 1 +
+      ::_pbi::WireFormatLite::EnumSize(this->_internal_status());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData DungeonInfo::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    DungeonInfo::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*DungeonInfo::GetClassData() const { return &_class_data_; }
+
+
+void DungeonInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<DungeonInfo*>(&to_msg);
+  auto& from = static_cast<const DungeonInfo&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.DungeonInfo)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_impl_.members_.MergeFrom(from._impl_.members_);
+  if (from._internal_has_leaderinfo()) {
+    _this->_internal_mutable_leaderinfo()->::Protocol::DungeonPlayerInfo::MergeFrom(
+        from._internal_leaderinfo());
+  }
+  if (from._internal_dungeonid() != 0) {
+    _this->_internal_set_dungeonid(from._internal_dungeonid());
+  }
+  if (from._internal_status() != 0) {
+    _this->_internal_set_status(from._internal_status());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void DungeonInfo::CopyFrom(const DungeonInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.DungeonInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool DungeonInfo::IsInitialized() const {
+  return true;
+}
+
+void DungeonInfo::InternalSwap(DungeonInfo* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.members_.InternalSwap(&other->_impl_.members_);
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(DungeonInfo, _impl_.status_)
+      + sizeof(DungeonInfo::_impl_.status_)
+      - PROTOBUF_FIELD_OFFSET(DungeonInfo, _impl_.leaderinfo_)>(
+          reinterpret_cast<char*>(&_impl_.leaderinfo_),
+          reinterpret_cast<char*>(&other->_impl_.leaderinfo_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata DungeonInfo::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Struct_2eproto_getter, &descriptor_table_Struct_2eproto_once,
+      file_level_metadata_Struct_2eproto[6]);
+}
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
@@ -1538,6 +2207,14 @@ Arena::CreateMaybeMessage< ::Protocol::PlayerInfo >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::Protocol::PlayerState*
 Arena::CreateMaybeMessage< ::Protocol::PlayerState >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Protocol::PlayerState >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::DungeonPlayerInfo*
+Arena::CreateMaybeMessage< ::Protocol::DungeonPlayerInfo >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::DungeonPlayerInfo >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::DungeonInfo*
+Arena::CreateMaybeMessage< ::Protocol::DungeonInfo >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::DungeonInfo >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

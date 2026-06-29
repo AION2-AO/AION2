@@ -11,7 +11,7 @@
 /**
  * 
  */
-class ADaeva;
+class AMMODaeva;
 UCLASS()
 class AION2_API UAOPlayerManager : public UGameInstanceSubsystem
 {
@@ -24,18 +24,21 @@ public:
 	void HandleLogin(uint64 PlayerId, uint8 ClassType);
 	void HandleSpawn(uint64 PlayerId, uint8 ClassType, FVector SpawnLocation, FRotator SpawnRotation);
 	void HnadleMove(uint64 PlayerId, FVector NewLocation, FRotator NewRotation, FVector NewVel);
-	
+	void HandleDungeonCreate(int32 DungeonId);
+	void HandleDungeonEnter(int32 DungeonId);
+	void HandleDungeonStart(FString ServerURL);
+
 private:
 	FVector PlayerStartLocation = FVector(442.0f,-147.0f, 90.0f );
 
 private:	
 	UPROPERTY()
-	TObjectPtr<ADaeva> MyPlayer;
+	TObjectPtr<AMMODaeva> MyPlayer;
 
 	UPROPERTY()
-	TMap<uint64, TObjectPtr<ADaeva>> PlayerInfos;
+	TMap<uint64, TObjectPtr<AMMODaeva>> PlayerInfos;
 	
-	TSubclassOf <ADaeva> PlayerClass;
+	TSubclassOf <AMMODaeva> PlayerClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
 	TMap<uint8, TSubclassOf<APawn>> JobClassMap;

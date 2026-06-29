@@ -25,6 +25,9 @@
     <Filter Include="Packet">
       <UniqueIdentifier>{145444dd-d971-464a-b88b-f432a46f63af}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Room">
+      <UniqueIdentifier>{8abd7d55-f065-4fb9-be94-7f8bdca29720}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="CoreGlobal\CoreGlobal.cpp">
@@ -75,7 +78,7 @@
     <ClCompile Include="Network\Service.cpp">
       <Filter>Network</Filter>
     </ClCompile>
-    <ClCompile Include="Session\DedicateSession.cpp">
+    <ClCompile Include="Session\DedicatedSession.cpp">
       <Filter>Session</Filter>
     </ClCompile>
     <ClCompile Include="Session\GameSession.cpp">
@@ -119,7 +122,13 @@
     <ClCompile Include="ObjectUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Room.cpp">
+      <Filter>Room</Filter>
+    </ClCompile>
+    <ClCompile Include="Dungeon.cpp">
+      <Filter>Room</Filter>
+    </ClCompile>
+    <ClCompile Include="DediSessionManager.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="CoreGlobal\CoreGlobal.h">
@@ -173,7 +182,7 @@
     <ClInclude Include="Network\Service.h">
       <Filter>Network</Filter>
     </ClInclude>
-    <ClInclude Include="Session\DedicateSession.h">
+    <ClInclude Include="Session\DedicatedSession.h">
       <Filter>Session</Filter>
     </ClInclude>
     <ClInclude Include="Session\GameSession.h">
@@ -216,6 +225,12 @@
     <ClInclude Include="ObjectUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Room.h" />
+    <ClInclude Include="Room.h">
+      <Filter>Room</Filter>
+    </ClInclude>
+    <ClInclude Include="Dungeon.h">
+      <Filter>Room</Filter>
+    </ClInclude>
+    <ClInclude Include="DediSessionManager.h" />
   </ItemGroup>
 </Project>

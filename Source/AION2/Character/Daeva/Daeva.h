@@ -13,6 +13,15 @@ class USkeletalMeshComponent;
 class UInputAction;
 class UGameplayEffect;
 
+class UAOUserWidgetBase;
+class UWidgetComponent;
+class UAOWidgetComponentBase;
+class USceneComponent;
+class UMaterialInterface;
+
+class AAOPlayerState;
+class UAbilitySystemComponent;
+
 UENUM(BlueprintType)
 enum class EDaevaPartType : uint8
 {
@@ -42,7 +51,9 @@ enum class EMontageID : uint8
 	Key3,
 	Key4,
 	KeyQ,
-	KeyE
+	KeyE,
+	Die,
+	Rebirth
 };
 
 UENUM(BlueprintType)
@@ -66,6 +77,14 @@ enum class EAbilityID : uint8
 	KeyE
 };
 
+// UI: Player ASC�� �غ�Ǹ� bind
+DECLARE_MULTICAST_DELEGATE_ThreeParams(
+	FOnPlayerUIReady,
+	AAOPlayerState*,
+	UAbilitySystemComponent*,
+	ADaeva*
+);
+
 UCLASS()
 class AION2_API ADaeva : public AAOCharacter
 {
@@ -82,11 +101,15 @@ protected:
 	virtual void OnRep_PlayerState() override;
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
+	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
+
 private:
 	void Tick_Camera(float DeltaTime);
-	void Tick_Combat(float DeltaTime);
 
 public:
+	UFUNCTION(NetMulticast, Reliable)
+	void Multicast_PlayMontage(EMontageID MontageID, float PlayRate);
+
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayWingMontage(EMontageID MontageID, float PlayRate);
 
@@ -100,7 +123,11 @@ public:
 	void Client_PlayCameraShake();
 
 public:
+	bool HasMoveInput();
 	virtual void SearchTarget() override;
+	virtual void TeleportBackToTarget() override;
+	FRotator GetLookAtToTarget();
+	void SetCameraByLookAt(const FRotator& LookAtRot);
 
 protected:
 	virtual void Move(const FInputActionValue& Value);
@@ -124,18 +151,23 @@ protected:
 
 protected:
 	virtual void OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera) override;
-	virtual void TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser) override;
+	virtual void TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitResult, AAOCharacter* DamageCauser) override;
 
 private:
 	void InputSpacePressed();
 	void InputLBPressed();
 	void InputRBPressed();
-
 	void InputMoveReleased();
 
 protected:
 	void OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount);
 
+public:
+	virtual void HandleDeath();
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
+
+protected:
+	FDelegateHandle HealthChangedDelegateHandle;
 
 protected:
 	void StartSprint();
@@ -150,6 +182,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Sprint")
 	TSubclassOf<UGameplayEffect> SprintDrainEffect;
 
+
 	UFUNCTION(Server, Reliable)
 	void ServerStartSprint();
 
@@ -158,6 +191,7 @@ protected:
 
 	void RequestStartSprint();
 	void RequestStopSprint();
+
 
 	FActiveGameplayEffectHandle SprintEffectHandle;
 	FActiveGameplayEffectHandle SprintDrainEffectHandle;
@@ -178,16 +212,11 @@ private:
 	void PlayCameraShake(bool& bDidShakeCamera);
 	bool IsFrontOfCamera(AActor* Other);
 	float CalcDistanceSquaredToScreenCenter(AActor* Other);
+	void ChangeCurrentTargetInClient(AAOCharacter* NewTarget);
 
-public:
-	void SetMyId(uint64 Id) { MyId = Id; }
-
-	void SendMovePacket();
-	void ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel);
-
-	bool HasMovement();
-	bool IsCurrentMoving();
-
+private:
+	// UI ����. Local Player�� ���� Head-up UI�� �߰��Ѵ�.
+	void BindOverheadStatusWidget();
 
 public:
 	FORCEINLINE UAnimMontage* GetMontageByID(EMontageID Index) const { return Montages[Index]; }
@@ -195,6 +224,7 @@ public:
 	FORCEINLINE USkeletalMeshComponent* GetSubWeaponMesh() const { return SubWeapon; }
 	FORCEINLINE USkeletalMeshComponent* GetWingMesh() const { return Wing; }
 	FORCEINLINE UAnimInstance* GetWingAnimInstance() const { return GetWingMesh()->GetAnimInstance(); }
+	virtual TArray<USkeletalMeshComponent*> GetAllMeshes() override;
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "Movement", meta = (AllowPrivateAccess = "true"))
@@ -218,7 +248,17 @@ private:
 
 	float TargetZoomDistance;
 
+public:
+	// UI: Player ASC�� �غ�Ǹ� UI Bind.
+	FOnPlayerUIReady OnPlayerUIReady;
+
+	bool IsPlayerUIReady() const;
+	void NotifyPlayerUIReady();
+
 private:
+	bool bPlayerUIReady = false;
+
+protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> MoveAction;
 
@@ -290,25 +330,6 @@ private:
 
 	bool bTagEventsRegistered = false;
 
-private:
-	FTimerHandle SendMoveHandle;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Network")
-	float SendMoveTimer = 0.1f;
-
-	// �ֱٿ� ���´� ��ġ, ȸ��
-	FVector LastLoc = FVector::ZeroVector;
-	FRotator LastRot = FRotator::ZeroRotator;
-
-	// ���� ��ġ, ȸ��
-	FVector TargetLoc = FVector::ZeroVector;
-	FRotator TargetRot = FRotator::ZeroRotator;
-	FVector TargetVel = FVector::ZeroVector;
-
-	bool bWasMovingLastSend = false;
-
-	uint64 MyId = -1;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Combat", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UCameraShakeBase> CameraShakeClass;
 
@@ -316,4 +337,12 @@ private:
 	AAOCharacter* PreviousTarget = nullptr;
 	FTimerHandle TargetSearchTimer;
 
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USceneComponent> BillboardComponent;
+
+	TObjectPtr<UMaterialInterface> WidgetMaterial;
 };

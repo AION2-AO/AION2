@@ -24,10 +24,12 @@ USING_SHARED_PTR(IocpObject);
 USING_SHARED_PTR(Listener);
 USING_SHARED_PTR(Service);
 USING_SHARED_PTR(MMOServerService);
+USING_SHARED_PTR(DediService);
 
 USING_SHARED_PTR(Session);
 USING_SHARED_PTR(PacketSession);
 USING_SHARED_PTR(GameSession);
+USING_SHARED_PTR(DedicatedSession);
 USING_SHARED_PTR(SendBuffer);
 USING_SHARED_PTR(Player);
 
@@ -35,6 +37,8 @@ USING_SHARED_PTR(JobQueue);
 USING_SHARED_PTR(Job);
 
 USING_SHARED_PTR(Room);
+USING_SHARED_PTR(Dungeon);
+USING_SHARED_PTR(DungeonWaitingRoom);
 
 
 const uint64 WORKER_TICK = 64;

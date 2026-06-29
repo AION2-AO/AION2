@@ -4,7 +4,7 @@
 
 #include <map>
 
-// 던전
+// 로비
 class Room : public JobQueue
 {
 public:
@@ -24,7 +24,7 @@ public:
 	void Broadcast(SendBufferRef sendBuffer, uint64 exceptId);
 
 private:
-	std::map< uint64, PlayerRef> _players;
+	std::map<uint64, PlayerRef> _players;
 };
 
 extern RoomRef GRoom;

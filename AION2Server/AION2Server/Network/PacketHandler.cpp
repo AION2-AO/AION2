@@ -1,10 +1,12 @@
 #include "pch.h"
 #include "PacketHandler.h"
-#include "GameSession.h"
+#include "GameSession.h"'
+#include "Session/DedicatedSession.h"
 #include "DBConnectionPool.h"
 #include "DBBind.h"
 #include "ItemData.h"
 #include "Room.h"
+#include "Dungeon.h"
 #include "Player.h"
 #include "ObjectUtils.h"
 
@@ -112,7 +114,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 			{
 				GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 				PlayerRef player = ObjectUtils::CreatePlayer(gameSession);
-				player->SetPlayerInfo(playerClass, exp, gold, hp);
+				player->SetPlayerInfo(static_cast<Protocol::ClassType>(playerClass), exp, gold, hp);
 				isFirstRow = false;
 			}
 			if (itemInstanceId != 0)
@@ -167,10 +169,11 @@ bool PacketHandler::HandleMapComplete(PacketSessionRef& session, Protocol::C_Map
 {
 	std::cout << "Handle Map Complete\n";
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	if (!gameSession)return false;
 	PlayerRef player = gameSession->_player;
 	GRoom->DoAsync(&Room::HandleEnterPlayer, player);
 
-	return false;
+	return true;
 }
 
 bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt)
@@ -182,6 +185,53 @@ bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket
 		return false;
 
 	GRoom->DoAsync(&Room::HandleMove, pkt, player);
+	return true;
+}
 
+bool PacketHandler::HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt)
+{
+	DedicatedSessionRef dediSession = static_pointer_cast<DedicatedSession>(session);
+	dediSession->SetAddrInfo(pkt.serverip(), pkt.serverport());
+
+	std::cout << "Dedicated Server Registered: "
+		<< pkt.serverip() << ":" << pkt.serverport() << std::endl;
+
+	return true;
+}
+
+bool PacketHandler::HandleDungeonWaitingRoom(PacketSessionRef& session, Protocol::C_DungeonWaitingRoomEnterPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleWaitingRoom, player);
+	return true;
+}
+
+bool PacketHandler::HandleDungeonCreate(PacketSessionRef& session, Protocol::C_DungeonCreatePacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleCreateDungeon, player);
+	return true;
+}
+
+bool PacketHandler::HandleDungeonEnter(PacketSessionRef& session, Protocol::C_DungeonEnteracket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleEnterDungeon, player);
+	return true;
+}
+
+bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_DungeonStartacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	//GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleCreateDungeon, player);
+
+	int32 dungeonId = pkt.dungeonid();
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonStart, player, dungeonId);
 	return true;
 }

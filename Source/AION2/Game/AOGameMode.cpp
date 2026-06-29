@@ -17,6 +17,13 @@ void AAOGameMode::BeginPlay()
 	{
 		NetworkManager = GameInst->GetNetworkManager();
 	}
+
+#if UE_SERVER
+	if (GameInst)
+	{
+		GameInst->SendDediIpPort();
+	}
+#endif
 }
 
 void AAOGameMode::Tick(float DeltaTime)

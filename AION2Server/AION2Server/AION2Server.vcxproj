@@ -25,6 +25,8 @@
     <ClCompile Include="DB\DBBind.cpp" />
     <ClCompile Include="DB\DBConnection.cpp" />
     <ClCompile Include="DB\DBConnectionPool.cpp" />
+    <ClCompile Include="DediSessionManager.cpp" />
+    <ClCompile Include="Dungeon.cpp" />
     <ClCompile Include="Enum.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
@@ -52,7 +54,7 @@
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
     <ClCompile Include="Room.cpp" />
-    <ClCompile Include="Session\DedicateSession.cpp" />
+    <ClCompile Include="Session\DedicatedSession.cpp" />
     <ClCompile Include="Session\GameSession.cpp" />
     <ClCompile Include="Session\GameSessionManager.cpp" />
     <ClCompile Include="Session\Session.cpp" />
@@ -80,6 +82,8 @@
     <ClInclude Include="DB\DBBind.h" />
     <ClInclude Include="DB\DBConnection.h" />
     <ClInclude Include="DB\DBConnectionPool.h" />
+    <ClInclude Include="DediSessionManager.h" />
+    <ClInclude Include="Dungeon.h" />
     <ClInclude Include="Enum.pb.h" />
     <ClInclude Include="ItemData.h" />
     <ClInclude Include="Job\Job.h" />
@@ -97,7 +101,7 @@
     <ClInclude Include="Player.h" />
     <ClInclude Include="Protocol.pb.h" />
     <ClInclude Include="Room.h" />
-    <ClInclude Include="Session\DedicateSession.h" />
+    <ClInclude Include="Session\DedicatedSession.h" />
     <ClInclude Include="Session\GameSession.h" />
     <ClInclude Include="Session\GameSessionManager.h" />
     <ClInclude Include="Session\Session.h" />

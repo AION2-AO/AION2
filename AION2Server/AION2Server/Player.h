@@ -6,15 +6,18 @@ class Player
 {
 public:
 	Player() = default;
-	Player(int32 playerClass, int32 exp, int32 gold, int32 hp);
+	Player(Protocol::ClassType playerClass, int32 exp, int32 gold, int32 hp);
 
-	void SetPlayerInfo(int32 playerClass, int32 exp, int32 gold, int32 hp);
+	void SetPlayerInfo(Protocol::ClassType playerClass, int32 exp, int32 gold, int32 hp);
 
 	uint64 GetId() { return _playerId; }
+	std::string GetName() { return _name; }
+	Protocol::ClassType GetClass() { return _class; }
 	int32 GetGold() { return _gold; }
 	int32 GetHp() { return _hp; }
 	int32 GetExp() { return _exp; }
 
+	void SetName(std::string playerName) { _name = playerName; }
 	void SetPos(Protocol::Vector3 inPos) { _playerPos = inPos; }
 	void SetRot(Protocol::Rotator3 inRot) { _playerRot = inRot; }
 
@@ -29,7 +32,7 @@ public:
 	std::atomic<std::weak_ptr<Room>> room;
 
 public:
-	int32 _class;
+	Protocol::ClassType _class;
 	int32 _gold;
 	int32 _hp;
 	int32 _exp;

@@ -3,14 +3,24 @@
 #include "Physics/Collision.h"
 #include "GAS/AOGameplayTags.h"
 #include "Player/AOPlayerController.h"
+#include "GAS/AttributeSet/AOAttributeSet.h"
+#include "Actor/AOProjectile.h"
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
+#include "Net/UnrealNetwork.h"
 
 AAOCharacter::AAOCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAOCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
 	PrimaryActorTick.bCanEverTick = true;
+}
+
+void AAOCharacter::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
+{
+	Super::GetLifetimeReplicatedProps(OutLifetimeProps);
+
+	DOREPLIFETIME(AAOCharacter, bIsDead);
 }
 
 void AAOCharacter::Multicast_DrawDebugCapsuleCollider_Implementation(const FVector& CapsuleOrigin, const float CapsuleHalfHeight, const float AttackRadius, const FColor DrawColor)
@@ -22,8 +32,17 @@ void AAOCharacter::SearchTarget()
 {
 }
 
+void AAOCharacter::TeleportBackToTarget()
+{
+}
+
 void AAOCharacter::CheckAttackHit(const FAttackData& AttackData)
 {
+	if (!HasAuthority())
+	{
+		return;
+	}
+
 	TArray<FHitResult> OutHitResults;
 
 	const float AttackRange = AttackData.TraceData.Range;
@@ -68,14 +87,6 @@ void AAOCharacter::CheckAttackHit(const FAttackData& AttackData)
 	}
 }
 
-void AAOCharacter::InitGAS()
-{
-}
-
-void AAOCharacter::ClearGAS()
-{
-}
-
 void AAOCharacter::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
 {
 	AAOCharacter* Target = Cast<AAOCharacter>(HitActor);
@@ -84,11 +95,10 @@ void AAOCharacter::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitA
 		return;
 	}
 
-	Target->TakeDamageAO(AttackData, this);
-	// gc
+	Target->TakeDamageAO(AttackData, HitResult, this);
 }
 
-void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, AAOCharacter* DamageCauser)
+void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitResult, AAOCharacter* DamageCauser)
 {
 	UAbilitySystemComponent* SourceASC = DamageCauser->GetAbilitySystemComponent();
 	UAbilitySystemComponent* TargetASC = GetAbilitySystemComponent();
@@ -97,9 +107,98 @@ void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, AAOCharacter* Dam
 		return;
 	}
 
-	//FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
-	//FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffect, 1, Context);
-	//SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+	const float AttackPower = SourceASC->GetNumericAttribute(UAOAttributeSet::GetAttackPowerAttribute());
+	const float Defense = TargetASC->GetNumericAttribute(UAOAttributeSet::GetDefenseAttribute());
+
+	const float Multiplier = AttackData.DamageMultiplier;
+	const float BaseDamage = AttackPower * Multiplier;
+
+	const float FinalDamage = FMath::Max(1.0f, BaseDamage * (100.0f / (100.0f + Defense)));
+
+	FGameplayEffectContextHandle Context = SourceASC->MakeEffectContext();
+	Context.AddSourceObject(DamageCauser);
+
+	FGameplayEffectSpecHandle SpecHandle = SourceASC->MakeOutgoingSpec(DamageEffect, 1.0f, Context);
+
+	if (!SpecHandle.IsValid())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Damage]"));
+		return;
+	}
+
+	SpecHandle.Data->SetSetByCallerMagnitude(
+		FGameplayTag::RequestGameplayTag(TEXT("Data.Damage")),
+		-FinalDamage
+	);
+
+	const float OldHealth =
+		TargetASC->GetNumericAttribute(
+			UAOAttributeSet::GetHealthAttribute()
+		);
+
+	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
+
+	const float NewHealth =
+		TargetASC->GetNumericAttribute(
+			UAOAttributeSet::GetHealthAttribute()
+		);
+
+	UE_LOG(
+		LogTemp,
+		Warning,
+		TEXT("[Damage] %s -> %s | ATK: %.1f | DEF: %.1f | Mult: %.2f | Final: %.2f | HP: %.1f -> %.1f"),
+		*GetNameSafe(DamageCauser),
+		*GetNameSafe(this),
+		AttackPower,
+		Defense,
+		Multiplier,
+		FinalDamage,
+		OldHealth,
+		NewHealth
+	);
+
+	if (AttackData.HitGameplayCueTag.IsValid())
+	{
+		FGameplayCueParameters CueParams;
+		CueParams.Location = HitResult.ImpactPoint;
+		CueParams.Normal = HitResult.ImpactNormal;
+		CueParams.Instigator = this;
+		CueParams.EffectCauser = this;
+		TargetASC->ExecuteGameplayCue(AttackData.HitGameplayCueTag, CueParams);
+	}
+}
+
+void AAOCharacter::SpawnAttackProjectile(const FAttackData& AttackData, TSubclassOf<class AAOProjectile> ProjectileClass, const FName& SpawnSocket)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (!ProjectileClass)
+	{
+		return;
+	}
+
+	const FTransform SocketTransform = GetMesh()->GetSocketTransform(SpawnSocket);
+
+	FVector Direction = GetActorForwardVector();
+	if (IsValid(CurrentTarget))
+	{
+		Direction = (CurrentTarget->GetActorLocation() - SocketTransform.GetLocation()).GetSafeNormal();
+	}
+
+	FTransform SpawnTransform = SocketTransform;
+	SpawnTransform.SetRotation(Direction.Rotation().Quaternion());
+
+	AAOProjectile* Projectile = GetWorld()->SpawnActorDeferred<AAOProjectile>(ProjectileClass, SpawnTransform, this, this, ESpawnActorCollisionHandlingMethod::AlwaysSpawn);
+	if (!Projectile)
+	{
+		return;
+	}
+
+	Projectile->InitProjectile(AttackData, this, CurrentTarget, Direction);
+	Projectile->FinishSpawning(SpawnTransform);
 }
 
 bool AAOCharacter::IsEnemy(AActor* TargetActor)
@@ -137,7 +236,23 @@ void AAOCharacter::DrawDebugCapsuleCollider(const FVector& CapsuleOrigin, const 
 #endif
 }
 
+void AAOCharacter::InitGAS()
+{
+}
+
+void AAOCharacter::ClearGAS()
+{
+}
+
 UAbilitySystemComponent* AAOCharacter::GetAbilitySystemComponent() const
 {
 	return ASC;
+}
+
+TArray<USkeletalMeshComponent*> AAOCharacter::GetAllMeshes()
+{
+	TArray<USkeletalMeshComponent*> Meshes;
+	Meshes.Add(GetMesh());
+
+	return Meshes;
 }

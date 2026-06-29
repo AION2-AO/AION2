@@ -5,13 +5,20 @@
 #include "Character/Daeva/Daeva.h"
 #include "GA_Attack.generated.h"
 
+class UGameplayEffect;
+
 UCLASS()
 class AION2_API UGA_Attack : public UGameplayAbility
 {
 	GENERATED_BODY()
 
 public:
-	virtual void ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData) override;
+	virtual void ActivateAbility(
+		const FGameplayAbilitySpecHandle Handle,
+		const FGameplayAbilityActorInfo* ActorInfo,
+		const FGameplayAbilityActivationInfo ActivationInfo,
+		const FGameplayEventData* TriggerEventData
+	) override;
 
 protected:
 	UFUNCTION()
@@ -39,7 +46,7 @@ private:
 	EMontageID MontageIDToPlay;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
-	float MontagePlayRate;
+	float MontagePlayRate = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
 	FName StartSectionName;

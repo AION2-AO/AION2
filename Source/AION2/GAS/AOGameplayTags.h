@@ -21,12 +21,36 @@
 
 #define EVENT_CHECKATTACKHIT FGameplayTag::RequestGameplayTag(TEXT("Event.CheckAttackHit"))
 
+// GameplayCue
+#define CUE_GHOSTTRAIL FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.GhostTrail"))
+
 // Monster Game Tag
 
 // Action 
-#define ABILITY_MONSTER_CHARGEATTACK FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.ChargeAttack"))
-#define ABILITY_MONSTER_TELEPORT FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.Teleport"))
+#define ABILITY_MONSTER_TH_CHARGEATTACK   FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.TH.ChargeAttack"))
+#define ABILITY_MONSTER_TH_TELEPORTATTACK FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.TH.TeleportAttack"))
+#define ABILITY_MONSTER_TH_RANGEDATTACK   FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.TH.RangedAttack"))
+#define ABILITY_MONSTER_TH_MELEEATTACK    FGameplayTag::RequestGameplayTag(TEXT("Ability.Monster.TH.MELEEAttack"))
+
 
 // Cooldown 
-#define COOLDOWN_MONSTER_CHARGEATTACK FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Monster.ChargeAttack"))
-#define COOLDOWN_MONSTER_TELEPORT FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Monster.Teleport"))
+#define COOLDOWN_MONSTER_TH_CHARGEATTACK FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Monster.TH.ChargeAttack"))
+#define COOLDOWN_MONSTER_TH_TELEPORTATTACK FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Monster.TH.TeleportAttack"))
+
+
+
+// Phase 
+#define PHASE_MONSTER_OUTOFCOMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.OutofCombat"))
+#define PHASE_MONSTER_PRECOMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.PreCombat"))
+#define PHASE_MONSTER_COMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Combat"))
+#define PHASE_MONSTER_DEAD FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Dead"))
+
+
+// State
+#define STATE_MONSTER_TH_IDLE FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.Idle"))
+#define STATE_MONSTER_TH_CHASE FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.Chase"))
+#define STATE_MONSTER_TH_RANGEDSHOT FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.RangedShot"))
+#define STATE_MONSTER_TH_MELEEATTACK FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.MeleeAttack"))
+#define STATE_MONSTER_TH_CHARGEATTACK FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.ChargeAttack"))
+#define STATE_MONSTER_TH_TELEPORTATTACK FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.TeleportAttack"))
+#define STATE_MONSTER_TH_DEAD FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.Dead"))

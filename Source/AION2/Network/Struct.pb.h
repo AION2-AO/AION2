@@ -54,6 +54,12 @@ struct TableStruct_Struct_2eproto {
 };
 extern const ::PROTOBUF_NAMESPACE_ID::internal::DescriptorTable descriptor_table_Struct_2eproto;
 namespace Protocol {
+class DungeonInfo;
+struct DungeonInfoDefaultTypeInternal;
+extern DungeonInfoDefaultTypeInternal _DungeonInfo_default_instance_;
+class DungeonPlayerInfo;
+struct DungeonPlayerInfoDefaultTypeInternal;
+extern DungeonPlayerInfoDefaultTypeInternal _DungeonPlayerInfo_default_instance_;
 class ItemData;
 struct ItemDataDefaultTypeInternal;
 extern ItemDataDefaultTypeInternal _ItemData_default_instance_;
@@ -71,6 +77,8 @@ struct Vector3DefaultTypeInternal;
 extern Vector3DefaultTypeInternal _Vector3_default_instance_;
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
+template<> ::Protocol::DungeonInfo* Arena::CreateMaybeMessage<::Protocol::DungeonInfo>(Arena*);
+template<> ::Protocol::DungeonPlayerInfo* Arena::CreateMaybeMessage<::Protocol::DungeonPlayerInfo>(Arena*);
 template<> ::Protocol::ItemData* Arena::CreateMaybeMessage<::Protocol::ItemData>(Arena*);
 template<> ::Protocol::PlayerInfo* Arena::CreateMaybeMessage<::Protocol::PlayerInfo>(Arena*);
 template<> ::Protocol::PlayerState* Arena::CreateMaybeMessage<::Protocol::PlayerState>(Arena*);
@@ -958,6 +966,402 @@ class PlayerState final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Struct_2eproto;
 };
+// -------------------------------------------------------------------
+
+class DungeonPlayerInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.DungeonPlayerInfo) */ {
+ public:
+  inline DungeonPlayerInfo() : DungeonPlayerInfo(nullptr) {}
+  ~DungeonPlayerInfo() override;
+  explicit PROTOBUF_CONSTEXPR DungeonPlayerInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DungeonPlayerInfo(const DungeonPlayerInfo& from);
+  DungeonPlayerInfo(DungeonPlayerInfo&& from) noexcept
+    : DungeonPlayerInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline DungeonPlayerInfo& operator=(const DungeonPlayerInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DungeonPlayerInfo& operator=(DungeonPlayerInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DungeonPlayerInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DungeonPlayerInfo* internal_default_instance() {
+    return reinterpret_cast<const DungeonPlayerInfo*>(
+               &_DungeonPlayerInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    5;
+
+  friend void swap(DungeonPlayerInfo& a, DungeonPlayerInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DungeonPlayerInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DungeonPlayerInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  DungeonPlayerInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<DungeonPlayerInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DungeonPlayerInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const DungeonPlayerInfo& from) {
+    DungeonPlayerInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DungeonPlayerInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.DungeonPlayerInfo";
+  }
+  protected:
+  explicit DungeonPlayerInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMemberNameFieldNumber = 2,
+    kMemberIdFieldNumber = 1,
+    kMemberClassFieldNumber = 3,
+    kIsReadyFieldNumber = 4,
+    kIndexFieldNumber = 5,
+  };
+  // string memberName = 2;
+  void clear_membername();
+  const std::string& membername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_membername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_membername();
+  PROTOBUF_NODISCARD std::string* release_membername();
+  void set_allocated_membername(std::string* membername);
+  private:
+  const std::string& _internal_membername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_membername(const std::string& value);
+  std::string* _internal_mutable_membername();
+  public:
+
+  // uint64 memberId = 1;
+  void clear_memberid();
+  uint64_t memberid() const;
+  void set_memberid(uint64_t value);
+  private:
+  uint64_t _internal_memberid() const;
+  void _internal_set_memberid(uint64_t value);
+  public:
+
+  // .Protocol.ClassType memberClass = 3;
+  void clear_memberclass();
+  ::Protocol::ClassType memberclass() const;
+  void set_memberclass(::Protocol::ClassType value);
+  private:
+  ::Protocol::ClassType _internal_memberclass() const;
+  void _internal_set_memberclass(::Protocol::ClassType value);
+  public:
+
+  // bool isReady = 4;
+  void clear_isready();
+  bool isready() const;
+  void set_isready(bool value);
+  private:
+  bool _internal_isready() const;
+  void _internal_set_isready(bool value);
+  public:
+
+  // int32 index = 5;
+  void clear_index();
+  int32_t index() const;
+  void set_index(int32_t value);
+  private:
+  int32_t _internal_index() const;
+  void _internal_set_index(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.DungeonPlayerInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr membername_;
+    uint64_t memberid_;
+    int memberclass_;
+    bool isready_;
+    int32_t index_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
+// -------------------------------------------------------------------
+
+class DungeonInfo final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.DungeonInfo) */ {
+ public:
+  inline DungeonInfo() : DungeonInfo(nullptr) {}
+  ~DungeonInfo() override;
+  explicit PROTOBUF_CONSTEXPR DungeonInfo(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  DungeonInfo(const DungeonInfo& from);
+  DungeonInfo(DungeonInfo&& from) noexcept
+    : DungeonInfo() {
+    *this = ::std::move(from);
+  }
+
+  inline DungeonInfo& operator=(const DungeonInfo& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline DungeonInfo& operator=(DungeonInfo&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const DungeonInfo& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const DungeonInfo* internal_default_instance() {
+    return reinterpret_cast<const DungeonInfo*>(
+               &_DungeonInfo_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    6;
+
+  friend void swap(DungeonInfo& a, DungeonInfo& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(DungeonInfo* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(DungeonInfo* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  DungeonInfo* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<DungeonInfo>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const DungeonInfo& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const DungeonInfo& from) {
+    DungeonInfo::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(DungeonInfo* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.DungeonInfo";
+  }
+  protected:
+  explicit DungeonInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMembersFieldNumber = 4,
+    kLeaderInfoFieldNumber = 3,
+    kDungeonIdFieldNumber = 1,
+    kStatusFieldNumber = 2,
+  };
+  // repeated .Protocol.DungeonPlayerInfo members = 4;
+  int members_size() const;
+  private:
+  int _internal_members_size() const;
+  public:
+  void clear_members();
+  ::Protocol::DungeonPlayerInfo* mutable_members(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::DungeonPlayerInfo >*
+      mutable_members();
+  private:
+  const ::Protocol::DungeonPlayerInfo& _internal_members(int index) const;
+  ::Protocol::DungeonPlayerInfo* _internal_add_members();
+  public:
+  const ::Protocol::DungeonPlayerInfo& members(int index) const;
+  ::Protocol::DungeonPlayerInfo* add_members();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::DungeonPlayerInfo >&
+      members() const;
+
+  // .Protocol.DungeonPlayerInfo leaderInfo = 3;
+  bool has_leaderinfo() const;
+  private:
+  bool _internal_has_leaderinfo() const;
+  public:
+  void clear_leaderinfo();
+  const ::Protocol::DungeonPlayerInfo& leaderinfo() const;
+  PROTOBUF_NODISCARD ::Protocol::DungeonPlayerInfo* release_leaderinfo();
+  ::Protocol::DungeonPlayerInfo* mutable_leaderinfo();
+  void set_allocated_leaderinfo(::Protocol::DungeonPlayerInfo* leaderinfo);
+  private:
+  const ::Protocol::DungeonPlayerInfo& _internal_leaderinfo() const;
+  ::Protocol::DungeonPlayerInfo* _internal_mutable_leaderinfo();
+  public:
+  void unsafe_arena_set_allocated_leaderinfo(
+      ::Protocol::DungeonPlayerInfo* leaderinfo);
+  ::Protocol::DungeonPlayerInfo* unsafe_arena_release_leaderinfo();
+
+  // int32 dungeonId = 1;
+  void clear_dungeonid();
+  int32_t dungeonid() const;
+  void set_dungeonid(int32_t value);
+  private:
+  int32_t _internal_dungeonid() const;
+  void _internal_set_dungeonid(int32_t value);
+  public:
+
+  // .Protocol.RoomStatus status = 2;
+  void clear_status();
+  ::Protocol::RoomStatus status() const;
+  void set_status(::Protocol::RoomStatus value);
+  private:
+  ::Protocol::RoomStatus _internal_status() const;
+  void _internal_set_status(::Protocol::RoomStatus value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.DungeonInfo)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::DungeonPlayerInfo > members_;
+    ::Protocol::DungeonPlayerInfo* leaderinfo_;
+    int32_t dungeonid_;
+    int status_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Struct_2eproto;
+};
 // ===================================================================
 
 
@@ -1445,9 +1849,321 @@ inline void PlayerState::set_allocated_playerrotation(::Protocol::Rotator3* play
   // @@protoc_insertion_point(field_set_allocated:Protocol.PlayerState.playerRotation)
 }
 
+// -------------------------------------------------------------------
+
+// DungeonPlayerInfo
+
+// uint64 memberId = 1;
+inline void DungeonPlayerInfo::clear_memberid() {
+  _impl_.memberid_ = uint64_t{0u};
+}
+inline uint64_t DungeonPlayerInfo::_internal_memberid() const {
+  return _impl_.memberid_;
+}
+inline uint64_t DungeonPlayerInfo::memberid() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonPlayerInfo.memberId)
+  return _internal_memberid();
+}
+inline void DungeonPlayerInfo::_internal_set_memberid(uint64_t value) {
+  
+  _impl_.memberid_ = value;
+}
+inline void DungeonPlayerInfo::set_memberid(uint64_t value) {
+  _internal_set_memberid(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonPlayerInfo.memberId)
+}
+
+// string memberName = 2;
+inline void DungeonPlayerInfo::clear_membername() {
+  _impl_.membername_.ClearToEmpty();
+}
+inline const std::string& DungeonPlayerInfo::membername() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonPlayerInfo.memberName)
+  return _internal_membername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void DungeonPlayerInfo::set_membername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.membername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.DungeonPlayerInfo.memberName)
+}
+inline std::string* DungeonPlayerInfo::mutable_membername() {
+  std::string* _s = _internal_mutable_membername();
+  // @@protoc_insertion_point(field_mutable:Protocol.DungeonPlayerInfo.memberName)
+  return _s;
+}
+inline const std::string& DungeonPlayerInfo::_internal_membername() const {
+  return _impl_.membername_.Get();
+}
+inline void DungeonPlayerInfo::_internal_set_membername(const std::string& value) {
+  
+  _impl_.membername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* DungeonPlayerInfo::_internal_mutable_membername() {
+  
+  return _impl_.membername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* DungeonPlayerInfo::release_membername() {
+  // @@protoc_insertion_point(field_release:Protocol.DungeonPlayerInfo.memberName)
+  return _impl_.membername_.Release();
+}
+inline void DungeonPlayerInfo::set_allocated_membername(std::string* membername) {
+  if (membername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.membername_.SetAllocated(membername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.membername_.IsDefault()) {
+    _impl_.membername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.DungeonPlayerInfo.memberName)
+}
+
+// .Protocol.ClassType memberClass = 3;
+inline void DungeonPlayerInfo::clear_memberclass() {
+  _impl_.memberclass_ = 0;
+}
+inline ::Protocol::ClassType DungeonPlayerInfo::_internal_memberclass() const {
+  return static_cast< ::Protocol::ClassType >(_impl_.memberclass_);
+}
+inline ::Protocol::ClassType DungeonPlayerInfo::memberclass() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonPlayerInfo.memberClass)
+  return _internal_memberclass();
+}
+inline void DungeonPlayerInfo::_internal_set_memberclass(::Protocol::ClassType value) {
+  
+  _impl_.memberclass_ = value;
+}
+inline void DungeonPlayerInfo::set_memberclass(::Protocol::ClassType value) {
+  _internal_set_memberclass(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonPlayerInfo.memberClass)
+}
+
+// bool isReady = 4;
+inline void DungeonPlayerInfo::clear_isready() {
+  _impl_.isready_ = false;
+}
+inline bool DungeonPlayerInfo::_internal_isready() const {
+  return _impl_.isready_;
+}
+inline bool DungeonPlayerInfo::isready() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonPlayerInfo.isReady)
+  return _internal_isready();
+}
+inline void DungeonPlayerInfo::_internal_set_isready(bool value) {
+  
+  _impl_.isready_ = value;
+}
+inline void DungeonPlayerInfo::set_isready(bool value) {
+  _internal_set_isready(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonPlayerInfo.isReady)
+}
+
+// int32 index = 5;
+inline void DungeonPlayerInfo::clear_index() {
+  _impl_.index_ = 0;
+}
+inline int32_t DungeonPlayerInfo::_internal_index() const {
+  return _impl_.index_;
+}
+inline int32_t DungeonPlayerInfo::index() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonPlayerInfo.index)
+  return _internal_index();
+}
+inline void DungeonPlayerInfo::_internal_set_index(int32_t value) {
+  
+  _impl_.index_ = value;
+}
+inline void DungeonPlayerInfo::set_index(int32_t value) {
+  _internal_set_index(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonPlayerInfo.index)
+}
+
+// -------------------------------------------------------------------
+
+// DungeonInfo
+
+// int32 dungeonId = 1;
+inline void DungeonInfo::clear_dungeonid() {
+  _impl_.dungeonid_ = 0;
+}
+inline int32_t DungeonInfo::_internal_dungeonid() const {
+  return _impl_.dungeonid_;
+}
+inline int32_t DungeonInfo::dungeonid() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonInfo.dungeonId)
+  return _internal_dungeonid();
+}
+inline void DungeonInfo::_internal_set_dungeonid(int32_t value) {
+  
+  _impl_.dungeonid_ = value;
+}
+inline void DungeonInfo::set_dungeonid(int32_t value) {
+  _internal_set_dungeonid(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonInfo.dungeonId)
+}
+
+// .Protocol.RoomStatus status = 2;
+inline void DungeonInfo::clear_status() {
+  _impl_.status_ = 0;
+}
+inline ::Protocol::RoomStatus DungeonInfo::_internal_status() const {
+  return static_cast< ::Protocol::RoomStatus >(_impl_.status_);
+}
+inline ::Protocol::RoomStatus DungeonInfo::status() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonInfo.status)
+  return _internal_status();
+}
+inline void DungeonInfo::_internal_set_status(::Protocol::RoomStatus value) {
+  
+  _impl_.status_ = value;
+}
+inline void DungeonInfo::set_status(::Protocol::RoomStatus value) {
+  _internal_set_status(value);
+  // @@protoc_insertion_point(field_set:Protocol.DungeonInfo.status)
+}
+
+// .Protocol.DungeonPlayerInfo leaderInfo = 3;
+inline bool DungeonInfo::_internal_has_leaderinfo() const {
+  return this != internal_default_instance() && _impl_.leaderinfo_ != nullptr;
+}
+inline bool DungeonInfo::has_leaderinfo() const {
+  return _internal_has_leaderinfo();
+}
+inline void DungeonInfo::clear_leaderinfo() {
+  if (GetArenaForAllocation() == nullptr && _impl_.leaderinfo_ != nullptr) {
+    delete _impl_.leaderinfo_;
+  }
+  _impl_.leaderinfo_ = nullptr;
+}
+inline const ::Protocol::DungeonPlayerInfo& DungeonInfo::_internal_leaderinfo() const {
+  const ::Protocol::DungeonPlayerInfo* p = _impl_.leaderinfo_;
+  return p != nullptr ? *p : reinterpret_cast<const ::Protocol::DungeonPlayerInfo&>(
+      ::Protocol::_DungeonPlayerInfo_default_instance_);
+}
+inline const ::Protocol::DungeonPlayerInfo& DungeonInfo::leaderinfo() const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonInfo.leaderInfo)
+  return _internal_leaderinfo();
+}
+inline void DungeonInfo::unsafe_arena_set_allocated_leaderinfo(
+    ::Protocol::DungeonPlayerInfo* leaderinfo) {
+  if (GetArenaForAllocation() == nullptr) {
+    delete reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(_impl_.leaderinfo_);
+  }
+  _impl_.leaderinfo_ = leaderinfo;
+  if (leaderinfo) {
+    
+  } else {
+    
+  }
+  // @@protoc_insertion_point(field_unsafe_arena_set_allocated:Protocol.DungeonInfo.leaderInfo)
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::release_leaderinfo() {
+  
+  ::Protocol::DungeonPlayerInfo* temp = _impl_.leaderinfo_;
+  _impl_.leaderinfo_ = nullptr;
+#ifdef PROTOBUF_FORCE_COPY_IN_RELEASE
+  auto* old =  reinterpret_cast<::PROTOBUF_NAMESPACE_ID::MessageLite*>(temp);
+  temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  if (GetArenaForAllocation() == nullptr) { delete old; }
+#else  // PROTOBUF_FORCE_COPY_IN_RELEASE
+  if (GetArenaForAllocation() != nullptr) {
+    temp = ::PROTOBUF_NAMESPACE_ID::internal::DuplicateIfNonNull(temp);
+  }
+#endif  // !PROTOBUF_FORCE_COPY_IN_RELEASE
+  return temp;
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::unsafe_arena_release_leaderinfo() {
+  // @@protoc_insertion_point(field_release:Protocol.DungeonInfo.leaderInfo)
+  
+  ::Protocol::DungeonPlayerInfo* temp = _impl_.leaderinfo_;
+  _impl_.leaderinfo_ = nullptr;
+  return temp;
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::_internal_mutable_leaderinfo() {
+  
+  if (_impl_.leaderinfo_ == nullptr) {
+    auto* p = CreateMaybeMessage<::Protocol::DungeonPlayerInfo>(GetArenaForAllocation());
+    _impl_.leaderinfo_ = p;
+  }
+  return _impl_.leaderinfo_;
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::mutable_leaderinfo() {
+  ::Protocol::DungeonPlayerInfo* _msg = _internal_mutable_leaderinfo();
+  // @@protoc_insertion_point(field_mutable:Protocol.DungeonInfo.leaderInfo)
+  return _msg;
+}
+inline void DungeonInfo::set_allocated_leaderinfo(::Protocol::DungeonPlayerInfo* leaderinfo) {
+  ::PROTOBUF_NAMESPACE_ID::Arena* message_arena = GetArenaForAllocation();
+  if (message_arena == nullptr) {
+    delete _impl_.leaderinfo_;
+  }
+  if (leaderinfo) {
+    ::PROTOBUF_NAMESPACE_ID::Arena* submessage_arena =
+        ::PROTOBUF_NAMESPACE_ID::Arena::InternalGetOwningArena(leaderinfo);
+    if (message_arena != submessage_arena) {
+      leaderinfo = ::PROTOBUF_NAMESPACE_ID::internal::GetOwnedMessage(
+          message_arena, leaderinfo, submessage_arena);
+    }
+    
+  } else {
+    
+  }
+  _impl_.leaderinfo_ = leaderinfo;
+  // @@protoc_insertion_point(field_set_allocated:Protocol.DungeonInfo.leaderInfo)
+}
+
+// repeated .Protocol.DungeonPlayerInfo members = 4;
+inline int DungeonInfo::_internal_members_size() const {
+  return _impl_.members_.size();
+}
+inline int DungeonInfo::members_size() const {
+  return _internal_members_size();
+}
+inline void DungeonInfo::clear_members() {
+  _impl_.members_.Clear();
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::mutable_members(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.DungeonInfo.members)
+  return _impl_.members_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::DungeonPlayerInfo >*
+DungeonInfo::mutable_members() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.DungeonInfo.members)
+  return &_impl_.members_;
+}
+inline const ::Protocol::DungeonPlayerInfo& DungeonInfo::_internal_members(int index) const {
+  return _impl_.members_.Get(index);
+}
+inline const ::Protocol::DungeonPlayerInfo& DungeonInfo::members(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.DungeonInfo.members)
+  return _internal_members(index);
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::_internal_add_members() {
+  return _impl_.members_.Add();
+}
+inline ::Protocol::DungeonPlayerInfo* DungeonInfo::add_members() {
+  ::Protocol::DungeonPlayerInfo* _add = _internal_add_members();
+  // @@protoc_insertion_point(field_add:Protocol.DungeonInfo.members)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::DungeonPlayerInfo >&
+DungeonInfo::members() const {
+  // @@protoc_insertion_point(field_list:Protocol.DungeonInfo.members)
+  return _impl_.members_;
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

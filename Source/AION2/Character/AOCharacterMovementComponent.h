@@ -11,7 +11,6 @@ enum class EAOMovementMode : uint8
 	Glide = 1
 };
 
-
 UCLASS()
 class AION2_API UAOCharacterMovementComponent : public UCharacterMovementComponent
 {

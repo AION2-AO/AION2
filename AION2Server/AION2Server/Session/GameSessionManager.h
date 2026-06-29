@@ -9,6 +9,7 @@ public:
 	void Add(GameSessionRef session);
 	void Remove(GameSessionRef session);
 	void Broadcast(SendBufferRef sendBuffer);
+	GameSessionRef FindById(uint64 id);
 
 private:
 	std::mutex _sessionMngLock;

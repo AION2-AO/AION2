@@ -25,8 +25,8 @@ UGE_Cooldown_Monster_Teleport::UGE_Cooldown_Monster_Teleport()
 
 	// 5. 이 GE가 적용되는 동안 Target ASC에 부여할 태그 설정
 	FInheritedTagContainer GrantedTags;
-	GrantedTags.Added.AddTag(COOLDOWN_MONSTER_TELEPORT);
-	GrantedTags.CombinedTags.AddTag(COOLDOWN_MONSTER_TELEPORT);
+	GrantedTags.Added.AddTag(COOLDOWN_MONSTER_TH_TELEPORTATTACK);
+	GrantedTags.CombinedTags.AddTag(COOLDOWN_MONSTER_TH_TELEPORTATTACK);
 
 	TargetTagsComponent->SetAndApplyTargetTagChanges(GrantedTags);
 

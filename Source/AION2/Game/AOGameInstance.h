@@ -5,6 +5,8 @@
 #include "CoreMinimal.h"
 #include "Engine/GameInstance.h"
 #include "Network/PacketHeader.h"
+#include "Interfaces/IHttpRequest.h"
+#include "Interfaces/IHttpResponse.h"
 #include "AOGameInstance.generated.h"
 
 /**
@@ -19,10 +21,13 @@ public:
 	virtual void Init() override;
 
 	void TryAsyncConnect(const FString& Ip, int32 Port);
-
 	bool ConnectToServer(const FString& Ip, int32 Port);
-
 	bool IsServerConnected();
+
+	FString  GetLocalIPAddress();
+	int32 GetLocalPort();
+	//void SendDediIpPort(FHttpRequestPtr Request, FHttpResponsePtr Response, bool bWasSuccessful);
+	void SendDediIpPort();
 
 	UFUNCTION(BlueprintCallable)
 	void SendSignUpPacket(const FString& Id, const FString& Password, int32 ClassType);
@@ -50,6 +55,7 @@ public:
 	
 	void SetMyPlayerClass(uint8 ClassType) { MyPlayerClass = ClassType; }
 	int32 GetMyPlayerClass() { return MyPlayerClass; }
+
 public:
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	TObjectPtr<class UAOLoginUserWidget> LoginWidget;
@@ -60,4 +66,6 @@ public:
 private:
 	uint64 MyPlayerId = 0;
 	uint8 MyPlayerClass = 0;
+
+	FString MyPlayerName;
 };
