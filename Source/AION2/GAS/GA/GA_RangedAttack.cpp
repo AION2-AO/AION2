@@ -43,32 +43,19 @@ void UGA_RangedAttack::ActivateAbility(
 
 	if (!AttackMontage)
 	{
-		UE_LOG(
-			LogTemp,
-			Error,
-			TEXT("[Attack] Montage is null. MontageID=%d"),
-			static_cast<int32>(MontageIDToPlay)
-		);
+		UE_LOG(LogTemp,Error,TEXT("[Attack] Montage is null. MontageID=%d"),static_cast<int32>(MontageIDToPlay));
 
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
-	const float SafePlayRate =
-		FMath::Max(MontagePlayRate, 0.01f);
+	const float SafePlayRate = FMath::Max(MontagePlayRate, 0.01f);
 
-	const float AttackDuration =
-		AttackMontage->GetPlayLength() / SafePlayRate;
+	const float AttackDuration = AttackMontage->GetPlayLength() / SafePlayRate;
 
-	const FGameplayTag AttackSlowDurationTag =
-		FGameplayTag::RequestGameplayTag(
-			FName("Data.AttackSlowDuration")
-		);
+	const FGameplayTag AttackSlowDurationTag = FGameplayTag::RequestGameplayTag(FName("Data.AttackSlowDuration"));
 
-	const FGameplayTag AttackingTag =
-		FGameplayTag::RequestGameplayTag(
-			FName("State.Attacking")
-		);
+	const FGameplayTag AttackingTag = FGameplayTag::RequestGameplayTag(FName("State.Attacking"));
 
 	// GameplayEffectsToApply 안에 있는 모든 GE 적용
 	for (const TSubclassOf<UGameplayEffect> GameplayEffect : GameplayEffectsToApply)
@@ -94,28 +81,14 @@ void UGA_RangedAttack::ActivateAbility(
 			GameplayEffect->GetDefaultObject<UGameplayEffect>();
 
 		if (EffectCDO &&
-			EffectCDO->InheritableOwnedTagsContainer.CombinedTags.HasTagExact(AttackingTag))
+			EffectCDO->GetGrantedTags().HasTagExact(AttackingTag))
 		{
-			SpecHandle.Data->SetSetByCallerMagnitude(
-				AttackSlowDurationTag,
-				AttackDuration
-			);
+			SpecHandle.Data->SetSetByCallerMagnitude(AttackSlowDurationTag,	AttackDuration);
 
-			UE_LOG(
-				LogTemp,
-				Log,
-				TEXT("[AttackSlow] Duration=%.2f / GE=%s"),
-				AttackDuration,
-				*GameplayEffect->GetName()
-			);
+			UE_LOG(LogTemp,	Log,TEXT("[AttackSlow] Duration=%.2f / GE=%s"),	AttackDuration,*GameplayEffect->GetName());
 		}
 
-		ApplyGameplayEffectSpecToOwner(
-			Handle,
-			ActorInfo,
-			ActivationInfo,
-			SpecHandle
-		);
+		ApplyGameplayEffectSpecToOwner(Handle,ActorInfo,ActivationInfo,	SpecHandle);
 	}
 
 	// 공격 시작 시 Sprint GE 제거
@@ -129,13 +102,7 @@ void UGA_RangedAttack::ActivateAbility(
 
 	// 공격 몽타주 재생
 	UAbilityTask_PlayMontageAndWait* MontageTask =
-		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-			this,
-			NAME_None,
-			AttackMontage,
-			SafePlayRate,
-			StartSectionName
-		);
+		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this,NAME_None,AttackMontage,SafePlayRate,StartSectionName);
 
 	if (!MontageTask)
 	{
@@ -143,25 +110,13 @@ void UGA_RangedAttack::ActivateAbility(
 		return;
 	}
 
-	MontageTask->OnCompleted.AddDynamic(
-		this,
-		&UGA_RangedAttack::OnMontageTaskFinished
-	);
+	MontageTask->OnCompleted.AddDynamic(this,&UGA_RangedAttack::OnMontageTaskFinished);
 
-	MontageTask->OnBlendOut.AddDynamic(
-		this,
-		&UGA_RangedAttack::OnMontageTaskFinished
-	);
+	MontageTask->OnBlendOut.AddDynamic(this,&UGA_RangedAttack::OnMontageTaskFinished);
 
-	MontageTask->OnInterrupted.AddDynamic(
-		this,
-		&UGA_RangedAttack::OnMontageTaskCancelled
-	);
+	MontageTask->OnInterrupted.AddDynamic(this,&UGA_RangedAttack::OnMontageTaskCancelled);
 
-	MontageTask->OnCancelled.AddDynamic(
-		this,
-		&UGA_RangedAttack::OnMontageTaskCancelled
-	);
+	MontageTask->OnCancelled.AddDynamic(this,&UGA_RangedAttack::OnMontageTaskCancelled);
 
 	MontageTask->ReadyForActivation();
 
@@ -174,10 +129,7 @@ void UGA_RangedAttack::ActivateAbility(
 
 	if (WaitHitCheckTask)
 	{
-		WaitHitCheckTask->EventReceived.AddDynamic(
-			this,
-			&UGA_RangedAttack::OnLaunchProjectileEvent
-		);
+		WaitHitCheckTask->EventReceived.AddDynamic(this,&UGA_RangedAttack::OnLaunchProjectileEvent);
 
 		WaitHitCheckTask->ReadyForActivation();
 	}
@@ -192,24 +144,12 @@ void UGA_RangedAttack::ActivateAbility(
 
 void UGA_RangedAttack::OnMontageTaskFinished()
 {
-	EndAbility(
-		CurrentSpecHandle,
-		CurrentActorInfo,
-		CurrentActivationInfo,
-		true,
-		false
-	);
+	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,false);
 }
 
 void UGA_RangedAttack::OnMontageTaskCancelled()
 {
-	EndAbility(
-		CurrentSpecHandle,
-		CurrentActorInfo,
-		CurrentActivationInfo,
-		true,
-		true
-	);
+	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,true);
 }
 
 void UGA_RangedAttack::OnLaunchProjectileEvent(FGameplayEventData Payload)

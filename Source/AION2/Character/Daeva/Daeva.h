@@ -128,6 +128,7 @@ public:
 	virtual void TeleportBackToTarget() override;
 	FRotator GetLookAtToTarget();
 	void SetCameraByLookAt(const FRotator& LookAtRot);
+	void ResetForDungeonRespawn();
 
 protected:
 	virtual void Move(const FInputActionValue& Value);

@@ -11,6 +11,10 @@
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GAS/AttributeSet/AOAttributeSet.h"
 
+#include "UI/AOWidgetComponentBase.h"
+#include "Components/WidgetComponent.h"
+#include "Components/SceneComponent.h"
+#include "Materials/MaterialInterface.h"
 
 // Sets default values
 ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
@@ -51,6 +55,43 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	{
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
+
+#pragma region UI
+
+	// Head-up UI
+	BillboardComponent = CreateDefaultSubobject<USceneComponent>(TEXT("BillboardComponent"));
+	BillboardComponent->SetupAttachment(RootComponent);
+	BillboardComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
+	BillboardComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 180.0f));
+
+	OverheadStatusWidgetComponent = CreateDefaultSubobject<UAOWidgetComponentBase>(TEXT("OverheadStatusWidget"));
+	OverheadStatusWidgetComponent->SetupAttachment(BillboardComponent);
+	OverheadStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
+	OverheadStatusWidgetComponent->SetBlendMode(EWidgetBlendMode::Transparent);
+	OverheadStatusWidgetComponent->SetDrawSize(FVector2D(80.0f, 14.0f));
+	OverheadStatusWidgetComponent->SetRelativeLocation(FVector::ZeroVector);
+	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator::ZeroRotator);
+	OverheadStatusWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	static ConstructorHelpers::FClassFinder<UUserWidget>
+		WidgetClass(
+			TEXT("/Game/UI/Ingame/WBP_MonsterStatus_Head.WBP_MonsterStatus_Head_C"));
+
+	if (WidgetClass.Succeeded())
+	{
+		OverheadStatusWidgetComponent->SetWidgetClass(
+			WidgetClass.Class);
+	}
+
+	static ConstructorHelpers::FObjectFinder<UMaterialInterface> WidgetMat(
+		TEXT("/Game/UI/Resource/Material/BaseMaterial/M_WorldSpaceUI.M_WorldSpaceUI")
+	);
+
+	if (WidgetMat.Succeeded())
+	{
+		WidgetMaterial = WidgetMat.Object;
+	}
+#pragma endregion
 
 }
 
@@ -128,6 +169,19 @@ void ATalythra::BeginPlay()
 	AttackWarningRangeSceneComponent->SetIsReplicated(true);
 #pragma endregion 
 
+
+#pragma region UI
+	/* [UI: 발광도를 죽이는 Material로 설정.]
+	* 생성자에서는 초기화 과정에서 Material이 기본값으로 바뀔 수 있기 때문에,
+	* 타이밍이 더 뒤인 Begin에서 작동.
+	*/
+	if (WidgetMaterial)
+	{
+		OverheadStatusWidgetComponent->SetMaterial(0, WidgetMaterial);
+		OverheadStatusWidgetComponent->MarkRenderStateDirty();
+	}
+#pragma endregion
+
 }
 
 // Called every frame
@@ -157,6 +211,24 @@ void ATalythra::Tick(float DeltaTime)
 
 	if (AttackWarningRangeSceneComponent->GetVisibleFlag() == true)
 	{
+
+#pragma region UI TickCamera
+		// UI Bill Board
+		if (GetNetMode() == NM_DedicatedServer || !BillboardComponent)
+		{
+			return;
+		}
+
+		APlayerController* LocalPC = GetWorld()->GetFirstPlayerController();
+		if (!LocalPC || !LocalPC->PlayerCameraManager)
+		{
+			return;
+		}
+
+		const FVector CameraLocation = LocalPC->PlayerCameraManager->GetCameraLocation();
+		const FVector WidgetLocation = BillboardComponent->GetComponentLocation();
+		BillboardComponent->SetWorldRotation((CameraLocation - WidgetLocation).Rotation());
+#pragma endregion
 
 		AttackWarningElapsedTime += DeltaTime;
 
@@ -188,14 +260,6 @@ void ATalythra::Tick(float DeltaTime)
 	{
 		TurnToTarget();
 	}
-
-	//GEngine->AddOnScreenDebugMessage(
-	//	-1,                  // Key (-1이면 매번 새 줄)
-	//	2.f,                 // 표시 시간 (초)
-	//	FColor::Yellow,      // 색상
-	//	FString::Printf(TEXT("Health: %.1f"), AttributeSet->GetHealth())
-	//);
-
 }
 
 void ATalythra::Multicast_PlayAttackMontage_Implementation(UAnimMontage* MontageToPlay)
@@ -660,7 +724,6 @@ void ATalythra::DoFireProjectile_3()
 
 	/* Decal 끄기 */
 	Multicast_AttackLine_Pattern_3_Off();
-
 }
 
 void ATalythra::InitAttributeSet()

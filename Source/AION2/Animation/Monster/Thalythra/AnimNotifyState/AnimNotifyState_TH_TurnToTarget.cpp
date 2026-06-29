@@ -97,7 +97,7 @@ void UAnimNotifyState_TH_TurnToTarget::NotifyEnd(
 
 
 
-	Talythra->Set_RotationAble(true);
+	Talythra->Set_RotationAble(false);
 
 
 

@@ -1,5 +1,12 @@
 #include "Game/AODungeonGameMode.h"
 
+#include "Character/AOCharacter.h"
+#include "Character/Daeva/Daeva.h"
+
+#include "GameFramework/PlayerController.h"
+#include "GameFramework/PlayerStart.h"
+#include "GameFramework/Controller.h"
+
 #include "Character/Monster/AOMonsterBase.h"
 
 #include "Engine/World.h"
@@ -241,11 +248,26 @@ void AAODungeonGameMode::ClearDungeon()
 {
 	CurrentPhase = EDungeonPhase::Cleared;
 
+	ClearAllRespawnTimers();
+
 	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Dungeon Clear"));
 
 	GiveDungeonReward();
 
 	//RequestReturnToVillage();
+}
+
+void AAODungeonGameMode::FailDungeon()
+{
+	if (CurrentPhase == EDungeonPhase::Failed)
+	{
+		return;
+	}
+
+	CurrentPhase = EDungeonPhase::Failed;
+	ClearAllRespawnTimers();
+
+	UE_LOG(LogTemp, Warning, TEXT("Dungeon Failed"));
 }
 
 void AAODungeonGameMode::ReturnToVillage()
@@ -259,6 +281,51 @@ void AAODungeonGameMode::ReturnToVillage()
 	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Return To Village"));
 
 	GetWorld()->ServerTravel(VillageMapPath);
+}
+
+void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerController)
+{
+	if (!DeadPlayerController)
+	{
+		return;
+	}
+
+	if (CurrentPhase == EDungeonPhase::Cleared || CurrentPhase == EDungeonPhase::Failed)
+	{
+		return;
+	}
+
+	if (DeadPlayerControllers.Contains(DeadPlayerController))
+	{
+		return;
+	}
+
+	APawn* DeadPawn = DeadPlayerController->GetPawn();
+
+	if (!DeadPawn)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Dead player has no Pawn"));
+		return;
+	}
+
+	const FTransform DeathTransform = DeadPawn->GetActorTransform();
+
+	DeadPlayerControllers.Add(DeadPlayerController);
+
+	const int32 ActivePlayerCount = GetActiveDungeonPlayerCount();
+	const int32 AlivePlayerCount = GetAliveDungeonPlayerCount();
+
+	UE_LOG(LogTemp,	Warning, TEXT("[Dungeon] Player Dead. Alive: %d / %d"), AlivePlayerCount, ActivePlayerCount);
+
+	if (AlivePlayerCount <= 0)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("All Palyers Dead. Dungeon Failed"));
+
+		StartWipeRespawn();
+		return;
+	}
+
+	StartPlayerRespawnTimer(DeadPlayerController, DeathTransform);
 }
 
 void AAODungeonGameMode::SetCombatPhase(int32 BossNumber)
@@ -301,6 +368,288 @@ void AAODungeonGameMode::SetDefeatedPhase(int32 BossNumber)
 	default:
 		break;
 	}
+}
+
+void AAODungeonGameMode::StartPlayerRespawnTimer(APlayerController* DeadPlayerController, const FTransform& RespawnTransform)
+{
+	if (!DeadPlayerController)
+	{
+		return;
+	}
+
+	if (RespawnTimerHandles.Contains(DeadPlayerController))
+	{
+		return;
+	}
+
+	PendingRespawnTransforms.Add(DeadPlayerController, RespawnTransform);
+
+	FTimerHandle NewRespawnTimerHandle;
+
+	TWeakObjectPtr<APlayerController> WeakPlayerController = DeadPlayerController;
+
+	FTimerDelegate RespawnDelegate;
+	RespawnDelegate.BindLambda([this, WeakPlayerController]()
+		{
+			if (!WeakPlayerController.IsValid())
+			{
+				return;
+			}
+
+			RespawnPlayer(WeakPlayerController.Get());
+		});
+
+	GetWorldTimerManager().SetTimer(NewRespawnTimerHandle, RespawnDelegate, RespawnDelay, false);
+
+	RespawnTimerHandles.Add(DeadPlayerController, NewRespawnTimerHandle);
+
+	UE_LOG(LogTemp,Warning, TEXT("Respawn scheduled: %s / %.1f sec"),*DeadPlayerController->GetName(),RespawnDelay);
+}
+
+void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
+{
+	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] RespawnPlayer Called"));
+
+	if (!PlayerController)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dungeon] PlayerController is null"));
+		return;
+	}
+
+	if (CurrentPhase == EDungeonPhase::Failed || CurrentPhase == EDungeonPhase::Cleared)
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Cannot Respawn. Dungeon Ended."));
+		return;
+	}
+
+	RespawnTimerHandles.Remove(PlayerController);
+
+	if (!DeadPlayerControllers.Contains(PlayerController))
+	{
+		UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Player is not in DeadPlayerControllers"));
+		return;
+	}
+
+	const FTransform* RespawnTransform = PendingRespawnTransforms.Find(PlayerController);
+
+	if (!RespawnTransform)
+	{
+		UE_LOG(LogTemp, Error, TEXT("[Dungeon] Respawn Transform Not Found: %s"), *PlayerController->GetName());
+
+		return;
+	}
+
+	APawn* OldPawn = PlayerController->GetPawn();
+
+	if (OldPawn)
+	{
+		PlayerController->UnPossess();
+		OldPawn->Destroy();
+	}
+
+	RestartPlayerAtTransform(PlayerController, *RespawnTransform);
+
+	if (ADaeva* RespawnedPlayer = Cast<ADaeva>(PlayerController->GetPawn()))
+	{
+		RespawnedPlayer->ResetForDungeonRespawn();
+	}
+
+	DeadPlayerControllers.Remove(PlayerController);
+	PendingRespawnTransforms.Remove(PlayerController);
+
+	UE_LOG(	LogTemp, Warning, TEXT("Player Respawned: %s"),*PlayerController->GetName());
+}
+
+int32 AAODungeonGameMode::GetActiveDungeonPlayerCount() const
+{
+	int32 PlayerCount = 0;
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PlayerController = It->Get();
+
+		if (!PlayerController)
+		{
+			continue;
+		}
+
+		if (!PlayerController->PlayerState)
+		{
+			continue;
+		}
+
+		++PlayerCount;
+	}
+
+	return PlayerCount;
+}
+
+int32 AAODungeonGameMode::GetAliveDungeonPlayerCount() const
+{
+	int32 AlivePlayerCount = 0;
+
+	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	{
+		APlayerController* PlayerController = It->Get();
+
+		if (!PlayerController)
+		{
+			continue;
+		}
+
+		if (!PlayerController->PlayerState)
+		{
+			continue;
+		}
+
+		if (!DeadPlayerControllers.Contains(PlayerController))
+		{
+			++AlivePlayerCount;
+		}
+	}
+
+	return AlivePlayerCount;
+}
+
+APlayerStart* AAODungeonGameMode::FindDungeonRespawnPoint() const
+{
+	TArray<AActor*> FoundPlayerStarts;
+
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
+
+	TArray<APlayerStart*> RespawnPoints;
+
+	for (AActor* Actor : FoundPlayerStarts)
+	{
+		APlayerStart* PlayerStart = Cast<APlayerStart>(Actor);
+
+		if (!PlayerStart)
+		{
+			continue;
+		}
+
+		if (PlayerStart->ActorHasTag(RespawnPlayerStartTag))
+		{
+			RespawnPoints.Add(PlayerStart);
+		}
+	}
+
+	if (RespawnPoints.IsEmpty())
+	{
+		return nullptr;
+	}
+
+	const int32 RandomIndex = FMath::RandRange(0, RespawnPoints.Num() - 1);
+
+	return RespawnPoints[RandomIndex];
+}
+
+void AAODungeonGameMode::ClearAllRespawnTimers()
+{
+	for (auto& Pair : RespawnTimerHandles)
+	{
+		GetWorldTimerManager().ClearTimer(Pair.Value);
+	}
+
+	RespawnTimerHandles.Empty();
+	PendingRespawnTransforms.Empty();
+
+}
+
+void AAODungeonGameMode::StartWipeRespawn()
+{
+	ClearAllRespawnTimers();
+
+	GetWorldTimerManager().ClearTimer(WipeRespawnTimerHandle);
+
+	GetWorldTimerManager().SetTimer(WipeRespawnTimerHandle,	this,&AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint,RespawnDelay,false);
+
+	UE_LOG(	LogTemp,Warning,TEXT("Wipe Respawn Scheduled / Boss %d / %.1f sec"),CurrentBossNumber,RespawnDelay);
+}
+
+void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
+{
+	APlayerStart* Checkpoint = FindBossRespawnPoint(CurrentBossNumber);
+
+	if (!Checkpoint)
+	{
+		UE_LOG(LogTemp,	Error,TEXT("Boss %d Respawn Point Not Found."),CurrentBossNumber);
+
+		return;
+	}
+
+	TArray<TObjectPtr<APlayerController>> PlayersToRespawn;
+
+	for (APlayerController* PlayerController : DeadPlayerControllers)
+	{
+		if (PlayerController)
+		{
+			PlayersToRespawn.Add(PlayerController);
+		}
+	}
+
+	for (APlayerController* PlayerController : PlayersToRespawn)
+	{
+		APawn* OldPawn = PlayerController->GetPawn();
+
+		if (OldPawn)
+		{
+			PlayerController->UnPossess();
+			OldPawn->Destroy();
+		}
+
+		RestartPlayerAtPlayerStart(PlayerController, Checkpoint);
+
+		if (ADaeva* RespawnedPlayer = Cast<ADaeva>(PlayerController->GetPawn()))
+		{
+			RespawnedPlayer->ResetForDungeonRespawn();
+		}
+
+		UE_LOG(LogTemp,Warning,TEXT("Wipe Respawned: %s / Boss %d"),*PlayerController->GetName(),CurrentBossNumber);
+	}
+
+	DeadPlayerControllers.Empty();
+	PendingRespawnTransforms.Empty();
+	RespawnTimerHandles.Empty();
+}
+
+APlayerStart* AAODungeonGameMode::FindBossRespawnPoint(int32 CurrentBossNumber) const
+{
+	FName TargetTag;
+
+	switch (CurrentBossNumber)
+	{
+	case 1:
+		TargetTag = Boss1RespawnTag;
+		break;
+
+	case 2:
+		TargetTag = Boss2RespawnTag;
+		break;
+
+	case 3:
+		TargetTag = Boss3RespawnTag;
+		break;
+
+	default:
+		return nullptr;
+	}
+
+	TArray<AActor*> FoundPlayerStarts;
+
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
+
+	for (AActor* Actor : FoundPlayerStarts)
+	{
+		APlayerStart* PlayerStart = Cast<APlayerStart>(Actor);
+
+		if (PlayerStart && PlayerStart->ActorHasTag(TargetTag))
+		{
+			return PlayerStart;
+		}
+	}
+
+	return nullptr;
 }
 
 void AAODungeonGameMode::RequestReturnToVillage()

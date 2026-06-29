@@ -7,8 +7,10 @@
 #include "Types/TalythraTypes.h"
 #include "Talythra.generated.h"
 
-
-
+// UI
+class UAOWidgetComponentBase;
+class USceneComponent;
+class UMaterialInterface;
 
 
 
@@ -200,5 +202,13 @@ private:
 	UPROPERTY(VisibleAnywhere)
 	float AttackWarningElapsedTime = 0.0f;
 
+	// UI
+	private:
+		UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
 
+		UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+		TObjectPtr<USceneComponent> BillboardComponent;
+
+		TObjectPtr<UMaterialInterface> WidgetMaterial;
 };

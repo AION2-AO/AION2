@@ -138,37 +138,17 @@ void UGA_Dash::ActivateAbility(
 
 	MontageTask->ReadyForActivation();
 
-	UE_LOG(
-		LogTemp,
-		Log,
-		TEXT("[Dash Start] Stamina: %.1f / %.1f"),
-		AttributeSet->GetStamina(),
-		AttributeSet->GetMaxStamina()
-	);
+	UE_LOG(LogTemp,Log,TEXT("[Dash Start] Stamina: %.1f / %.1f"),AttributeSet->GetStamina(),AttributeSet->GetMaxStamina());
 }
 
 void UGA_Dash::OnDashFinished()
 {
-	UE_LOG(LogTemp, Log, TEXT("[Dash Finished]"));
-
-	EndAbility(
-		CurrentSpecHandle,
-		CurrentActorInfo,
-		CurrentActivationInfo,
-		true,
-		false
-	);
+	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,false);
 }
 
 void UGA_Dash::OnDashCancelled()
 {
 	UE_LOG(LogTemp, Warning, TEXT("[Dash Cancelled]"));
 
-	EndAbility(
-		CurrentSpecHandle,
-		CurrentActorInfo,
-		CurrentActivationInfo,
-		true,
-		true
-	);
+	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,true);
 }

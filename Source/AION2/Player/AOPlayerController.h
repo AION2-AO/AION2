@@ -30,6 +30,7 @@ public:
 protected:
 	virtual void BeginPlay() override;
 	virtual void SetupInputComponent() override;
+	virtual void AcknowledgePossession(APawn* P) override;
 
 private:
 	void SetInputMappingContext(EInputType InNewInputType);

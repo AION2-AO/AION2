@@ -8,11 +8,13 @@
 
 #include "Components/CapsuleComponent.h"
 #include "Net/UnrealNetwork.h"
+#include "Game/AODungeonGameMode.h"
 
 #include "GameplayTagContainer.h"
 #include "AbilitySystemComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "GameFramework/SpringArmComponent.h"
+#include "GameFramework/PlayerController.h"
 #include "Components/SkeletalMeshComponent.h"
 #include "Camera/CameraComponent.h"
 #include "EnhancedInputComponent.h"
@@ -142,7 +144,7 @@ void ADaeva::PossessedBy(AController* NewController)
 
 	InitGAS();
 
-	// UI Í¥Ä?®Ìï¥, LocalplayerÎ©?Ï∂îÍ?.
+	// LocalController¿œ ∂ß∏∏ UI ∏∏µÈµµ∑œ º≥¡§
 	if (AAOPlayerController* AOController = Cast<AAOPlayerController>(NewController))
 	{
 		if (AOController->IsLocalController())
@@ -167,7 +169,7 @@ void ADaeva::OnRep_PlayerState()
 
 	InitGAS();
 
-	// UI Í¥Ä?®Ìï¥, LocalplayerÎ©?Ï∂îÍ?.
+	// LocalController¿œ ∂ß∏∏ UI ∏∏µÈµµ∑œ º≥¡§
 	if (AAOPlayerController* AOController = Cast<AAOPlayerController>(GetController()))
 	{
 		if (AOController->IsLocalController())
@@ -438,6 +440,38 @@ void ADaeva::SetCameraByLookAt(const FRotator& LookAtRot)
 	}
 }
 
+void ADaeva::ResetForDungeonRespawn()
+{
+	if (!ASC)
+	{
+		UE_LOG(LogTemp, Error, TEXT("ASC is null"));
+		return;
+	}
+
+	const UAOAttributeSet* AttributeSet = ASC->GetSet<UAOAttributeSet>();
+
+	if (!AttributeSet)
+	{
+		UE_LOG(LogTemp, Error, TEXT("AttributeSet is null"));
+		return;
+	}
+
+	const float RespawnHealth = AttributeSet->GetMaxHealth();
+	const float RespawnMana = AttributeSet->GetMana();
+	const float RespawnStamina = AttributeSet->GetStamina();
+
+	ASC->SetNumericAttributeBase(UAOAttributeSet::GetHealthAttribute(), RespawnHealth);
+	ASC->SetNumericAttributeBase(UAOAttributeSet::GetManaAttribute(), RespawnMana);
+	ASC->SetNumericAttributeBase(UAOAttributeSet::GetStaminaAttribute(), RespawnStamina);
+
+	// ªÁ∏¡ ≈¬±◊ ¡¶∞≈.
+	const FGameplayTag DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
+	ASC->RemoveLooseGameplayTag(DeadTag);
+
+	// New Pawn¿Ãπ«∑Œ ±‚∫ª¿˚¿∏∑Œ false¿Ã¡ˆ∏∏ ∏Ì»Æ«œ∞‘ «œ±‚ ¿ß«ÿ √ ±‚»≠.
+	bIsDead = false;
+}
+
 void ADaeva::Move(const FInputActionValue& Value)
 {
 	if (IsDead())
@@ -691,7 +725,19 @@ void ADaeva::TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitRe
 
 void ADaeva::InputShiftPressed()
 {
+	if (IsDead())
+	{
+		return;
+	}
+
+	// ¥ÎΩ√¥¬ ¿¸≈ı, ∫Ò¿¸≈ı ∏µŒ ∞°¥….
 	GASInputPressed(static_cast<int32>(EAbilityID::Dash));
+
+	// ¿¸≈ı ¡ﬂ∞˙ »∞∞≠ ¡ﬂø°¥¬ Sprint ±›¡ˆ
+	if (ASC->HasMatchingGameplayTag(STATE_COMBAT) || ASC->HasMatchingGameplayTag(STATE_GLIDING))
+	{
+		return;
+	}
 
 	if (bHasMoveInput)
 	{
@@ -776,6 +822,12 @@ void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
 
 	SetWeaponVisibility(bIsCombat);
 	SetSubWeaponVisibility(bIsCombat);
+
+	// ¿¸≈ı ¡¯¿‘ º¯∞£ ±‚¡ÿ Sprint ∞≠¡¶ ¡æ∑·.
+	if (bIsCombat)
+	{
+		RequestStopSprint();
+	}
 }
 
 void ADaeva::HandleDeath()
@@ -788,6 +840,10 @@ void ADaeva::HandleDeath()
 	bIsDead = true;
 
 	UE_LOG(LogTemp, Warning, TEXT("[Death] %s Died"), *GetName());
+
+	// ¡◊±‚ ¿¸ø° Controller∏¶ ∏’¿˙ »Æ∫∏«ÿæﬂ «—¥Ÿ.
+	APlayerController* PlayerController =
+		Cast<APlayerController>(GetController());
 
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
@@ -806,10 +862,43 @@ void ADaeva::HandleDeath()
 
 	if (HasAuthority())
 	{
-		DetachFromControllerPendingDestroy();
+		// GameModeø° ∏’¿˙ ªÁ∏¡ ªÁΩ« ¿¸¥ﬁ
+		if (PlayerController)
+		{
+			if (AAODungeonGameMode* DungeonGameMode =
+				GetWorld()->GetAuthGameMode<AAODungeonGameMode>())
+			{
+				UE_LOG(
+					LogTemp,
+					Warning,
+					TEXT("[Death] Notify Dungeon GameMode: %s"),
+					*PlayerController->GetName()
+				);
+
+				DungeonGameMode->NotifyPlayerDied(PlayerController);
+			}
+			else
+			{
+				UE_LOG(LogTemp, Error, TEXT("[Death] DungeonGameMode is null"));
+			}
+		}
+		else
+		{
+			UE_LOG(
+				LogTemp,
+				Error,
+				TEXT("[Death] PlayerController is null before detach: %s"),
+				*GetName()
+			);
+		}
+
+		// ªÁ∏¡ æ÷¥œ∏ﬁ¿Ãº«¿∫ Controller∞° ∫ŸæÓ ¿÷æÓµµ ¿Áª˝ ∞°¥…
 		Multicast_PlayMontage(EMontageID::Die, 1.0f);
 		Multicast_PlayWingMontage(EMontageID::Die, 1.0f);
 		Multicast_SetWingVisibility(true);
+
+		// ø©±‚º≠¥¬ ¡¶∞≈«œ∞≈≥™ ¡÷ºÆ √≥∏Æ
+		// DetachFromControllerPendingDestroy();
 	}
 }
 
@@ -836,6 +925,13 @@ void ADaeva::StartSprint()
 	{
 		return;
 	}
+
+	//º≠πˆ ±««— ±‚¡ÿ¿∏∑Œ √÷¡æ ¬˜¥‹.
+	if (ASC->HasMatchingGameplayTag(STATE_COMBAT))
+	{
+		return;
+	}
+
 
 	if (SprintEffectHandle.IsValid())
 	{
@@ -869,14 +965,6 @@ void ADaeva::StartSprint()
 	SprintEffectHandle =
 		ASC->ApplyGameplayEffectSpecToSelf(*SprintSpec.Data.Get());
 
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Sprint] Sprint applied / HandleValid=%d / Speed=%.1f"),
-		SprintEffectHandle.IsValid(),
-		ASC->GetNumericAttribute(UAOAttributeSet::GetMoveSpeedAttribute())
-	);
-
 	FGameplayEffectContextHandle DrainContext = ASC->MakeEffectContext();
 	DrainContext.AddSourceObject(this);
 
@@ -891,13 +979,6 @@ void ADaeva::StartSprint()
 
 	SprintDrainEffectHandle =
 		ASC->ApplyGameplayEffectSpecToSelf(*DrainSpec.Data.Get());
-
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Sprint] Drain applied / HandleValid=%d"),
-		SprintDrainEffectHandle.IsValid()
-	);
 }
 
 void ADaeva::StopSprint()
@@ -918,8 +999,6 @@ void ADaeva::StopSprint()
 		ASC->RemoveActiveGameplayEffect(SprintDrainEffectHandle);
 		SprintDrainEffectHandle.Invalidate();
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[Sprint] Stopped"));
 }
 
 bool ADaeva::IsSprinting() const

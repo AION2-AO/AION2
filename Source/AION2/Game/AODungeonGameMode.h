@@ -5,6 +5,8 @@
 #include "AODungeonGameMode.generated.h"
 
 class AAOMonsterBase;
+class APlayerController;
+class APlayerStart;
 
 UENUM(BlueprintType)
 enum class EDungeonPhase : uint8
@@ -46,6 +48,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void ReturnToVillage();
 
+	// Player Health 0 or Died Call
+	void NotifyPlayerDied(APlayerController* DeadPlayerController);
+
 protected:
 	void FindPlacedBosses();
 	void InitializePlacedBosses();
@@ -55,11 +60,32 @@ protected:
 	void StartNextBoss();
 
 	void ClearDungeon();
+	void FailDungeon();
 
 	void SetCombatPhase(int32 BossNumber);
 	void SetDefeatedPhase(int32 BossNumber);
 
+
+	void StartPlayerRespawnTimer(APlayerController* DeadPlayerController, const FTransform& RespawnTransform);
+	void RespawnPlayer(APlayerController* PlayerController);
+
+	int32 GetActiveDungeonPlayerCount() const;
+	int32 GetAliveDungeonPlayerCount() const;
+
+	APlayerStart* FindDungeonRespawnPoint() const;
+	void ClearAllRespawnTimers();
+
+	void StartWipeRespawn();
+	void RespawnAllDeadPlayersAtBossCheckpoint();
+	APlayerStart* FindBossRespawnPoint(int32 CurrentBossNumber) const;
+
 protected:
+	// 일반 사망 : 죽은 자리에서 부활.
+	TMap<TObjectPtr<APlayerController>, FTransform> PendingRespawnTransforms;
+
+	// 팀 전멸 : 보스 근처 체크포인트에서 전체 부활
+	FTimerHandle WipeRespawnTimerHandle;
+
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
 	EDungeonPhase CurrentPhase = EDungeonPhase::Ready;
 
@@ -76,6 +102,29 @@ protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Dungeon|Map")
 	FString VillageMapPath = TEXT("/Game/Map/Village.Village");
 
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
+	FName RespawnPlayerStartTag = TEXT("DungeonRespawn");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
+	float RespawnDelay = 5.0f;
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
+	FName Boss1RespawnTag = TEXT("Boss1Respawn");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
+	FName Boss2RespawnTag = TEXT("Boss2Respawn");
+
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
+	FName Boss3RespawnTag = TEXT("Boss3Respawn");
+
+	// CurrentDeadPlayer
+	UPROPERTY()
+	TSet<TObjectPtr<APlayerController>> DeadPlayerControllers;
+
+	// RespawnTimer
+	TMap<TObjectPtr<APlayerController>, FTimerHandle> RespawnTimerHandles;
+
+
 	FTimerHandle NextBossTimerHandle;
 
 protected:
@@ -88,5 +137,7 @@ protected:
 public :
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void RequestReturnToVillage();
+
+
 	
 };
