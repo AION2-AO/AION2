@@ -32,33 +32,14 @@ void UMyNavExporter::ExportNavMesh(UWorld* World)
 	TArray<uint8> BinaryData;
 	FMemoryWriter Writer(BinaryData);
 
-	// Çì´õ Á¤º¸ ÀúÀå (¼­¹ö°¡ Å¸ÀÏ °³¼ö µîÀ» ¹Ì¸® ¾Ë ¼ö ÀÖµµ·Ï)
 	int32 MaxTiles = DetourMesh->getMaxTiles();
 	Writer << MaxTiles;
 
-	// dtNavMeshParams ÀúÀå (¼­¹ö dtNavMesh ÃÊ±âÈ­¿¡ ÇÊ¼ö)
+	// dtNavMeshParams ï¿½ï¿½ï¿½ï¿½ (ï¿½ï¿½ï¿½ï¿½ dtNavMesh ï¿½Ê±ï¿½È­ï¿½ï¿½ ï¿½Ê¼ï¿½)
 	const dtNavMeshParams* Params = DetourMesh->getParams();
-	// ÀÓ½Ã º¯¼ö¿¡ ´ëÀÔÇÏ¿© L-value·Î º¯È¯ ÈÄ Á÷·ÄÈ­
-	float OrigX = static_cast<float>(Params->orig[0]);
-	float OrigY = static_cast<float>(Params->orig[1]);
-	float OrigZ = static_cast<float>(Params->orig[2]);
-	Writer << OrigX;
-	Writer << OrigY;
-	Writer << OrigZ;
+	Writer.Serialize((void*)Params, sizeof(dtNavMeshParams));
 
-	float TileWidth = static_cast<float>(Params->tileWidth);
-	float TileHeight = static_cast<float>(Params->tileHeight);
-	Writer << TileWidth;
-	Writer << TileHeight;
-
-	int32 MaxParamsTiles = static_cast<int32>(Params->maxTiles);
-	int32 MaxPolys = static_cast<int32>(Params->maxPolys);
-	Writer << MaxParamsTiles;
-	Writer << MaxPolys;
-
-
-
-	// °¢ Å¸ÀÏÀÇ ¹ÙÀÌ³Ê¸® µ¥ÀÌÅÍ ¼øÈ¸ ¹× ÀúÀå
+	// ï¿½ï¿½ Å¸ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½Ì³Ê¸ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½È¸ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½
 	int32 ZeroSize = 0;
 	for (int i = 0; i < MaxTiles; ++i)
 	{
@@ -68,20 +49,13 @@ void UMyNavExporter::ExportNavMesh(UWorld* World)
 			Writer << ZeroSize;
 			continue;
 		}
-		int32 DataSize = static_cast<int32>(Tile->dataSize);
+		int DataSize = Tile->dataSize;
 		Writer << DataSize;
 
-		// Ã¹ ¹øÂ° Å¸ÀÏ(index 0)ÀÇ ¸ÅÁ÷³Ñ¹ö °­Á¦ °ËÁõ ·Î±× Ãâ·ÂÇÏ¿© ±â·Ï È®ÀÎ
-		if (i == 0 && DataSize >= 4)
-		{
-			int32* RawMagic = (int32*)Tile->data;
-			UE_LOG(LogTemp, Log, TEXT("Export Tile 0 Magic Data: 0x%X"), *RawMagic);
-		}
-
-		Writer.Serialize(const_cast<unsigned char*>(Tile->data), DataSize);
+		Writer.Serialize(Tile->data, DataSize);
 	}
 	 FString SavePath = FPaths::ProjectDir()/TEXT("Common/Nav/NavMesh.nav");
-		// ¿ÜºÎ ÆÄÀÏ·Î ÀúÀå 
+		// ï¿½Üºï¿½ ï¿½ï¿½ï¿½Ï·ï¿½ ï¿½ï¿½ï¿½ï¿½ 
 		 bool bSuccess = FFileHelper::SaveArrayToFile(BinaryData, *SavePath);
 
 	if (bSuccess)

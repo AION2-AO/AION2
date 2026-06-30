@@ -38,7 +38,7 @@ enum : uint16
 	PKT_S_SPAWN = 1007,
 
 	PKT_C_MOVE = 1008,
-	PKT_S_MOVE = 1009, 
+	PKT_S_MOVE = 1009,
 
 	PKT_C_DUNGEONWAITINTROOM = 1010,
 	PKT_S_DUNGEONWAITINTROOM = 1011,
@@ -55,6 +55,11 @@ enum : uint16
 	PKT_C_DUNGEONSTART = 1018,
 	PKT_S_DUNGEONSTART = 1019,
 
+	PKT_C_STOREPURCHASE = 1020,
+	PKT_S_STOREPURCHASE = 1021,
+
+	PKT_C_CHANGEHP = 1022,
+
 	PKT_DS_DEDICATED = 1100,
 };
 
@@ -69,7 +74,15 @@ struct FPlayerInfo
 	uint64 PlayerId = 0;
 
 	UPROPERTY()
+	FString PlayerName;
+
+	UPROPERTY()
 	uint8 ClassType = 0;
+
+	FPlayerInfo() {}
+	FPlayerInfo(uint64 InId, FString InName, uint8 InClass)
+		:PlayerId(InId), PlayerName(InName), ClassType(InClass) 
+	{}
 };
 
 struct FPacket

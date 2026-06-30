@@ -3,6 +3,8 @@
 
 #include "AI/Talythra/AITalythraAIController.h"
 #include "Character/Monster/Boss/Thalythra/Talythra.h"
+#include "GAS/AttributeSet/AOAttributeSet.h"
+#include "GAS/AOGameplayTags.h"
 
 
 
@@ -26,7 +28,7 @@ void AAITalythraAIController::BeginPlay()
 
 
 	 ControlledTalythra = Cast<ATalythra>(ControlledMonster);
-
+	 ControlledMonsterAttributeSet = ControlledTalythra->GetAttributeSet();
 }
 
 void AAITalythraAIController::Tick(float DeltaSeconds)
@@ -34,6 +36,17 @@ void AAITalythraAIController::Tick(float DeltaSeconds)
 	Super::Tick(DeltaSeconds);
 
 	// 나중에는 target player를 랜덤으로 잡아줘도 될듯함.
+		// 서버에서만 로직 호출할 수 있도록 설정 
+	if (HasAuthority() == false)
+		return;
+
+
+	if (ControlledMonsterAttributeSet->GetHealth() <= 0)
+	{
+		PhaseTag = PHASE_MONSTER_DEAD;
+	}
+
+
 
 }
 

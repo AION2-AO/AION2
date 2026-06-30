@@ -22,7 +22,8 @@ private:
 
 public:
 	void HandleLogin(uint64 PlayerId, uint8 ClassType);
-	void HandleSpawn(uint64 PlayerId, uint8 ClassType, FVector SpawnLocation, FRotator SpawnRotation);
+	void HandleSpawn(uint64 PlayerId, FString PlayerName, uint8 ClassType, FVector SpawnLocation, FRotator SpawnRotation);
+	void HandleItem(Protocol::S_ItemDataPacket Items);
 	void HnadleMove(uint64 PlayerId, FVector NewLocation, FRotator NewRotation, FVector NewVel);
 	void HandleDungeonCreate(int32 DungeonId);
 	void HandleDungeonEnter(int32 DungeonId);
@@ -36,13 +37,19 @@ private:
 	TObjectPtr<AMMODaeva> MyPlayer;
 
 	UPROPERTY()
-	TMap<uint64, TObjectPtr<AMMODaeva>> PlayerInfos;
+	TMap<uint64, TObjectPtr<AMMODaeva>> Players;
+
+	UPROPERTY()
+	TMap<uint64, FPlayerInfo> PlayerInfos;
 	
 	TSubclassOf <AMMODaeva> PlayerClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
 	TMap<uint8, TSubclassOf<APawn>> JobClassMap;
 	
+	TMap<int32, Protocol::ItemData> MyItems;
+
+private:
 	class UAOGameInstance* GameInstance;
 	UWorld* World;
 };

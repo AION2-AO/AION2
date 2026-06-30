@@ -27,6 +27,7 @@ public:
 
 public:
     void SetRaidHUDVisible();
+    UAOPlayerHUDWidget* GetPlayerHUDWidget() const { return PlayerHUDWidget; }
 
 protected:
     UPROPERTY(meta = (BindWidget), BlueprintReadOnly)

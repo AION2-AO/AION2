@@ -55,6 +55,8 @@ public:
 	void HandleCreateDungeon(PlayerRef player);
 	void HandleEnterDungeon(PlayerRef player);
 	void HandleDungeonStart(PlayerRef player, int32 dungeonId);
+	void HandleDungeonExit(int32 dungeonId);
+	void HandleReadyPacket(PlayerRef player, int32 dungeonId);
 
 	void WaitingRoomBroadcast(SendBufferRef sendBuffer, uint64 exceptId = 0);
 

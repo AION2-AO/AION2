@@ -68,6 +68,7 @@ protected:
 
 	void StartPlayerRespawnTimer(APlayerController* DeadPlayerController, const FTransform& RespawnTransform);
 	void RespawnPlayer(APlayerController* PlayerController);
+	AActor* ChoosePlayerStart_Implementation(AController* Player) override;
 
 	int32 GetActiveDungeonPlayerCount() const;
 	int32 GetAliveDungeonPlayerCount() const;
@@ -116,6 +117,12 @@ protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon|Respawn")
 	FName Boss3RespawnTag = TEXT("Boss3Respawn");
+
+	UPROPERTY(EditDefaultsOnly, Category = "Dungeon|Spawn")
+	FName DungeonStartTag = TEXT("DungeonStart");
+
+private :
+	int32 NextDungeonStartIndex = 0;
 
 	// CurrentDeadPlayer
 	UPROPERTY()

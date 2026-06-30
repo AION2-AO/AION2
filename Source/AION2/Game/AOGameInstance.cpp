@@ -20,7 +20,7 @@ void UAOGameInstance::Init()
 #else
 
 #if UE_BUILD_DEVELOPMENT
-	TryAsyncConnect("127.0.0.1", 7777);
+	TryAsyncConnect("172.16.15.116", 7777);
 #endif
 #endif
 

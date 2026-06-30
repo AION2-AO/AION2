@@ -1,4 +1,5 @@
 #include "Character/Daeva/Daeva.h"
+#include "AOQuickSlotComponent.h"
 #include "Player/AOPlayerState.h"
 #include "GAS/AOGameplayTags.h"
 #include "Character/AOCharacterMovementComponent.h"
@@ -9,6 +10,7 @@
 #include "Components/CapsuleComponent.h"
 #include "Net/UnrealNetwork.h"
 #include "Game/AODungeonGameMode.h"
+#include "GameplayEffect.h"		
 
 #include "GameplayTagContainer.h"
 #include "AbilitySystemComponent.h"
@@ -95,6 +97,8 @@ ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
 		OverheadStatusWidgetComponent->SetWidgetClass(
 			WidgetClass.Class);
 	}
+
+	QuickSlotComponent = CreateDefaultSubobject<UAOQuickSlotComponent>(TEXT("QuickSlotComponent"));
 }
 
 void ADaeva::BeginPlay()
@@ -118,7 +122,7 @@ void ADaeva::PossessedBy(AController* NewController)
 
 	InitGAS();
 
-	// LocalControllerÀÏ ¶§¸¸ UI ¸¸µéµµ·Ï ¼³Á¤
+	// LocalControllerì¼ ë•Œë§Œ UI ë§Œë“¤ë„ë¡ ì„¤ì •
 	if (AAOPlayerController* AOController = Cast<AAOPlayerController>(NewController))
 	{
 		if (AOController->IsLocalController())
@@ -143,7 +147,7 @@ void ADaeva::OnRep_PlayerState()
 
 	InitGAS();
 
-	// LocalControllerÀÏ ¶§¸¸ UI ¸¸µéµµ·Ï ¼³Á¤
+	// LocalControllerì¼ ë•Œë§Œ UI ë§Œë“¤ë„ë¡ ì„¤ì •
 	if (AAOPlayerController* AOController = Cast<AAOPlayerController>(GetController()))
 	{
 		if (AOController->IsLocalController())
@@ -309,10 +313,10 @@ void ADaeva::SearchTarget()
 			continue;
 		}
 
-		//if (!IsEnemy(HitActor))
-		//{
-		//	continue;
-		//}
+		if (!IsEnemy(HitActor))
+		{
+			continue;
+		}
 
 		if (!IsFrontOfCamera(HitActor))
 		{
@@ -422,12 +426,25 @@ void ADaeva::ResetForDungeonRespawn()
 	ASC->SetNumericAttributeBase(UAOAttributeSet::GetManaAttribute(), RespawnMana);
 	ASC->SetNumericAttributeBase(UAOAttributeSet::GetStaminaAttribute(), RespawnStamina);
 
-	// »ç¸Á ÅÂ±× Á¦°Å.
+	// ì‚¬ë§ íƒœê·¸ ì œê±°.
 	const FGameplayTag DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 	ASC->RemoveLooseGameplayTag(DeadTag);
 
-	// New PawnÀÌ¹Ç·Î ±âº»ÀûÀ¸·Î falseÀÌÁö¸¸ ¸íÈ®ÇÏ°Ô ÇÏ±â À§ÇØ ÃÊ±âÈ­.
+	// New Pawnì´ë¯€ë¡œ ê¸°ë³¸ì ìœ¼ë¡œ falseì´ì§€ë§Œ ëª…í™•í•˜ê²Œ í•˜ê¸° ìœ„í•´ ì´ˆê¸°í™”.
 	bIsDead = false;
+
+	if (HasAuthority())
+	{
+		Multicast_PlayMontage(EMontageID::Rebirth, 1.3f);
+		Multicast_PlayWingMontage(EMontageID::Rebirth, 1.0f);
+		Multicast_SetWingVisibility(true);
+		if (UAnimInstance* AnimInstance = GetMesh()->GetAnimInstance())
+		{
+			FOnMontageEnded EndDelegate;
+			EndDelegate.BindUObject(this, &ThisClass::OnRebirthMontageEnded);
+			AnimInstance->Montage_SetEndDelegate(EndDelegate, GetMontageByID(EMontageID::Rebirth));
+		}
+	}
 }
 
 void ADaeva::Move(const FInputActionValue& Value)
@@ -446,9 +463,7 @@ void ADaeva::Move(const FInputActionValue& Value)
 	FVector ForwardVector = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 	FVector RightVector = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::Y);
 
-	FVector NewMoveInputDirection =
-		ForwardVector * Movement.Y +
-		RightVector * Movement.X;
+	FVector NewMoveInputDirection =	ForwardVector * Movement.Y + RightVector * Movement.X;
 
 	if (NewMoveInputDirection.IsNearlyZero())
 	{
@@ -459,12 +474,6 @@ void ADaeva::Move(const FInputActionValue& Value)
 
 	CurrentMoveInputDirection = NewMoveInputDirection.GetSafeNormal();
 	AddMovementInput(CurrentMoveInputDirection);
-
-	
-	/*if (bSprintInputHeld)
-	{
-		RequestStartSprint();
-	}*/
 }
 
 void ADaeva::Look(const FInputActionValue& Value)
@@ -493,6 +502,20 @@ void ADaeva::InitGAS()
 
 	ASC = GASPS->GetAbilitySystemComponent();
 	ASC->InitAbilityActorInfo(GASPS, this);
+
+	if (HasAuthority() && ManaRegenEffect)
+	{
+		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+		Context.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(ManaRegenEffect, 1.f, Context);
+
+		if (SpecHandle.IsValid())
+		{
+			ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+			UE_LOG(LogTemp, Log, TEXT("Regen Effect Applied."));
+		}
+	}
 
 	if (!HealthChangedDelegateHandle.IsValid())
 	{
@@ -532,7 +555,7 @@ void ADaeva::InitGAS()
 		ApplyDashStaminaRegenEffect();
 	}
 
-	// UI ?ì„± ë°?Bind.
+	// UI ?ì•¹ê½¦ è«›?Bind.
 	NotifyPlayerUIReady();
 }
 
@@ -611,8 +634,7 @@ void ADaeva::ApplyDashStaminaRegenEffect()
 	FGameplayEffectContextHandle EffectContext = ASC->MakeEffectContext();
 	EffectContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle SpecHandle =
-		ASC->MakeOutgoingSpec(DashStaminaRegenEffect, 1.0f, EffectContext);
+	FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(DashStaminaRegenEffect, 1.0f, EffectContext);
 
 	if (SpecHandle.IsValid())
 	{
@@ -627,19 +649,14 @@ void ADaeva::BindMoveSpeedAttribute()
 		return;
 	}
 
-	MoveSpeedChangedDelegateHandle =
-		ASC->GetGameplayAttributeValueChangeDelegate(
-			UAOAttributeSet::GetMoveSpeedAttribute()
-		).AddUObject(this, &ADaeva::OnMoveSpeedChanged);
+	MoveSpeedChangedDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate( 
+		UAOAttributeSet::GetMoveSpeedAttribute()).AddUObject(this, &ADaeva::OnMoveSpeedChanged);
 
 	bMoveSpeedDelegateRegistered = true;
 
-	const float CurrentMoveSpeed =
-		ASC->GetNumericAttribute(UAOAttributeSet::GetMoveSpeedAttribute());
+	const float CurrentMoveSpeed = ASC->GetNumericAttribute(UAOAttributeSet::GetMoveSpeedAttribute());
 
 	GetCharacterMovement()->MaxWalkSpeed = CurrentMoveSpeed;
-
-	UE_LOG(LogTemp, Log, TEXT("[MoveSpeed] Initial Apply: %.1f"), CurrentMoveSpeed);
 }
 
 void ADaeva::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
@@ -651,13 +668,7 @@ void ADaeva::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
 
 	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
 
-	UE_LOG(
-		LogTemp,
-		Log,
-		TEXT("[MoveSpeed] %.1f -> %.1f"),
-		Data.OldValue,
-		Data.NewValue
-	);
+	UE_LOG(	LogTemp,Log,TEXT("[MoveSpeed] %.1f -> %.1f"),Data.OldValue,	Data.NewValue);
 }
 
 void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
@@ -665,6 +676,31 @@ void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, 
 	Super::OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
 
 	PlayCameraShake(bDidShakeCamera);
+
+	// ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ È¸ï¿½ï¿½.
+	if (HasAuthority() && HitManaRegenEffect)
+	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
+
+		if (!ASC)
+		{
+			return;
+		}
+
+		FGameplayEffectContextHandle ContextHandle = ASC->MakeEffectContext();
+		ContextHandle.AddSourceObject(this);
+
+		FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(HitManaRegenEffect, 1.f, ContextHandle);
+		if (!SpecHandle.IsValid())
+		{
+			return;
+		}
+
+		SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Data.HitManaRegen")), HitManaRegenAmount);
+		const float BeforeMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
+		ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		const float AfterMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
+	}
 }
 
 void ADaeva::TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitResult, AAOCharacter* DamageCauser)
@@ -677,6 +713,16 @@ void ADaeva::TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitRe
 	
 	Super::TakeDamageAO(AttackData, HitResult, DamageCauser);
 
+	if (StateCombatApplyEffect)
+	{
+		FGameplayEffectContextHandle Context = ASC->MakeEffectContext();
+		FGameplayEffectSpecHandle SpecHandle = ASC->MakeOutgoingSpec(StateCombatApplyEffect, 1.f, Context);
+		if (SpecHandle.IsValid())
+		{
+			ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
+		}
+	}
+
 	bool bDidShakeCamera = false;
 	PlayCameraShake(bDidShakeCamera);
 }
@@ -688,10 +734,10 @@ void ADaeva::InputShiftPressed()
 		return;
 	}
 
-	// ´ë½Ã´Â ÀüÅõ, ºñÀüÅõ ¸ğµÎ °¡´É.
+	// ëŒ€ì‹œëŠ” ì „íˆ¬, ë¹„ì „íˆ¬ ëª¨ë‘ ê°€ëŠ¥.
 	GASInputPressed(static_cast<int32>(EAbilityID::Dash));
 
-	// ÀüÅõ Áß°ú È°°­ Áß¿¡´Â Sprint ±İÁö
+	// ì „íˆ¬ ì¤‘ê³¼ í™œê°• ì¤‘ì—ëŠ” Sprint ê¸ˆì§€
 	if (ASC->HasMatchingGameplayTag(STATE_COMBAT) || ASC->HasMatchingGameplayTag(STATE_GLIDING))
 	{
 		return;
@@ -781,10 +827,18 @@ void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
 	SetWeaponVisibility(bIsCombat);
 	SetSubWeaponVisibility(bIsCombat);
 
-	// ÀüÅõ ÁøÀÔ ¼ø°£ ±âÁØ Sprint °­Á¦ Á¾·á.
+	// ì „íˆ¬ ì§„ì… ìˆœê°„ ê¸°ì¤€ Sprint ê°•ì œ ì¢…ë£Œ.
 	if (bIsCombat)
 	{
 		RequestStopSprint();
+	}
+}
+
+void ADaeva::OnRebirthMontageEnded(UAnimMontage* Montage, bool bInterrupted)
+{
+	if (HasAuthority())
+	{
+		Multicast_SetWingVisibility(false);
 	}
 }
 
@@ -799,9 +853,9 @@ void ADaeva::HandleDeath()
 
 	UE_LOG(LogTemp, Warning, TEXT("[Death] %s Died"), *GetName());
 
-	// Á×±â Àü¿¡ Controller¸¦ ¸ÕÀú È®º¸ÇØ¾ß ÇÑ´Ù.
-	APlayerController* PlayerController =
-		Cast<APlayerController>(GetController());
+
+	// ì£½ê¸° ì „ì— Controllerë¥¼ ë¨¼ì € í™•ë³´í•´ì•¼ í•œë‹¤.
+	APlayerController* PlayerController = Cast<APlayerController>(GetController());
 
 	GetCharacterMovement()->StopMovementImmediately();
 	GetCharacterMovement()->DisableMovement();
@@ -812,26 +866,19 @@ void ADaeva::HandleDeath()
 	{
 		ASC->CancelAllAbilities();
 
-		const FGameplayTag DeadTag =
-			FGameplayTag::RequestGameplayTag(FName("State.Dead"));
+		const FGameplayTag DeadTag = FGameplayTag::RequestGameplayTag(FName("State.Dead"));
 
 		ASC->AddLooseGameplayTag(DeadTag);
 	}
 
 	if (HasAuthority())
 	{
-		// GameMode¿¡ ¸ÕÀú »ç¸Á »ç½Ç Àü´Ş
+		// GameModeì— ë¨¼ì € ì‚¬ë§ ì‚¬ì‹¤ ì „ë‹¬
 		if (PlayerController)
 		{
-			if (AAODungeonGameMode* DungeonGameMode =
-				GetWorld()->GetAuthGameMode<AAODungeonGameMode>())
+			if (AAODungeonGameMode* DungeonGameMode = GetWorld()->GetAuthGameMode<AAODungeonGameMode>())
 			{
-				UE_LOG(
-					LogTemp,
-					Warning,
-					TEXT("[Death] Notify Dungeon GameMode: %s"),
-					*PlayerController->GetName()
-				);
+				UE_LOG(LogTemp,Warning,TEXT("[Death] Notify Dungeon GameMode: %s"),*PlayerController->GetName());
 
 				DungeonGameMode->NotifyPlayerDied(PlayerController);
 			}
@@ -842,20 +889,15 @@ void ADaeva::HandleDeath()
 		}
 		else
 		{
-			UE_LOG(
-				LogTemp,
-				Error,
-				TEXT("[Death] PlayerController is null before detach: %s"),
-				*GetName()
-			);
+			UE_LOG(LogTemp,	Error,TEXT("[Death] PlayerController is null before detach: %s"),*GetName());
 		}
 
-		// »ç¸Á ¾Ö´Ï¸ŞÀÌ¼ÇÀº Controller°¡ ºÙ¾î ÀÖ¾îµµ Àç»ı °¡´É
+		// ì‚¬ë§ ì• ë‹ˆë©”ì´ì…˜ì€ Controllerê°€ ë¶™ì–´ ìˆì–´ë„ ì¬ìƒ ê°€ëŠ¥
 		Multicast_PlayMontage(EMontageID::Die, 1.0f);
 		Multicast_PlayWingMontage(EMontageID::Die, 1.0f);
 		Multicast_SetWingVisibility(true);
 
-		// ¿©±â¼­´Â Á¦°ÅÇÏ°Å³ª ÁÖ¼® Ã³¸®
+		// ì—¬ê¸°ì„œëŠ” ì œê±°í•˜ê±°ë‚˜ ì£¼ì„ ì²˜ë¦¬
 		// DetachFromControllerPendingDestroy();
 	}
 }
@@ -884,7 +926,7 @@ void ADaeva::StartSprint()
 		return;
 	}
 
-	//¼­¹ö ±ÇÇÑ ±âÁØÀ¸·Î ÃÖÁ¾ Â÷´Ü.
+	//ì„œë²„ ê¶Œí•œ ê¸°ì¤€ìœ¼ë¡œ ìµœì¢… ì°¨ë‹¨.
 	if (ASC->HasMatchingGameplayTag(STATE_COMBAT))
 	{
 		return;
@@ -911,8 +953,7 @@ void ADaeva::StartSprint()
 	FGameplayEffectContextHandle SprintContext = ASC->MakeEffectContext();
 	SprintContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle SprintSpec =
-		ASC->MakeOutgoingSpec(SprintEffect, 1.0f, SprintContext);
+	FGameplayEffectSpecHandle SprintSpec = ASC->MakeOutgoingSpec(SprintEffect, 1.0f, SprintContext);
 
 	if (!SprintSpec.IsValid())
 	{
@@ -926,8 +967,7 @@ void ADaeva::StartSprint()
 	FGameplayEffectContextHandle DrainContext = ASC->MakeEffectContext();
 	DrainContext.AddSourceObject(this);
 
-	FGameplayEffectSpecHandle DrainSpec =
-		ASC->MakeOutgoingSpec(SprintDrainEffect, 1.0f, DrainContext);
+	FGameplayEffectSpecHandle DrainSpec = ASC->MakeOutgoingSpec(SprintDrainEffect, 1.0f, DrainContext);
 
 	if (!DrainSpec.IsValid())
 	{
@@ -935,8 +975,7 @@ void ADaeva::StartSprint()
 		return;
 	}
 
-	SprintDrainEffectHandle =
-		ASC->ApplyGameplayEffectSpecToSelf(*DrainSpec.Data.Get());
+	SprintDrainEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*DrainSpec.Data.Get());
 }
 
 void ADaeva::StopSprint()
@@ -966,8 +1005,7 @@ bool ADaeva::IsSprinting() const
 		return false;
 	}
 
-	const FGameplayTag SprintTag =
-		FGameplayTag::RequestGameplayTag(FName("State.Sprint"));
+	const FGameplayTag SprintTag = FGameplayTag::RequestGameplayTag(FName("State.Sprint"));
 
 	return ASC->HasMatchingGameplayTag(SprintTag);
 }
@@ -1168,4 +1206,22 @@ TArray<USkeletalMeshComponent*> ADaeva::GetAllMeshes()
 	}
 
 	return Meshes;
+}
+
+void ADaeva::SetMyId(uint64 Id)
+{
+	MyId = Id;
+}
+
+void ADaeva::SetMyClass(uint8 ClassType)
+{
+	//Type = static_cast<EDaevaClassType>(ClassType);
+	///AAOPlayerState* AOPlayerState = GetPlayerState<AAOPlayerState>();
+	//AOPlayerState->SetMyClass(static_cast<EDaevaClassType>(ClassType));
+}
+
+void ADaeva::SetMyName(FString InName)
+{
+	//AAOPlayerState* AOPlayerState = GetPlayerState<AAOPlayerState>();
+	//AOPlayerState->SetMyName(InName);
 }

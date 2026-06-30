@@ -235,3 +235,43 @@ bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_Du
 	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonStart, player, dungeonId);
 	return true;
 }
+
+bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchase& pkt)
+{
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+
+	// 플레이어 아이디, 아이템 아이디 넘기고 잔액을 받음
+	DBBind<2, 2> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
+
+	int32 characterId = pkt.playerid();
+	int32 itemId = pkt.itemid();
+
+	dbBind.BindParam(0, characterId);
+	dbBind.BindParam(1, itemId);
+
+	int32 errorCode = -1;
+	int32 remainingGold = 0;
+
+	std::wcout.imbue(std::locale("kor"));
+	dbBind.BindCol(0, errorCode);
+	dbBind.BindCol(1, remainingGold);
+
+
+	if (dbBind.Execute())
+	{
+		if (dbBind.Fetch())
+		{
+			std::cout << "ResultCode : " << errorCode << std::endl;
+		}
+	}
+	else
+	{
+		return false;
+	}
+	GDBConnectionPool->Push(dbConnect);
+
+	Protocol::S_StorePurchase purchasePacket;
+	purchasePacket.set_gold(remainingGold);
+	SendBufferRef purchaseBuffer = PacketHandler::MakeSendBuffer(purchasePacket);
+	session->Send(purchaseBuffer);
+}

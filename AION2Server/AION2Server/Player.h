@@ -13,6 +13,7 @@ public:
 	uint64 GetId() { return _playerId; }
 	std::string GetName() { return _name; }
 	Protocol::ClassType GetClass() { return _class; }
+
 	int32 GetGold() { return _gold; }
 	int32 GetHp() { return _hp; }
 	int32 GetExp() { return _exp; }
@@ -20,9 +21,12 @@ public:
 	void SetName(std::string playerName) { _name = playerName; }
 	void SetPos(Protocol::Vector3 inPos) { _playerPos = inPos; }
 	void SetRot(Protocol::Rotator3 inRot) { _playerRot = inRot; }
+	void SetReady(bool ready) { _isReady = ready; }
 
 	Protocol::Vector3 GetPos() { return _playerPos; }
 	Protocol::Rotator3 GetRot() { return _playerRot; }
+
+	bool GetReady() { return _isReady; }
 
 public:
 	uint64 _playerId = 0;
@@ -37,6 +41,8 @@ public:
 	int32 _hp;
 	int32 _exp;
 
+	bool _isReady = false;
+	
 	Protocol::Vector3 _playerPos;
 	Protocol::Rotator3 _playerRot;
 };

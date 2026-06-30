@@ -5,19 +5,19 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
 #include "NiagaraComponent.h"
-#include "AODunzeonEntrance.generated.h"
+#include "AODungeonEntrance.generated.h"
 
 class UNiagaraComponent;
 class UNiagaraSystem;
 
 UCLASS()
-class AION2_API AAODunzeonEntrance : public AActor
+class AION2_API AAODungeonEntrance : public AActor
 {
 	GENERATED_BODY()
 	
 public:	
 	// Sets default values for this actor's properties
-	AAODunzeonEntrance();
+	AAODungeonEntrance();
 
 protected:
 	// Called when the game starts or when spawned
@@ -35,28 +35,28 @@ protected:
 	UFUNCTION()
 	void OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor, class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
 
-	void EnterDunzeon();
-	void EnterDunzeonWaitingRoom();
+	void EnterDungeon();
+	void EnterDungeonWaitingRoom();
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TObjectPtr<class UUserWidget> DunzeonWaitingRoomWidget;
+	TObjectPtr<class UUserWidget> DungeonWaitingRoomWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSoftClassPtr<class UUserWidget> DunzeonWaitingRoomClass;
+	TSoftClassPtr<class UUserWidget> DungeonWaitingRoomClass;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TObjectPtr<class UUserWidget> DunzeonRoomWidget;
+	TObjectPtr<class UUserWidget> DungeonRoomWidget;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
-	TSoftClassPtr<class UUserWidget> DunzeonRoomClass;
+	TSoftClassPtr<class UUserWidget> DungeonRoomClass;
 private:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UNiagaraComponent> EffectComponent;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Effects", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UNiagaraSystem> DunzeonEffect;
+	TObjectPtr<UNiagaraSystem> DungeonEffect;
 
 private:
 	UPROPERTY()

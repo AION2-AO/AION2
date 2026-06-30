@@ -20,8 +20,6 @@ public:
 	virtual void SetupPlayerInputComponent(UInputComponent* PlayerInputComponent) override;
 
 public:
-	void SetMyId(uint64 Id) { MyId = Id; }
-	void SetMyClass(uint8 InClassType) { MyClassType = InClassType; }
 
 	void SendMovePacket();
 	void ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel);
@@ -55,7 +53,4 @@ public:
 
 private:
 	int32 DungeonId;
-
-	uint64 MyId = -1;
-	uint8 MyClassType;
 };

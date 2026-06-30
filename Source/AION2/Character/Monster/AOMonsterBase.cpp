@@ -43,13 +43,16 @@ void AAOMonsterBase::BeginPlay()
 {
     Super::BeginPlay();
 
+	// 클라에서 호출
+	InitGAS();
+
 }
 
 void AAOMonsterBase::PossessedBy(AController* NewController)
 {
     Super::PossessedBy(NewController);
 
-
+	// 서버에서 호출
     InitGAS();
 
 
@@ -146,6 +149,19 @@ void AAOMonsterBase::HandleBossDeath()
 	}
 
 	bIsDead = true;
+
+}
+
+void AAOMonsterBase::HandleBossDeathMontageEnd()
+{
+	/* 선환 */
+// 죽음 일시 해당 태그를 통해 확인하고 해당 ability가 끝나면 다음 구문을 이어서 호출하도록 하기 
+	FGameplayTag PhaseDeadTag = FGameplayTag::RequestGameplayTag(FName("Phase.Monster.Dead"));
+	if (Phase.MatchesTagExact(PhaseDeadTag) == false)
+	{
+		return;
+	}
+
 
 	UE_LOG(LogTemp, Warning, TEXT("[Monster Death] %s Died"), *GetName());
 

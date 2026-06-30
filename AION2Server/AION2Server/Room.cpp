@@ -29,6 +29,7 @@ void Room::EnterRoom(PlayerRef player)
 
 		playerState->set_playerid(player->_playerId);
 		playerState->set_playerclass(static_cast<Protocol::ClassType>(player->_class));
+		playerState->set_playername(player->GetName());
 
 		Protocol::Vector3* pos = playerState->mutable_playerlocation();
 		pos->set_x(player->GetPos().x());
@@ -39,6 +40,8 @@ void Room::EnterRoom(PlayerRef player)
 		rot->set_pitch(player->_playerRot.pitch());
 		rot->set_yaw(player->_playerRot.yaw());
 		rot->set_roll(player->_playerRot.roll());
+
+
 
 		SendBufferRef spawnBuffer =  PacketHandler::MakeSendBuffer(spawnPkt);
 		Broadcast(spawnBuffer, player->_playerId);
@@ -55,6 +58,7 @@ void Room::EnterRoom(PlayerRef player)
 			Protocol::PlayerState* playerState = spawnPkt.add_playerstates();
 			playerState->set_playerid(user->_playerId);
 			playerState->set_playerclass(static_cast<Protocol::ClassType>(user->_class));
+			playerState->set_playername(user->GetName());
 
 			Protocol::Vector3* pos = playerState->mutable_playerlocation();
 			pos->set_x(user->GetPos().x());

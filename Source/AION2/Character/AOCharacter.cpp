@@ -13,6 +13,7 @@
 AAOCharacter::AAOCharacter(const FObjectInitializer& ObjectInitializer)
 	: Super(ObjectInitializer.SetDefaultSubobjectClass<UAOCharacterMovementComponent>(ACharacter::CharacterMovementComponentName))
 {
+	bAlwaysRelevant = true;
 	PrimaryActorTick.bCanEverTick = true;
 }
 
@@ -72,16 +73,21 @@ void AAOCharacter::CheckAttackHit(const FAttackData& AttackData)
 
 	for (const FHitResult& HitResult : OutHitResults)
 	{
-		AActor* HitActor = HitResult.GetActor();
+		AAOCharacter* HitActor = Cast<AAOCharacter>(HitResult.GetActor());
 		if (!IsValid(HitActor))
 		{
 			continue;
 		}
-		
-		//if (!IsEnemy(HitActor))
-		//{
-		//	continue;
-		//}
+
+		if (HitActor->IsDead())
+		{
+			continue;
+		}
+
+		if (!IsEnemy(HitActor))
+		{
+			continue;
+		}
 
 		OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
 	}

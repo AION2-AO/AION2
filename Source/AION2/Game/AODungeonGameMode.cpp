@@ -39,11 +39,7 @@ void AAODungeonGameMode::FindPlacedBosses()
 {
 	TArray<AActor*> FoundActors;
 
-	UGameplayStatics::GetAllActorsOfClass(
-		this,
-		AAOMonsterBase::StaticClass(),
-		FoundActors
-	);
+	UGameplayStatics::GetAllActorsOfClass(this,AAOMonsterBase::StaticClass(),FoundActors);
 
 	for (AActor* Actor : FoundActors)
 	{
@@ -64,37 +60,20 @@ void AAODungeonGameMode::FindPlacedBosses()
 
 		if (PlacedBosses.Contains(BossIndex))
 		{
-			UE_LOG(
-				LogTemp,
-				Error,
-				TEXT("[Dungeon] Boss %d is duplicated: %s"),
-				BossIndex,
-				*Boss->GetName()
-			);
+			UE_LOG(LogTemp,Error,TEXT("[Dungeon] Boss %d is duplicated: %s"),BossIndex,*Boss->GetName());
 			continue;
 		}
 
 		PlacedBosses.Add(BossIndex, Boss);
 
-		UE_LOG(
-			LogTemp,
-			Warning,
-			TEXT("[Dungeon] Found Boss %d: %s"),
-			BossIndex,
-			*Boss->GetName()
-		);
+		UE_LOG(LogTemp,Warning,	TEXT("[Dungeon] Found Boss %d: %s"),BossIndex,*Boss->GetName());
 	}
 
 	for (int32 BossIndex = 1; BossIndex <= 3; ++BossIndex)
 	{
 		if (!PlacedBosses.Contains(BossIndex))
 		{
-			UE_LOG(
-				LogTemp,
-				Error,
-				TEXT("[Dungeon] Boss %d is not placed in this map."),
-				BossIndex
-			);
+			UE_LOG(	LogTemp,Error,TEXT("[Dungeon] Boss %d is not placed in this map."),	BossIndex);
 		}
 	}
 }
@@ -131,12 +110,7 @@ void AAODungeonGameMode::StartBossPhase(int32 BossNumber)
 {
 	if (BossNumber < 1 || BossNumber > 3)
 	{
-		UE_LOG(
-			LogTemp,
-			Error,
-			TEXT("[Dungeon] Invalid BossNumber: %d"),
-			BossNumber
-		);
+		UE_LOG(LogTemp,	Error,TEXT("[Dungeon] Invalid BossNumber: %d"),BossNumber);
 		return;
 	}
 
@@ -146,12 +120,7 @@ void AAODungeonGameMode::StartBossPhase(int32 BossNumber)
 
 	ActivateBoss(BossNumber);
 
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Dungeon] Boss %d Combat Start"),
-		BossNumber
-	);
+	UE_LOG(LogTemp,Warning,TEXT("[Dungeon] Boss %d Combat Start"),BossNumber);
 }
 
 void AAODungeonGameMode::ActivateBoss(int32 BossNumber)
@@ -160,12 +129,7 @@ void AAODungeonGameMode::ActivateBoss(int32 BossNumber)
 
 	if (!Boss)
 	{
-		UE_LOG(
-			LogTemp,
-			Error,
-			TEXT("[Dungeon] Boss %d not found."),
-			BossNumber
-		);
+		UE_LOG(	LogTemp,Error,TEXT("[Dungeon] Boss %d not found."),	BossNumber);
 		return;
 	}
 
@@ -173,13 +137,7 @@ void AAODungeonGameMode::ActivateBoss(int32 BossNumber)
 
 	Boss->SetDungeonBossActive(true);
 
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Dungeon] Boss %d Activated: %s"),
-		BossNumber,
-		*Boss->GetName()
-	);
+	UE_LOG(LogTemp,Warning,TEXT("[Dungeon] Boss %d Activated: %s"),BossNumber,*Boss->GetName());
 }
 
 void AAODungeonGameMode::NotifyBossDefeated(AAOMonsterBase* DefeatedBoss)
@@ -189,29 +147,18 @@ void AAODungeonGameMode::NotifyBossDefeated(AAOMonsterBase* DefeatedBoss)
 		return;
 	}
 
-	if (CurrentPhase == EDungeonPhase::Cleared ||
-		CurrentPhase == EDungeonPhase::Failed)
+	if (CurrentPhase == EDungeonPhase::Cleared || CurrentPhase == EDungeonPhase::Failed)
 	{
 		return;
 	}
 
 	if (DefeatedBoss != CurrentBoss)
 	{
-		UE_LOG(
-			LogTemp,
-			Warning,
-			TEXT("[Dungeon] Defeated boss is not current boss: %s"),
-			*DefeatedBoss->GetName()
-		);
+		UE_LOG(LogTemp,Warning,	TEXT("[Dungeon] Defeated boss is not current boss: %s"),*DefeatedBoss->GetName());
 		return;
 	}
 
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Dungeon] Boss %d Defeated"),
-		CurrentBossNumber
-	);
+	UE_LOG(	LogTemp,Warning,TEXT("[Dungeon] Boss %d Defeated"),	CurrentBossNumber);
 
 	SetDefeatedPhase(CurrentBossNumber);
 
@@ -221,20 +168,18 @@ void AAODungeonGameMode::NotifyBossDefeated(AAOMonsterBase* DefeatedBoss)
 
 	CurrentBoss = nullptr;
 
-	//if (CurrentBossNumber < 3)
-	//{
-	//	OpenGateForNextBoss(CurrentBossNumber);
+	if (CurrentBossNumber < 3)
+	{
+		OpenGateForNextBoss(CurrentBossNumber);
 
-	//	GetWorldTimerManager().SetTimer(
-	//		NextBossTimerHandle,
-	//		this,
-	//		&AAODunGameMode::StartNextBoss,
-	//		3.0f,
-	//		false
-	//	);
+		GetWorldTimerManager().SetTimer(NextBossTimerHandle,this,
+			&AAODungeonGameMode::StartNextBoss,
+			3.0f,
+			false
+		);
 
-	//	return;
-	//}
+		return;
+	}
 
 	ClearDungeon();
 }
@@ -435,7 +380,6 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 	if (!RespawnTransform)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[Dungeon] Respawn Transform Not Found: %s"), *PlayerController->GetName());
-
 		return;
 	}
 
@@ -458,6 +402,46 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 	PendingRespawnTransforms.Remove(PlayerController);
 
 	UE_LOG(	LogTemp, Warning, TEXT("Player Respawned: %s"),*PlayerController->GetName());
+}
+
+AActor* AAODungeonGameMode::ChoosePlayerStart_Implementation(AController* Player)
+{
+	TArray<AActor*> FoundPlayerStarts;
+
+	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
+
+	TArray<APlayerStart*> DungeonStarts;
+
+	for (AActor* Actor : FoundPlayerStarts)
+	{
+		APlayerStart* PlayerStart = Cast<APlayerStart>(Actor);
+
+		if (!PlayerStart)
+		{
+			continue;
+		}
+
+		if (PlayerStart->ActorHasTag(DungeonStartTag))
+		{
+			DungeonStarts.Add(PlayerStart);
+		}
+	}
+
+	if (DungeonStarts.IsEmpty())
+	{
+		return Super::ChoosePlayerStart_Implementation(Player);
+	}
+
+	// 접속 순서대로 Start를 하나씩 배정
+	// 배열 범위를 넘지 않도록 인덱스 반복.
+	const int32 StartIndex = NextDungeonStartIndex % DungeonStarts.Num();
+	APlayerStart* SelectedStart = DungeonStarts[StartIndex];
+
+	++NextDungeonStartIndex;
+
+	UE_LOG(LogTemp,Warning,TEXT("[Dungeon] Initial Spawn | Player: %s | Start: %s | Index: %d"),Player ? *Player->GetName() : TEXT("Unknown"),*SelectedStart->GetName(),StartIndex);
+
+	return SelectedStart;
 }
 
 int32 AAODungeonGameMode::GetActiveDungeonPlayerCount() const

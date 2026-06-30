@@ -144,6 +144,7 @@ void AAOPlayerController::CreateOrBindMainHUD()
 		MainHUD = CreateWidget<UAOMainHUDWidget>(this, MainHUDClass);
 		if (!MainHUD)
 		{
+			UE_LOG(LogTemp, Error, TEXT("PlayerContoroller Is Not Vaild"));
 			return;
 		}
 

@@ -5,7 +5,7 @@
 #include "CoreMinimal.h"
 #include "UI/AOUserWidgetBase.h"
 #include "AbilitySystemComponent.h"
-
+#include "Item/AOItemDataBase.h"
 #include "AOPlayerHUDWidget.generated.h"
 
 /**
@@ -53,6 +53,9 @@ private:
     void UpdateManaBar(float CurrentValue, float MaxValue);
     void UpdateStaminaBar(float CurrentValue, float MaxValue);
 
+public:
+    UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
+    void UpdateItemQuickSlot(int32 SlotIndex, const FAOSlotData& SlotData, const FItemData& TemplateData);
 private:
     ///
     // 중복 Binding/해제 문제에 대한 대안.

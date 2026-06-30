@@ -140,7 +140,7 @@ void UAOPlayerHUDWidget::UnbindASCDelegates()
         return;
     }
 
-    // Health ÇØÁ¦
+    // Health ï¿½ï¿½ï¿½ï¿½
     if (HealthChangedHandle.IsValid())
     {
         BoundASC->GetGameplayAttributeValueChangeDelegate(
@@ -159,7 +159,7 @@ void UAOPlayerHUDWidget::UnbindASCDelegates()
         MaxHealthChangedHandle.Reset();
     }
 
-    // Mana ÇØÁ¦
+    // Mana ï¿½ï¿½ï¿½ï¿½
     if (ManaChangedHandle.IsValid())
     {
         BoundASC->GetGameplayAttributeValueChangeDelegate(
@@ -178,7 +178,7 @@ void UAOPlayerHUDWidget::UnbindASCDelegates()
         MaxManaChangedHandle.Reset();
     }
 
-    // Stamina ÇØÁ¦
+    // Stamina ï¿½ï¿½ï¿½ï¿½
     if (StaminaChangedHandle.IsValid())
     {
         BoundASC->GetGameplayAttributeValueChangeDelegate(

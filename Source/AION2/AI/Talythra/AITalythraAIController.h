@@ -34,4 +34,10 @@ protected:
 	TObjectPtr<class ATalythra> ControlledTalythra;
 
 
+private:
+	// AttributeSet
+	UPROPERTY(EditAnywhere, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UAOAttributeSet> ControlledMonsterAttributeSet;
+
+
 };

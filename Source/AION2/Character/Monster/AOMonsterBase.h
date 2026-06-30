@@ -10,7 +10,7 @@
 #include "AOMonsterBase.generated.h"
 
 
-DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnAbilityFinishedEvent);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeadMontageEnd);
 
 UCLASS()
 class AION2_API AAOMonsterBase : public AAOCharacter
@@ -49,6 +49,8 @@ public:
 	// 몬스터 AI 컨트롤러에서 Phase 설정 뒤 Replicate. 
 	FORCEINLINE void Set_Phase(FGameplayTag _PhaseFlag) { Phase = _PhaseFlag; }
 	FORCEINLINE void Set_State(FGameplayTag _StateFlag) { State = _StateFlag; }
+
+	TObjectPtr<class UAOAttributeSet> GetAttributeSet() { return AttributeSet; }
 
 
 protected:
@@ -89,6 +91,16 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UDA_AbilitySet> AbilitySet;
+
+
+
+public:
+	UPROPERTY(BlueprintAssignable, Category = "Monster|Death")
+	FOnDeadMontageEnd OnDeadMontageEnd;
+
+	UFUNCTION(BlueprintCallable, Category = "Dungeon")
+	void HandleBossDeathMontageEnd();
+
 
 public:
 	/*

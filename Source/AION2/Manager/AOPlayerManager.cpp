@@ -6,8 +6,12 @@
 #include "Game/AOGameInstance.h"
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "Player/AOPlayerController.h"
+#include "Player/AOPlayerState.h"
+#include "UI/AOPlayerHUDWidget.h"
+#include "UI/AOMainHUDWidget.h"
+#include "AOQuickSlotComponent.h"
 
-UAOPlayerManager::UAOPlayerManager() 
+UAOPlayerManager::UAOPlayerManager()
 {
 	static ConstructorHelpers::FClassFinder<APawn> AssassinClassRef(TEXT("/Game/Blueprint/Daeva/Assassin/BP_MMOAssassin"));
 	if (AssassinClassRef.Succeeded())
@@ -43,17 +47,16 @@ void UAOPlayerManager::Initialize(FSubsystemCollectionBase& Collection)
 
 void UAOPlayerManager::HandleLogin(uint64 PlayerId, uint8 ClassType)
 {
-	// 애니메이션 넣기
 	GameInstance->SetMyPlayerId(PlayerId);
 	GameInstance->SetMyPlayerClass(ClassType);
 }
 
-void UAOPlayerManager::HandleSpawn(uint64 PlayerId, uint8 ClassType, FVector SpawnLocation, FRotator SpawnRotation)
+void UAOPlayerManager::HandleSpawn(uint64 PlayerId, FString PlayerName, uint8 ClassType, FVector SpawnLocation, FRotator SpawnRotation)
 {
 	if (!GameInstance)
 		return;
 
-	FActorSpawnParameters SpawnParams; 
+	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 	if (JobClassMap.Contains(ClassType))
@@ -67,12 +70,45 @@ void UAOPlayerManager::HandleSpawn(uint64 PlayerId, uint8 ClassType, FVector Spa
 				MyPlayer->SetMyId(PlayerId);
 				MyPlayer->SetMyClass(ClassType);
 
-				UE_LOG(LogTemp, Log, TEXT("HandleSpawn - SetMyId: %d"), PlayerId);
-
 				AAOPlayerController* PlayerController = Cast<AAOPlayerController>(GetWorld()->GetFirstPlayerController());
 				if (PlayerController != nullptr)
 				{
 					PlayerController->Possess(MyPlayer);
+					UAOQuickSlotComponent* InventoryComp = MyPlayer->FindComponentByClass<UAOQuickSlotComponent>();
+
+					if (InventoryComp == nullptr)
+					{
+						UE_LOG(LogTemp, Warning, TEXT("Inventory Is Nat Vaild"));
+						return;
+					}
+
+					UAOMainHUDWidget* MainHUD = PlayerController->GetMainHUD();
+					if (MainHUD == nullptr) return;
+
+					UAOPlayerHUDWidget* PlayerHUD = MainHUD->GetPlayerHUDWidget();
+					if (PlayerHUD == nullptr) return;
+				
+					for (const auto& Pair : MyItems)
+					{
+						const Protocol::ItemData& Item = Pair.Value;
+
+						int32 InstanceId = Item.iteminstancedid();
+						int32 TemplateId = Item.itemtemplateid();
+						int32 SlotIndex = Item.slotindex();
+						int32 Count = Item.count();
+
+						FAOSlotData SlotData;
+						SlotData.ItemInstancedId = InstanceId;
+						SlotData.ItemTemplateId = TemplateId;
+						SlotData.SlotIndex = SlotIndex;
+						SlotData.Count = Count;
+						FItemData TemplateData;
+
+						if (InventoryComp->FindItemTemplateData(TemplateId, TemplateData))
+						{
+							PlayerHUD->UpdateItemQuickSlot(SlotIndex, SlotData, TemplateData);
+						}
+					}
 				}
 			}
 		}
@@ -81,15 +117,35 @@ void UAOPlayerManager::HandleSpawn(uint64 PlayerId, uint8 ClassType, FVector Spa
 		{
 			AMMODaeva* NewPlayer = GetWorld()->SpawnActor<AMMODaeva>(SpawnClass, SpawnLocation, SpawnRotation, SpawnParams);
 			UE_LOG(LogTemp, Log, TEXT("Create NewPlayer: %d"), PlayerId);
-			PlayerInfos.Add(PlayerId, NewPlayer);
+			Players.Add(PlayerId, NewPlayer);
 		}
+
+		FPlayerInfo PlayerInfo(PlayerId, PlayerName, ClassType);
+		PlayerInfos.Add(PlayerId, PlayerInfo);
 	}
 
-	for (auto& player : PlayerInfos)
+	for (auto& player : Players)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Stored Players: %d"), player.Key);
 	}
+}
 
+void UAOPlayerManager::HandleItem(Protocol::S_ItemDataPacket Items)
+{
+	if (Items.playeritems_size() > 0)
+	{
+		int32 ItemCount = Items.playeritems_size();
+		if (ItemCount == 0) return;
+
+		if (Items.playeritems_size() > 0)
+		{
+			for (int i = 0; i < ItemCount; i++)
+			{
+				const Protocol::ItemData& Item = Items.playeritems(i);
+				MyItems.Add(Item.iteminstancedid(), Item);
+			}
+		}
+	}
 }
 
 void UAOPlayerManager::HnadleMove(uint64 PlayerId, FVector NewLocation, FRotator NewRotation, FVector NewVel)
@@ -99,7 +155,7 @@ void UAOPlayerManager::HnadleMove(uint64 PlayerId, FVector NewLocation, FRotator
 	UE_LOG(LogTemp, Log, TEXT("Handle_S_Move: %d"), PlayerId);
 
 	if (GameInstance->GetMyPlayerId() == PlayerId) return;
-	auto PlayerRef = PlayerInfos.Find(PlayerId);
+	auto PlayerRef = Players.Find(PlayerId);
 	if (PlayerRef == nullptr)return;
 	auto Player = PlayerRef->Get();
 	if (Player)
@@ -113,7 +169,7 @@ void UAOPlayerManager::HandleDungeonCreate(int32 DungeonId)
 	if (!GameInstance)
 		return;
 	uint64 PlayerId = GameInstance->GetMyPlayerId();
-	auto PlayerRef = PlayerInfos.Find(PlayerId);
+	auto PlayerRef = Players.Find(PlayerId);
 	if (PlayerRef == nullptr)return;
 	auto Player = PlayerRef->Get();
 	if (Player)

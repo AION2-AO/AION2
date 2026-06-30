@@ -37,14 +37,14 @@ int main()
 	IocpCoreRef dediIocpCore = std::make_shared<IocpCore>();
 
 	MMOServerServiceRef service = make_shared<MMOServerService>(
-		NetAddress(L"127.0.0.1", 7777),
+		NetAddress(L"172.16.30.107", 7777),
 		iocpCore,
 		[]() { return  std::make_shared<GameSession>(); },
 		100
 	);
 
 	DediServiceRef dediService = make_shared<DediService>(
-		NetAddress(L"172.16.15.116", 9999),
+		NetAddress(L"172.16.30.107", 9999),
 		dediIocpCore,
 		[]() { return  std::make_shared<DedicatedSession>(); },
 		10
