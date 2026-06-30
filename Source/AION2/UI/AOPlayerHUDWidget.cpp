@@ -9,6 +9,7 @@
 
 #include "Components/ProgressBar.h"
 #include "Components/TextBlock.h"
+#include "AOMonsterHUDWidget.h"
 
 
 void UAOPlayerHUDWidget::BindToASC(UAbilitySystemComponent* InASC)

@@ -12,9 +12,7 @@
 #include "GAS/AttributeSet/AOAttributeSet.h"
 
 #include "UI/AOWidgetComponentBase.h"
-#include "Components/WidgetComponent.h"
-#include "Components/SceneComponent.h"
-#include "Materials/MaterialInterface.h"
+#include "UI/AOMonsterHUDWidget.h"
 
 // Sets default values
 ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
@@ -56,24 +54,20 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
 
+	
+
 #pragma region UI
-
 	// Head-up UI
-	BillboardComponent = CreateDefaultSubobject<USceneComponent>(TEXT("BillboardComponent"));
-	BillboardComponent->SetupAttachment(RootComponent);
-	BillboardComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 130.0f));
-	BillboardComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 180.0f));
-
 	OverheadStatusWidgetComponent = CreateDefaultSubobject<UAOWidgetComponentBase>(TEXT("OverheadStatusWidget"));
-	OverheadStatusWidgetComponent->SetupAttachment(BillboardComponent);
-	OverheadStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::World);
-	OverheadStatusWidgetComponent->SetBlendMode(EWidgetBlendMode::Transparent);
-	OverheadStatusWidgetComponent->SetDrawSize(FVector2D(80.0f, 14.0f));
-	OverheadStatusWidgetComponent->SetRelativeLocation(FVector::ZeroVector);
-	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator::ZeroRotator);
+	OverheadStatusWidgetComponent->SetupAttachment(RootComponent);
+	OverheadStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	OverheadStatusWidgetComponent->SetDrawSize(FVector2D(150.0f, 80.0f));
+	OverheadStatusWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 3000.0f));
+	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+	OverheadStatusWidgetComponent->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
 	OverheadStatusWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 
-	static ConstructorHelpers::FClassFinder<UUserWidget>
+	static ConstructorHelpers::FClassFinder<UAOMonsterHUDWidget>
 		WidgetClass(
 			TEXT("/Game/UI/Ingame/WBP_MonsterStatus_Head.WBP_MonsterStatus_Head_C"));
 
@@ -84,13 +78,8 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	}
 
 	static ConstructorHelpers::FObjectFinder<UMaterialInterface> WidgetMat(
-		TEXT("/Game/UI/Resource/Material/BaseMaterial/M_WorldSpaceUI.M_WorldSpaceUI")
+		TEXT("/Game/UI/Resource/Material/BaseMaterial/M_WorldSpaceUI1.M_WorldSpaceUI1")
 	);
-
-	if (WidgetMat.Succeeded())
-	{
-		WidgetMaterial = WidgetMat.Object;
-	}
 #pragma endregion
 
 }
@@ -98,9 +87,6 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 void ATalythra::PostInitializeComponents()
 {
 	Super::PostInitializeComponents();
-
-
-
 }
 
 // Called when the game starts or when spawned
@@ -169,19 +155,6 @@ void ATalythra::BeginPlay()
 	AttackWarningRangeSceneComponent->SetIsReplicated(true);
 #pragma endregion 
 
-
-#pragma region UI
-	/* [UI: 발광도를 죽이는 Material로 설정.]
-	* 생성자에서는 초기화 과정에서 Material이 기본값으로 바뀔 수 있기 때문에,
-	* 타이밍이 더 뒤인 Begin에서 작동.
-	*/
-	if (WidgetMaterial)
-	{
-		OverheadStatusWidgetComponent->SetMaterial(0, WidgetMaterial);
-		OverheadStatusWidgetComponent->MarkRenderStateDirty();
-	}
-#pragma endregion
-
 }
 
 // Called every frame
@@ -189,9 +162,9 @@ void ATalythra::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
 	if (HasAuthority() == false)
-		return;
+		return; 
+
 
 	if (bChargeAttack)
 	{
@@ -211,25 +184,6 @@ void ATalythra::Tick(float DeltaTime)
 
 	if (AttackWarningRangeSceneComponent->GetVisibleFlag() == true)
 	{
-
-#pragma region UI TickCamera
-		// UI Bill Board
-		if (GetNetMode() == NM_DedicatedServer || !BillboardComponent)
-		{
-			return;
-		}
-
-		APlayerController* LocalPC = GetWorld()->GetFirstPlayerController();
-		if (!LocalPC || !LocalPC->PlayerCameraManager)
-		{
-			return;
-		}
-
-		const FVector CameraLocation = LocalPC->PlayerCameraManager->GetCameraLocation();
-		const FVector WidgetLocation = BillboardComponent->GetComponentLocation();
-		BillboardComponent->SetWorldRotation((CameraLocation - WidgetLocation).Rotation());
-#pragma endregion
-
 		AttackWarningElapsedTime += DeltaTime;
 
 		const float Alpha = FMath::Clamp(

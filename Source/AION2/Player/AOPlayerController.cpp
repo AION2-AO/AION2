@@ -69,6 +69,7 @@ void AAOPlayerController::AcknowledgePossession(APawn* P)
 		HandlePawnASCReady();
 	}
 }
+
 void AAOPlayerController::SetInputMappingContext(EInputType InNewInputType)
 {
 	ULocalPlayer* LocalPlayer = GetLocalPlayer();

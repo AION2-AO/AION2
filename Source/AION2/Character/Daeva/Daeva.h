@@ -16,8 +16,6 @@ class UGameplayEffect;
 class UAOUserWidgetBase;
 class UWidgetComponent;
 class UAOWidgetComponentBase;
-class USceneComponent;
-class UMaterialInterface;
 
 class AAOPlayerState;
 class UAbilitySystemComponent;
@@ -341,9 +339,4 @@ private:
 private:
 	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
-
-	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<USceneComponent> BillboardComponent;
-
-	TObjectPtr<UMaterialInterface> WidgetMaterial;
 };

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "Abilities/GameplayAbility.h"
+#include "Abilities/GameplayAbility.h" 
 #include "Character/Daeva/Daeva.h"
 #include "GA_Attack.generated.h"
 
@@ -33,6 +33,12 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	FAttackData AttackData;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana")
+	float ManaCost = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Mana")
+	TSubclassOf<UGameplayEffect> ManaCostEffect;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Effects", meta = (AllowPrivateAccess = "true"))

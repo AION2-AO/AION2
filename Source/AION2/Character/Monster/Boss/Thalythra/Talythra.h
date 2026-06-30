@@ -9,9 +9,7 @@
 
 // UI
 class UAOWidgetComponentBase;
-class USceneComponent;
-class UMaterialInterface;
-
+class UAOMonsterHUDWidget;
 
 
 UCLASS()
@@ -201,14 +199,15 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float AttackWarningElapsedTime = 0.0f;
+	
+
+
+public:
+	// MonsterBase¿¡¼­ »ó¼ÓµÊ.
+	int32 DungeonBossIndex = 3;
 
 	// UI
-	private:
-		UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
-
-		UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
-		TObjectPtr<USceneComponent> BillboardComponent;
-
-		TObjectPtr<UMaterialInterface> WidgetMaterial;
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
 };

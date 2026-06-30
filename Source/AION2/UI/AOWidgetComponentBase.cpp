@@ -8,7 +8,8 @@
 #include "Camera/PlayerCameraManager.h"
 #include "GameFramework/PlayerController.h"
 
-
+#include "UI/AOMonsterHUDWidget.h"
+#include "Character/Monster/AOMonsterBase.h"
 
 UAOWidgetComponentBase::UAOWidgetComponentBase()
 {
@@ -20,13 +21,31 @@ void UAOWidgetComponentBase::InitWidget()
 {
 	Super::InitWidget();
 
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
+	UAOUserWidgetBase* AOUserWidget = Cast<UAOUserWidgetBase>(GetWidget());
+	if (!AOUserWidget)
+	{
+		return;
+	}
+
 	// Super::InitWidget() 상위 로직을 따라가보면, 
 	// 함수 실행 과정에서 CreateWidget을 통해 Widget이 생성됨.
 	// 그 이후에 여기가 실행됨. 따라서 Widget 초기화를 보장 받을 수 있음.
-	UAOUserWidgetBase* AOUserWidget = Cast<UAOUserWidgetBase>(GetWidget());
-	if (AOUserWidget)
+	// AbilitySystem이 있으면 Bind.
+	AOUserWidget->BindToAbilitySystemActor(GetOwner());
+
+
+
+	// 만약 몬스터 Widget이면 아래 과정을 추가.
+	if (UAOMonsterHUDWidget* MonsterHUD = Cast<UAOMonsterHUDWidget>(AOUserWidget))
 	{
-		// AbilitySystem이 있으면 Bind.
-		AOUserWidget->BindToAbilitySystemActor(GetOwner());
+		if (const AAOMonsterBase* Monster = Cast<AAOMonsterBase>(GetOwner()))
+		{
+			MonsterHUD->SetMonsterIndex(Monster->DungeonBossIndex);
+		}
 	}
 }
