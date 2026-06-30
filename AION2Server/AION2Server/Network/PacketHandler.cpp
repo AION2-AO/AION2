@@ -4,7 +4,6 @@
 #include "Session/DedicatedSession.h"
 #include "DBConnectionPool.h"
 #include "DBBind.h"
-#include "ItemData.h"
 #include "Room.h"
 #include "Dungeon.h"
 #include "Player.h"
@@ -139,6 +138,8 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 
 		GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 		PlayerRef player = gameSession->_player;
+		player->SetName(pkt.id());
+
 		Protocol::PlayerInfo* playerInfo = loginPkt.mutable_playerinfo();
 		playerInfo->set_playerclass(static_cast<Protocol::ClassType>(player->_class));
 		playerInfo->set_playerid(player->_playerId);
@@ -171,6 +172,7 @@ bool PacketHandler::HandleMapComplete(PacketSessionRef& session, Protocol::C_Map
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	if (!gameSession)return false;
 	PlayerRef player = gameSession->_player;
+	if (!player) return false;
 	GRoom->DoAsync(&Room::HandleEnterPlayer, player);
 
 	return true;

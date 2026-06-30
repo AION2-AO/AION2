@@ -15,6 +15,7 @@ UAOWidgetComponentBase::UAOWidgetComponentBase()
 {
 	PrimaryComponentTick.bCanEverTick = true;
 	PrimaryComponentTick.bStartWithTickEnabled = true;
+	SetComponentTickInterval(0.2f);
 }
 
 void UAOWidgetComponentBase::InitWidget()
@@ -48,4 +49,50 @@ void UAOWidgetComponentBase::InitWidget()
 			MonsterHUD->SetMonsterIndex(Monster->DungeonBossIndex);
 		}
 	}
+}
+
+void UAOWidgetComponentBase::TickComponent(float DeltaTime, ELevelTick TickType, FActorComponentTickFunction* ThisTickFunction)
+{
+	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
+
+	if (GetNetMode() == NM_DedicatedServer)
+	{
+		return;
+	}
+
+	UpdateDistanceVisibility();
+}
+
+void UAOWidgetComponentBase::UpdateDistanceVisibility()
+{
+	AActor* OwnerActor = GetOwner();
+	if (!OwnerActor)
+	{
+		SetVisibility(false, true);
+		return;
+	}
+
+	APlayerController* LocalPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
+	APawn* LocalPawn = LocalPC ? LocalPC->GetPawn() : nullptr;
+
+	if (!LocalPawn)
+	{
+		SetVisibility(false, true);
+		return;
+	}
+
+	// 내 캐릭터 머리 위 UI는 이 거리 판정에서 제외.
+	if (bIgnoreOwningLocalPlayer && OwnerActor == LocalPawn)
+	{
+		SetVisibility(true, true);
+		return;
+	}
+
+	const float MaxDistanceSq = FMath::Square(MaxVisibleDistance);
+	const float CurrentDistanceSq = FVector::DistSquared(
+		LocalPawn->GetActorLocation(),
+		OwnerActor->GetActorLocation()
+	);
+
+	SetVisibility(CurrentDistanceSq < MaxDistanceSq, true);
 }

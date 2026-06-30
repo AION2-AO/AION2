@@ -13,8 +13,8 @@ void Player::SetPlayerInfo(Protocol::ClassType playerClass, int32 exp, int32 gol
 	_gold = gold;
 	_hp = hp;
 
-	_playerPos.set_x(100.f);
-	_playerPos.set_y(200.f);
+	_playerPos.set_x(-720.0f);
+	_playerPos.set_y(-1150.f);
 	_playerPos.set_z(300.f);
 
 	_playerRot.set_pitch(0);

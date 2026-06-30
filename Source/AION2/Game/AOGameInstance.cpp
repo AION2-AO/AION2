@@ -55,6 +55,10 @@ void UAOGameInstance::TryAsyncConnect(const FString& Ip, int32 Port)
 					});
 			}
 		});
+
+#if UE_SERVER
+	SendDediIpPort();
+#endif
 }
 
 bool UAOGameInstance::ConnectToServer(const FString& Ip, int32 Port)

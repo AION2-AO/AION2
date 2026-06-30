@@ -183,8 +183,9 @@ void Session::ProcessConnect()
 
 	GetService()->AddSession(GetSessionRef());
 
-	// TODO: OnConnected override logic
-	std::cout << "Client Connected!" << std::endl;
+	// 접속한 클라이언트의 IP와 Port 출력하도록 수정
+	std::wcout << L"Client Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
+		<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
 
 	OnConnected();
 	RegisterRecv();

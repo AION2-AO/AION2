@@ -96,3 +96,11 @@ x86/
 /Common/
 */ProtoBufCore/
 
+# Visual Studio 캐시 및 빌드 결과물
+out/
+CMakeSettings.json
+CMakePresets.json
+
+# vcpkg 로컬 설치 폴더 (깃에 절대 올리면 안 됨)
+vcpkg_used/
+.vcpkg/

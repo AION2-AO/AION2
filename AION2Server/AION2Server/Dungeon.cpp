@@ -7,6 +7,9 @@
 #include "DedicatedSession.h"
 #include "DediSessionManager.h"
 #include "GameSessionManager.h"
+#include "DB/DBConnectionPool.h"
+#include "DB/DBBind.h"
+
 #include <algorithm>
 #include <iostream>
 

@@ -24,5 +24,5 @@ IN_ADDR NetAddress::Ip2Address(const WCHAR* ip)
 {
 	IN_ADDR address;
 	::InetPtonW(AF_INET, ip, &address);
-	return IN_ADDR();
+	return address;
 }

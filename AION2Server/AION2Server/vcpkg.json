@@ -1,0 +1,7 @@
+{
+  "name": "aion2server",
+  "version-string": "1.0.0",
+  "dependencies": [
+    "hiredis"
+  ]
+}

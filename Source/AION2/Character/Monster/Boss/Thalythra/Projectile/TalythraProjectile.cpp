@@ -4,7 +4,7 @@
 #include "TalythraProjectile.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SphereComponent.h"
-
+#include "Character/AOCharacter.h"
 
 
 // Sets default values
@@ -33,6 +33,7 @@ ATalythraProjectile::ATalythraProjectile()
 	SetNetUpdateFrequency(100.f);		// 초당 최대 100번까지 클라에게 패킷을 보내라.
 	SetMinNetUpdateFrequency(30.f);     // 변화가 없거나 우선순위가 낮아도 초당 최소 30번은 체크 보장해라. 
 
+
 }
 
 // Called when the game starts or when spawned
@@ -40,7 +41,11 @@ void ATalythraProjectile::BeginPlay()
 {
 	Super::BeginPlay();
 
+	if (HasAuthority() == false)
+		return;
 
+	//Collision->OnComponentHit.AddDynamic(this, &ATalythraProjectile::OnProjectileHit);
+	Collision->OnComponentBeginOverlap.AddDynamic(this, &ATalythraProjectile::OnProjectileOverlapEvent);
 
 }
 
@@ -59,10 +64,52 @@ void ATalythraProjectile::OnProjectileHit(
 	const FHitResult& Hit)
 {
 
-
+	int a = 4;
 
 
 }
+
+void ATalythraProjectile::OnProjectileOverlapEvent(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+{
+	// 같은 발사자가 쏜 다른 투사체 무시
+	if (ATalythraProjectile* OtherProj = Cast<ATalythraProjectile>(OtherActor))
+	{
+		return; // 투사체끼리는 무조건 무시 (또는 GetInstigator 비교)
+	}
+
+	// 발사자 본인 무시
+	if (OtherActor == GetInstigator()) return;
+
+
+	int a = 4;
+
+	UE_LOG(LogTemp, Warning, TEXT("[TalythraProjectile] Overlap with %s (Comp: %s)"),
+		*GetNameSafe(OtherActor),
+		*GetNameSafe(OtherComp));
+
+
+	AAOCharacter* HitCharacter = Cast<AAOCharacter>(OtherActor);
+
+	if (HitCharacter->IsDead())
+	{
+		return;
+	}
+
+
+	AAOCharacter* ProjectileOwner = Cast<AAOCharacter>(GetInstigator());
+
+	bool bDidCameraShake = false;
+	HitCharacter->TakeDamageAO(AttackData, SweepResult, ProjectileOwner);
+
+	//HitCharacter->OnAttackSucceeded(AttackData, HitCharacter, SweepResult, bDidCameraShake);
+
+	//Destroy();
+
+}
+
+
+
+
 
 void ATalythraProjectile::InitVelocityAndDirection(const FVector Direction)
 {

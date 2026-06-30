@@ -32,8 +32,8 @@ uint32 AONetworkReceiverWorker::Run()
 	TArray<uint8> ReceiverBuffer;
 	uint8 TempData[BUFSIZE];
 
-	// 소켓은 기본적으로 Non-Blocking으로 한 번만 세팅함임
-	ClientSocket->SetNonBlocking(true);
+	// 소켓은 기본적으로 Non-Blocking으로 한 번만 세팅함
+	ClientSocket->SetNonBlocking(false);
 
 	// 스레드 생명주기 제어 루프 추가함
 	while (bRunThread)
