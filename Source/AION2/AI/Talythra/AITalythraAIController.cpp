@@ -61,11 +61,6 @@ void AAITalythraAIController::OnPossess(APawn* InPawn)
 	{
 		ControlledTalythra = Cast<ATalythra>(InPawn);
 
-		if (ControlledTalythra != NULL)
-		{
-			UE_LOG(LogTemp, Warning, TEXT("TalythraAIController possessed invalid pawn."));
-		}
-
 	}
 }
 

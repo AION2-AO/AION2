@@ -6,6 +6,7 @@
 #include "Interface/CombatInterface.h"
 #include "AOCharacter.generated.h"
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE_OneParam(FOnCharacterDead, AActor*, DeadActor);
 
 UCLASS(Abstract)
 class AION2_API AAOCharacter : public ACharacter, public IAbilitySystemInterface, public ICombatInterface
@@ -47,6 +48,8 @@ public:
 
 public:
 	FORCEINLINE void SetCurrentTarget(AAOCharacter* NewTarget) { CurrentTarget = NewTarget; }
+	// 선환 추가 
+	FOnCharacterDead OnPlayerDead;
 
 protected:
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "State")

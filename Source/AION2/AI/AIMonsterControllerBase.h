@@ -37,7 +37,8 @@ public:
 	UFUNCTION()
 	AActor* Get_CurrentTargetPlayer() { return CurrentTargetPlayer; }	
 
-
+	UFUNCTION()
+	void OnTargetDead(AActor* DeadActor);
 
 protected:
 	// State AI Tree ( 상태 트리 AI ) 

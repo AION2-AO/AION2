@@ -4,6 +4,9 @@
 
 #define TEAM_DAEVA FGameplayTag::RequestGameplayTag(TEXT("Team.Daeva"))
 #define TEAM_MONSTER FGameplayTag::RequestGameplayTag(TEXT("Team.Monster"))
+#define TEAM_PERCEPTION_DAEVA 1
+#define TEAM_PERCEPTION_MONSTER 2 
+
 
 #define FACTION_ELYOS FGameplayTag::RequestGameplayTag(TEXT("Faction.Elyos"))
 #define FACTION_ASMODIAN FGameplayTag::RequestGameplayTag(TEXT("Faction.Asmodian"))

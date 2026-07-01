@@ -134,6 +134,12 @@ void ADaeva::PossessedBy(AController* NewController)
 	}
 
 	BindOverheadStatusWidget();
+
+	// 선환 추가 
+	SetGenericTeamId(FGenericTeamId(TEAM_PERCEPTION_DAEVA)); // 플레이어 팀
+
+	//UE_LOG(LogTemp, Warning, TEXT("[%s] TeamID set: %d"),
+	//	*GetName(), GetGenericTeamId().GetId());
 }
 
 void ADaeva::UnPossessed()
@@ -852,6 +858,10 @@ void ADaeva::HandleDeath()
 	}
 
 	bIsDead = true;
+
+	// 선환 추가 
+	OnPlayerDead.Broadcast(this);
+
 
 	UE_LOG(LogTemp, Warning, TEXT("[Death] %s Died"), *GetName());
 

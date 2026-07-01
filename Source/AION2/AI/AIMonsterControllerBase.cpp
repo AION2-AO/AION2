@@ -89,19 +89,61 @@ void AAIMonsterControllerBase::TargetPerceptionOn(AActor* Actor, FAIStimulus Sti
 
 	if (HasAuthority())
 	{
-		if (HasDetectedTarget == false)
+		AAOCharacter* pPlayer = Cast<AAOCharacter>(Actor);
+		if (pPlayer == nullptr)
 		{
-			HasDetectedTarget = true;
-
-			PhaseTag = PHASE_MONSTER_PRECOMBAT;
-
-			ControlledMonster->Set_Phase(PHASE_MONSTER_PRECOMBAT);
-
-			ArrayTargetPlayers.Add(Actor);
-
-			CurrentTargetPlayer = Actor;
+			UE_LOG(LogTemp, Warning, TEXT("pPlayer nullptr"));
 		}
 
+		// 그러면 Deva에서 interface만들어서 해당 플레이어의 맴버변수 bisDead가 true라면, 
+		// 해당플레이어를 타겟에서 제거하면 될듯. 
+
+		// 해당 타겟이 이전에 발견하지 못했던 것이라면, 
+		if (ArrayTargetPlayers.Find(Actor) == -1)
+		{
+
+			if (HasDetectedTarget == false)
+			{
+				PhaseTag = PHASE_MONSTER_PRECOMBAT;
+				ControlledMonster->Set_Phase(PHASE_MONSTER_PRECOMBAT);
+				CurrentTargetPlayer = Actor;
+
+
+
+			}
+
+			if (pPlayer->IsDead() == false)
+			{
+				pPlayer->OnPlayerDead.AddDynamic(this, &AAIMonsterControllerBase::OnTargetDead);
+				ArrayTargetPlayers.Add(Actor);
+				UE_LOG(LogTemp, Warning, TEXT("targetCount: %d"),
+					ArrayTargetPlayers.Num());
+			}
+
+			HasDetectedTarget = true;
+		}
+
+
+
+		else
+			return;
 	}
+
+}
+
+
+
+void AAIMonsterControllerBase::OnTargetDead(AActor * DeadActor)
+{
+
+	// 타겟 리스트에서 제거해주는 작업
+
+	ArrayTargetPlayers.Remove(DeadActor);
+
+
+	UE_LOG(LogTemp, Warning, TEXT("targetCount_after_delete: %d"),
+		ArrayTargetPlayers.Num());
+
+	CurrentTargetPlayer = ArrayTargetPlayers[0];
 
 }

@@ -11,6 +11,10 @@
 #include "UI/AOMonsterHUDWidget.h"
 #include "Character/Monster/AOMonsterBase.h"
 
+#include "Character/Daeva/Daeva.h"
+#include "Player/AOPlayerState.h"
+
+
 UAOWidgetComponentBase::UAOWidgetComponentBase()
 {
 	PrimaryComponentTick.bCanEverTick = true;
@@ -37,9 +41,23 @@ void UAOWidgetComponentBase::InitWidget()
 	// 함수 실행 과정에서 CreateWidget을 통해 Widget이 생성됨.
 	// 그 이후에 여기가 실행됨. 따라서 Widget 초기화를 보장 받을 수 있음.
 	// AbilitySystem이 있으면 Bind.
-	AOUserWidget->BindToAbilitySystemActor(GetOwner());
 
-
+	if (APawn* OwnerPawn = Cast<APawn>(GetOwner()))
+	{
+		if (AAOPlayerState* AOPlayerState = OwnerPawn->GetPlayerState<AAOPlayerState>())
+		{
+			AOUserWidget->BindToPlayerState(AOPlayerState);
+		}
+		else
+		{
+			AOUserWidget->BindToAbilitySystemActor(GetOwner());
+		}
+	}
+	else
+	{
+		AOUserWidget->BindToAbilitySystemActor(GetOwner());
+	}
+		
 
 	// 만약 몬스터 Widget이면 아래 과정을 추가.
 	if (UAOMonsterHUDWidget* MonsterHUD = Cast<UAOMonsterHUDWidget>(AOUserWidget))
@@ -66,33 +84,31 @@ void UAOWidgetComponentBase::TickComponent(float DeltaTime, ELevelTick TickType,
 void UAOWidgetComponentBase::UpdateDistanceVisibility()
 {
 	AActor* OwnerActor = GetOwner();
-	if (!OwnerActor)
-	{
-		SetVisibility(false, true);
-		return;
-	}
-
 	APlayerController* LocalPC = GetWorld() ? GetWorld()->GetFirstPlayerController() : nullptr;
 	APawn* LocalPawn = LocalPC ? LocalPC->GetPawn() : nullptr;
 
-	if (!LocalPawn)
+	bool bShouldShow = false;
+
+	if (OwnerActor && LocalPawn)
 	{
-		SetVisibility(false, true);
-		return;
+		if (bIgnoreOwningLocalPlayer && OwnerActor == LocalPawn)
+		{
+			bShouldShow = true;
+		}
+		else
+		{
+			const float CurrentDistanceSq = FVector::DistSquared(
+				LocalPawn->GetActorLocation(),
+				OwnerActor->GetActorLocation()
+			);
+
+			bShouldShow = CurrentDistanceSq < FMath::Square(MaxVisibleDistance);
+		}
 	}
 
-	// 내 캐릭터 머리 위 UI는 이 거리 판정에서 제외.
-	if (bIgnoreOwningLocalPlayer && OwnerActor == LocalPawn || !bUseDistanceVisibility)
+	const bool bShouldHide = !bShouldShow;
+	if (bHiddenInGame != bShouldHide)
 	{
-		SetVisibility(true, true);
-		return;
+		SetHiddenInGame(bShouldHide);
 	}
-
-	const float MaxDistanceSq = FMath::Square(MaxVisibleDistance);
-	const float CurrentDistanceSq = FVector::DistSquared(
-		LocalPawn->GetActorLocation(),
-		OwnerActor->GetActorLocation()
-	);
-
-	SetVisibility(CurrentDistanceSq < MaxDistanceSq, true);
 }
