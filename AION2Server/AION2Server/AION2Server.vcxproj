@@ -28,8 +28,8 @@
     <ClCompile Include="DB\RedisConnection.cpp" />
     <ClCompile Include="DB\RedisConnectionPool.cpp" />
     <ClCompile Include="DB\RedisManager.cpp" />
-    <ClCompile Include="Dungeon.cpp" />
-    <ClCompile Include="Enum.pb.cc">
+    <ClCompile Include="Room\Dungeon.cpp" />
+    <ClCompile Include="Header\Enum.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -46,22 +46,22 @@
     <ClCompile Include="Network\NetAddress.cpp" />
     <ClCompile Include="Network\PacketHandler.cpp" />
     <ClCompile Include="Network\Service.cpp" />
-    <ClCompile Include="ObjectUtils.cpp" />
-    <ClCompile Include="Player.cpp" />
-    <ClCompile Include="Protocol.pb.cc">
+    <ClCompile Include="Utils\ObjectUtils.cpp" />
+    <ClCompile Include="Player\Player.cpp" />
+    <ClCompile Include="Header\Protocol.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|x64'">NotUsing</PrecompiledHeader>
     </ClCompile>
-    <ClCompile Include="Room.cpp" />
+    <ClCompile Include="Room\Room.cpp" />
     <ClCompile Include="Session\DedicatedSession.cpp" />
     <ClCompile Include="Session\DediSessionManager.cpp" />
     <ClCompile Include="Session\GameSession.cpp" />
     <ClCompile Include="Session\GameSessionManager.cpp" />
     <ClCompile Include="Session\Session.cpp" />
     <ClCompile Include="Source.cpp" />
-    <ClCompile Include="Struct.pb.cc">
+    <ClCompile Include="Header\Struct.pb.cc">
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">NotUsing</PrecompiledHeader>
       <PrecompiledHeader Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">NotUsing</PrecompiledHeader>
@@ -87,8 +87,8 @@
     <ClInclude Include="DB\RedisConnection.h" />
     <ClInclude Include="DB\RedisConnectionPool.h" />
     <ClInclude Include="DB\RedisManager.h" />
-    <ClInclude Include="Dungeon.h" />
-    <ClInclude Include="Enum.pb.h" />
+    <ClInclude Include="Room\Dungeon.h" />
+    <ClInclude Include="Header\Enum.pb.h" />
     <ClInclude Include="Job\Job.h" />
     <ClInclude Include="Job\JobQueue.h" />
     <ClInclude Include="Job\JobTimer.h" />
@@ -100,16 +100,16 @@
     <ClInclude Include="Network\NetAddress.h" />
     <ClInclude Include="Network\PacketHandler.h" />
     <ClInclude Include="Network\Service.h" />
-    <ClInclude Include="ObjectUtils.h" />
-    <ClInclude Include="Player.h" />
-    <ClInclude Include="Protocol.pb.h" />
-    <ClInclude Include="Room.h" />
+    <ClInclude Include="Utils\ObjectUtils.h" />
+    <ClInclude Include="Player\Player.h" />
+    <ClInclude Include="Header\Protocol.pb.h" />
+    <ClInclude Include="Room\Room.h" />
     <ClInclude Include="Session\DedicatedSession.h" />
     <ClInclude Include="Session\DediSessionManager.h" />
     <ClInclude Include="Session\GameSession.h" />
     <ClInclude Include="Session\GameSessionManager.h" />
     <ClInclude Include="Session\Session.h" />
-    <ClInclude Include="Struct.pb.h" />
+    <ClInclude Include="Header\Struct.pb.h" />
     <ClInclude Include="Utils\pch.h" />
     <ClInclude Include="Utils\RecvBuffer.h" />
     <ClInclude Include="Utils\SendBuffer.h" />
@@ -174,6 +174,9 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IntDir>$(Configuration)\</IntDir>
   </PropertyGroup>
+  <PropertyGroup Label="Vcpkg">
+    <VcpkgEnableManifest>true</VcpkgEnableManifest>
+  </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>TurnOffAllWarnings</WarningLevel>
@@ -218,7 +221,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\AION2Server\AION2Server\Player;C:\AION2\AION2Server\AION2Server\Header;C:\AION2\AION2Server\AION2Server\Room;$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>
@@ -237,7 +240,7 @@
       <ConformanceMode>true</ConformanceMode>
       <PrecompiledHeader>Use</PrecompiledHeader>
       <PrecompiledHeaderFile>pch.h</PrecompiledHeaderFile>
-      <AdditionalIncludeDirectories>$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\AION2Server\AION2Server\Player;C:\AION2\AION2Server\AION2Server\Header;C:\AION2\AION2Server\AION2Server\Room;$(ProjectDir)Navigation\;$(ProjectDir)Navigation\Include\;C:\AION2\AION2Server\AION2Server\Utils;C:\AION2\AION2Server\AION2Server\Session;C:\AION2\AION2Server\AION2Server\Network;C:\AION2\AION2Server\AION2Server\Job;C:\AION2\AION2Server\AION2Server\Header;C:\AION2\AION2Server\AION2Server\Room;C:\AION2\AION2Server\AION2Server\CoreGlobal;C:\AION2\AION2Server\AION2Server;C:\AION2\AION2Server\AION2Server\DB;C:\AION2\Source\ProtoBufCore\include;C:\UnrealEngine-5.6.1-release\Engine\Source\Runtime\Navmesh\Public\Detour;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
       <LanguageStandard>stdcpplatest</LanguageStandard>
     </ClCompile>
     <Link>

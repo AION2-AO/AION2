@@ -55,10 +55,11 @@ void AAODungeonEntrance::OnOverlapBegin(UPrimitiveComponent* OverlappedComp, AAc
                                         UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                         const FHitResult& SweepResult)
 {
-	if (Cast<ADaeva>(OtherActor))
+	ADaeva* CharacterActor = Cast<ADaeva>(OtherActor);
+	if (CharacterActor != nullptr)
 	{
 		UE_LOG(LogTemp, Log, TEXT("Dungeon OnOverlapBegin"));
-		PC = Cast<AAOPlayerController>(GetWorld()->GetFirstPlayerController());
+		PC = Cast<AAOPlayerController>(CharacterActor->GetController());
 		if (PC)
 		{
 			DungeonWaitingRoomWidget = UIManager->ShowWidget(DungeonWaitingRoomClass, EUILayer::PopUp);

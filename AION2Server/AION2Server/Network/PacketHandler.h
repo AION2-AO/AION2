@@ -41,6 +41,7 @@ enum : uint16
 
 	PKT_C_CHANGEHP = 1022,
 
+
 	PKT_DS_DEDICATED = 1100,
 };
 
@@ -59,6 +60,8 @@ public:
 		GPacketHandler[PKT_C_MAPLOADCOMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MovePacket>(HandleMove, session, buffer, len); };
 
+		GPacketHandler[PKT_C_CHANGEHP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHp>(HandleChangeHp, session, buffer, len); };
+
 		GPacketHandler[PKT_DS_DEDICATED] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DedicatedPacket>(HandleDedicated, session, buffer, len); };
 
 		GPacketHandler[PKT_C_DUNGEONWAITINTROOM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonWaitingRoomEnterPacket>(HandleDungeonWaitingRoom, session, buffer, len); };
@@ -74,6 +77,7 @@ public:
 	static bool HandleLogin(PacketSessionRef& session, Protocol::C_LoginPacket& pkt);
 	static bool HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt);
 	static bool HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt);
+	static bool HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHp& pkt);
 
 	static bool HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt);
 	static bool HandleDungeonWaitingRoom(PacketSessionRef& session, Protocol::C_DungeonWaitingRoomEnterPacket& pkt);

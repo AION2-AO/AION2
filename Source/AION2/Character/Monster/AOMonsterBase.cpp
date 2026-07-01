@@ -18,6 +18,11 @@
 #include "GAS/AttributeSet/AOAttributeSet.h"
 #include "Net/UnrealNetwork.h"
 
+// Targeting UI
+#include "UI/AOWidgetComponentBase.h"
+#include "UI/AOUserWidgetBase.h"
+#include "UI/AOMonsterHUDWidget_Targetable.h"
+
 // Sets default values
 AAOMonsterBase::AAOMonsterBase(const FObjectInitializer& ObjectInitializer)
     :Super(ObjectInitializer)
@@ -36,6 +41,49 @@ AAOMonsterBase::AAOMonsterBase(const FObjectInitializer& ObjectInitializer)
     bReplicates = true;
     SetReplicateMovement(true);
 
+
+	// TargetWidgetComponent
+	TargetWidgetComponent = CreateDefaultSubobject<UAOWidgetComponentBase>(TEXT("TargetWidget"));
+	TargetWidgetComponent->SetupAttachment(GetMesh(), TEXT("Bip001-Spine2"));
+	TargetWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	TargetWidgetComponent->SetDrawSize(FVector2D(64.0f, 64.0f));
+	TargetWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	TargetWidgetComponent->bUseDistanceVisibility = false;
+	TargetWidgetComponent->SetVisibility(false, true);
+
+	static ConstructorHelpers::FClassFinder<UAOUserWidgetBase>
+		TargetWidgetClass(
+			TEXT("/Game/UI/Ingame/WBP_TargetMarker.WBP_TargetMarker_C"));
+
+	if (TargetWidgetClass.Succeeded())
+	{
+		TargetWidgetComponent->SetWidgetClass(
+			TargetWidgetClass.Class);
+	}
+
+
+#pragma region UI
+	// Head-up UI
+	OverheadStatusWidgetComponent = CreateDefaultSubobject<UAOWidgetComponentBase>(TEXT("OverheadStatusWidget"));
+	OverheadStatusWidgetComponent->SetupAttachment(RootComponent);
+	OverheadStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
+	OverheadStatusWidgetComponent->SetDrawSize(FVector2D(150.0f, 80.0f));
+	OverheadStatusWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 350.0f));
+	OverheadStatusWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+
+	static ConstructorHelpers::FClassFinder<UAOMonsterHUDWidget_Targetable>
+		WidgetClass(
+			TEXT("/Game/UI/Ingame/WBP_MonsterStatus_Head.WBP_MonsterStatus_Head_C"));
+
+	if (WidgetClass.Succeeded())
+	{
+		OverheadStatusWidgetComponent->SetWidgetClass(
+			WidgetClass.Class);
+	}
+
+	OverheadStatusWidgetComponent->SetMaxVisibleDistance(6000.0f);
+#pragma endregion
+
 }
 
 // Called when the game starts or when spawned
@@ -46,6 +94,13 @@ void AAOMonsterBase::BeginPlay()
 	// 클라에서 호출
 	InitGAS();
 
+	// UI
+	if (TargetWidgetClass)
+	{
+		TargetWidgetComponent->SetWidgetClass(TargetWidgetClass);
+	}
+
+	TargetWidgetComponent->SetVisibility(false, true);
 }
 
 void AAOMonsterBase::PossessedBy(AController* NewController)
@@ -232,6 +287,22 @@ void AAOMonsterBase::OnHealthChanged(const FOnAttributeChangeData& Data)
 	}
 }
 
+void AAOMonsterBase::SetTargetWidgetVisible(bool bVisible)
+{
+	if (TargetWidgetComponent)
+	{
+		TargetWidgetComponent->SetVisibility(bVisible, true);
+	}
+
+	if (OverheadStatusWidgetComponent)
+	{
+		if (UAOMonsterHUDWidget_Targetable* StatusWidget =
+			Cast<UAOMonsterHUDWidget_Targetable>(OverheadStatusWidgetComponent->GetUserWidgetObject()))
+		{
+			StatusWidget->SetHiddenUIVisibliblity(bVisible);
+		}
+	}
+}
 
 // 호영 작성 
 void AAOMonsterBase::SetDungeonBossActive(bool bActive)

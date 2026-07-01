@@ -53,34 +53,6 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	{
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
-
-	
-
-#pragma region UI
-	// Head-up UI
-	OverheadStatusWidgetComponent = CreateDefaultSubobject<UAOWidgetComponentBase>(TEXT("OverheadStatusWidget"));
-	OverheadStatusWidgetComponent->SetupAttachment(RootComponent);
-	OverheadStatusWidgetComponent->SetWidgetSpace(EWidgetSpace::Screen);
-	OverheadStatusWidgetComponent->SetDrawSize(FVector2D(150.0f, 80.0f));
-	OverheadStatusWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 3000.0f));
-	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
-	OverheadStatusWidgetComponent->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
-	OverheadStatusWidgetComponent->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	static ConstructorHelpers::FClassFinder<UAOMonsterHUDWidget>
-		WidgetClass(
-			TEXT("/Game/UI/Ingame/WBP_MonsterStatus_Head.WBP_MonsterStatus_Head_C"));
-
-	if (WidgetClass.Succeeded())
-	{
-		OverheadStatusWidgetComponent->SetWidgetClass(
-			WidgetClass.Class);
-	}
-
-	OverheadStatusWidgetComponent->SetMaxVisibleDistance(6000.0f);
-
-#pragma endregion
-
 }
 
 void ATalythra::PostInitializeComponents()
@@ -308,7 +280,6 @@ void ATalythra::TurnToTarget()
 	}
 
 
-
 	AAITalythraAIController* TalythraAIController = Cast <AAITalythraAIController>(GetController());
 	if (TalythraAIController == nullptr)
 		return;
@@ -318,74 +289,31 @@ void ATalythra::TurnToTarget()
 		return;
 
 
+	// 플레이어를 향한 방향
+	FVector DirToPlayer = pPlayer->GetActorLocation() - GetActorLocation();
+	DirToPlayer.Z = 0.f;
 
-	// 몬스터에서 플레이어로 향하는 벡터
-	FVector vDirToPlayer = pPlayer->GetActorLocation() - GetActorLocation();
-	vDirToPlayer.Z = 0.f;
-	FVector vDirNoramlToPlayer = vDirToPlayer.GetSafeNormal();
+	if (DirToPlayer.IsNearlyZero())
+		return;
 
-	// 몬스터의 방향벡터 , 몬스터가 플레이어를 바라보는 방향벡터를 내적하여 사이 각 구하기.
-	FVector vDirMonsterFowradVector = GetActorForwardVector();
-	vDirMonsterFowradVector.Z = 0.f;
-	vDirMonsterFowradVector = vDirMonsterFowradVector.GetSafeNormal();
+	const FRotator DesiredRot(0.f, DirToPlayer.Rotation().Yaw, 0.f);
 
-	float Dot = FVector::DotProduct(vDirMonsterFowradVector, vDirNoramlToPlayer);
-	Dot = FMath::Clamp(Dot, -1.f, 1.f); // float 오차 연산 1.0001이 나올 수 있을 수 도 있으니깐!
+	// 각도 차 계산 (도착 판정용)
+	const float DeltaYaw = FMath::Abs(
+		FRotator::NormalizeAxis(DesiredRot.Yaw - GetActorRotation().Yaw)
+	);
 
-
-
-	// 두 벡터를 외적하여 회전 방향 구하기 
-
-	// 라디안 각도
-	const float Radian = FMath::Acos(Dot);
-
-	// 도 단위 각도
-	const float Degree = FMath::RadiansToDegrees(Radian);
-
-	FVector Cross = FVector::CrossProduct(vDirMonsterFowradVector, vDirNoramlToPlayer);
-
-
-	if (FMath::Abs(Degree) < 2.0f)
+	if (DeltaYaw < 2.0f)
 	{
-		// 여기서 회전 끄기 미세한 떨림 여기서 발생 bRotation 을 추가해서 그만 회전하게 하자!
-
 		RotationAble = false;
-
 		return;
 	}
-
-
 
 	if (RotationAble == false)
 		return;
 
-
-	const float DeltaTime = GetWorld()->GetDeltaSeconds();
-	const float TurnSpeed = GetCharacterMovement()->RotationRate.Yaw;
-
-
-	// 이번 프레임에 회전할 각도 
-	const float StepDegree = FMath::Min(abs(Degree), DeltaTime * TurnSpeed);
-
-
-	if (Cross.Z > 0.f)
-	{
-		// 시계 방향 → 오른쪽 회전
-		// 여기서 현재 포워트 벡터 기준으로 회전!
-		AddActorWorldRotation(FRotator(0.0f, StepDegree, 0.f));
-	}
-
-	else
-	{
-		// 반시계 방향 → 왼쪽 회전
-		// 여기서 현재 포워트 벡터 기준으로 회전!
-		AddActorWorldRotation(FRotator(0.0f, StepDegree * -1.f, 0.f));
-	}
-
-
-
-
-
+	// 목표 회전만 세팅 → 실제 회전은 CMC가 RotationRate에 맞춰 스무스하게 처리
+	TalythraAIController->SetControlRotation(DesiredRot);
 
 }
 
@@ -682,8 +610,8 @@ void ATalythra::DoFireProjectile_3()
 void ATalythra::InitAttributeSet()
 {
 	// AttributeSet설정
-	AttributeSet->InitHealth(250.f);
-	AttributeSet->InitMaxHealth(250.f);
+	AttributeSet->InitHealth(5000.f);
+	AttributeSet->InitMaxHealth(5000.f);
 
 	AttributeSet->InitStamina(100.f);
 	AttributeSet->InitMaxStamina(100.f);

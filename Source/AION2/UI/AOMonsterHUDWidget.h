@@ -12,14 +12,14 @@ class UProgressBar;
 class UTextBlock;
 
 /**
- * 
+ *
  */
 UCLASS()
 class AION2_API UAOMonsterHUDWidget : public UAOUserWidgetBase
 {
-	GENERATED_BODY()
-	
-	
+    GENERATED_BODY()
+
+
 public:
     virtual void BindToASC(UAbilitySystemComponent* InASC) override;
     virtual void UnbindFromASC() override;
@@ -67,7 +67,8 @@ protected:
 
     UPROPERTY(meta = (BindWidget), BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UTextBlock> TB_MonsterName;
-	
+
+
 private:
     int32 MonsterIndex = 0;
 };

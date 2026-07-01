@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "PacketHandler.h"
 #include "GameSession.h"'
 #include "Session/DedicatedSession.h"
@@ -8,6 +8,7 @@
 #include "Dungeon.h"
 #include "Player.h"
 #include "ObjectUtils.h"
+#include "RedisManager.h"
 
 PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
@@ -190,6 +191,23 @@ bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket
 	return true;
 }
 
+bool PacketHandler::HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHp& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	if (player == nullptr)
+		return false;
+
+	int32 hp = pkt.hp();
+	std::string name = player->GetName();
+	
+	GRedisManager.UpdatePlayerHp(name, hp);
+	std::cout << "Player " << player->GetName() << " HP Changed: " << player->GetHp() << " (Redis updated)" << std::endl;
+
+	return false;
+}
+
 bool PacketHandler::HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt)
 {
 	DedicatedSessionRef dediSession = static_pointer_cast<DedicatedSession>(session);
@@ -242,7 +260,7 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 {
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
 
-	// ÇÃ·¹ÀÌ¾î ¾ÆÀÌµğ, ¾ÆÀÌÅÛ ¾ÆÀÌµğ ³Ñ±â°í ÀÜ¾×À» ¹ŞÀ½
+	// í”Œë ˆì´ì–´ ì•„ì´ë””, ì•„ì´í…œ ì•„ì´ë”” ë„˜ê¸°ê³  ì”ì•¡ì„ ë°›ìŒ
 	DBBind<2, 2> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
 
 	int32 characterId = pkt.playerid();
@@ -272,6 +290,7 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 	}
 	GDBConnectionPool->Push(dbConnect);
 
+	// ê³¨ë“œ + ì•„ì´í…œ  countë„ ë„£ì–´ì„œ ìƒˆë¡œê³ ì¹¨ í•˜ê²Œ í•˜ê¸°
 	Protocol::S_StorePurchase purchasePacket;
 	purchasePacket.set_gold(remainingGold);
 	SendBufferRef purchaseBuffer = PacketHandler::MakeSendBuffer(purchasePacket);

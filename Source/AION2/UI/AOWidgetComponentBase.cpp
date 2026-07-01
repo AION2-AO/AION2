@@ -55,7 +55,7 @@ void UAOWidgetComponentBase::TickComponent(float DeltaTime, ELevelTick TickType,
 {
 	Super::TickComponent(DeltaTime, TickType, ThisTickFunction);
 
-	if (GetNetMode() == NM_DedicatedServer)
+	if (GetNetMode() == NM_DedicatedServer || !bUseDistanceVisibility)
 	{
 		return;
 	}
@@ -82,7 +82,7 @@ void UAOWidgetComponentBase::UpdateDistanceVisibility()
 	}
 
 	// 내 캐릭터 머리 위 UI는 이 거리 판정에서 제외.
-	if (bIgnoreOwningLocalPlayer && OwnerActor == LocalPawn)
+	if (bIgnoreOwningLocalPlayer && OwnerActor == LocalPawn || !bUseDistanceVisibility)
 	{
 		SetVisibility(true, true);
 		return;

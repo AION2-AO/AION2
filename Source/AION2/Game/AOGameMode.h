@@ -14,6 +14,8 @@ class AION2_API AAOGameMode : public AGameMode
 {
 	GENERATED_BODY()
 public:
+	AAOGameMode();
+
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
 	

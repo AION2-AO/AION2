@@ -37,6 +37,10 @@ public:
 
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|Visibility")
+	bool bUseDistanceVisibility = true;
+
+protected:
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|Visibility")
 	float MaxVisibleDistance = 3000.0f;
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI|Visibility")

@@ -15,7 +15,14 @@ using uint32 = unsigned __int32;
 using uint64 = unsigned __int64;
 
 #define OUT
-#define ASSERT_CRASH(expr) assert(expr)
+#define ASSERT_CRASH(expr)			\
+do {								\
+	if (!(expr))					\
+	{								\
+		int* crash = nullptr;		\
+		*crash = 0xDEADBEEF;		\
+	}								\
+} while (false)
 
 #define USING_SHARED_PTR(name)  using name##Ref = std::shared_ptr<class name>;
 

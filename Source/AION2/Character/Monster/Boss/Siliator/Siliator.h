@@ -9,4 +9,9 @@ class AION2_API ASiliator : public AAOMonsterBase
 {
 	GENERATED_BODY()
 	
+protected:
+	virtual void BeginPlay() override;
+
+public:
+	virtual void InitAttributeSet() override;
 };

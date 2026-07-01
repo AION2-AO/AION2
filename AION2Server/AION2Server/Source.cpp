@@ -5,6 +5,7 @@
 #include "DedicatedSession.h"
 #include "ThreadManager.h"
 #include "DB/DBConnectionPool.h"
+#include "Room/Room.h"
 #include "PacketHandler.h"
 
 void DoWorkerJob(const ServiceRef& service)
@@ -59,6 +60,8 @@ int main()
 	{
 		std::cout << "Dedi Server Started on Port 9999" << std::endl;
 	}
+
+	GRoom->DoTimer(180000, &Room::HandleSavePlayerHp);
 
 	int32 maxCore = std::thread::hardware_concurrency();
 	for (int32 i = 0; i < maxCore - 5; i++)

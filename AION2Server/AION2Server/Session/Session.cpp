@@ -1,4 +1,4 @@
-#include "pch.h"
+ï»¿#include "pch.h"
 #include "Session.h"
 #include "SocketUtils.h"
 #include "Service.h"
@@ -169,8 +169,8 @@ void Session::RegisterSend()
 		if (errorCode != WSA_IO_PENDING)
 		{
 			HandleError(errorCode);
-			_sendEvent.owner = nullptr; // RELEASE_REF
-			_sendEvent.sendBuffers.clear(); // RELEASE_REF
+			_sendEvent.owner = nullptr;
+			_sendEvent.sendBuffers.clear(); 
 			_sendRegistered.store(false);
 		}
 	}
@@ -182,10 +182,17 @@ void Session::ProcessConnect()
 	_connected.store(true);
 
 	GetService()->AddSession(GetSessionRef());
-
-	// Á¢¼ÓÇÑ Å¬¶óÀÌ¾ğÆ®ÀÇ IP¿Í Port Ãâ·ÂÇÏµµ·Ï ¼öÁ¤
-	std::wcout << L"Client Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
-		<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
+	if (GetService()->GetServiceType() == ServiceType::MMOServer)
+		// ì ‘ì†í•œ í´ë¼ì´ì–¸íŠ¸ì˜ IPì™€ Port ì¶œë ¥í•˜ë„ë¡ ìˆ˜ì •
+	{
+		std::wcout << L"Client Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
+			<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
+	}
+	else
+	{
+		std::wcout << L"Dedi Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
+			<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
+	}
 
 	OnConnected();
 	RegisterRecv();
@@ -229,8 +236,8 @@ void Session::ProcessRecv(int32 numBytes)
 void Session::ProcessSend(int32 numBytes)
 {
 	_sendEvent.owner = nullptr;
-	_sendEvent.sendBuffers.clear(); 
-	
+	_sendEvent.sendBuffers.clear();
+
 	if (numBytes == 0)
 	{
 		Disconnect(L"SendZero");

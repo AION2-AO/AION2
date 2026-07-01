@@ -104,3 +104,4 @@ CMakePresets.json
 # vcpkg 로컬 설치 폴더 (깃에 절대 올리면 안 됨)
 vcpkg_used/
 .vcpkg/
+vcpkg_installed/

@@ -19,7 +19,12 @@
 #define COMBO_AVAILABLE_RB2 FGameplayTag::RequestGameplayTag(TEXT("Combo.Available.RB2"))
 #define COMBO_AVAILABLE_RB3 FGameplayTag::RequestGameplayTag(TEXT("Combo.Available.RB3"))
 
+// Event 
 #define EVENT_CHECKATTACKHIT FGameplayTag::RequestGameplayTag(TEXT("Event.CheckAttackHit"))
+#define EVENT_CHECKATTACKHIT_BEGIN FGameplayTag::RequestGameplayTag(TEXT("Event.CheckAttackHit.Begin"))
+#define EVENT_CHECKATTACKHIT_END FGameplayTag::RequestGameplayTag(TEXT("Event.CheckAttackHit.End"))
+
+
 
 // GameplayCue
 #define CUE_GHOSTTRAIL FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.GhostTrail"))

@@ -46,6 +46,7 @@ void Service::Broadcast()
 MMOServerService::MMOServerService(NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount)
 	: Service(address, core, factory, maxSessionCount)
 {
+	_type = ServiceType::MMOServer;
 }
 
 bool MMOServerService::Start()
@@ -68,6 +69,7 @@ void MMOServerService::CloseService()
 DediService::DediService(NetAddress address, IocpCoreRef core, SessionFactory factory, int32 maxSessionCount)
 	: Service(address, core, factory, maxSessionCount)
 {
+	_type = ServiceType::DediServer;
 }
 
 bool DediService::Start()

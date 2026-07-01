@@ -32,7 +32,7 @@ public:
 	FORCEINLINE FGameplayTag Get_State() { return StateTag; }
 
 	UFUNCTION()
-	void TargetPerceptionOn(AActor* Actor, FAIStimulus  Stimlus);
+	virtual void TargetPerceptionOn(AActor* Actor, FAIStimulus  Stimlus);
 
 	UFUNCTION()
 	AActor* Get_CurrentTargetPlayer() { return CurrentTargetPlayer; }	

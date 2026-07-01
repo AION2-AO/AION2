@@ -106,29 +106,26 @@
     <ClCompile Include="Job\ThreadManager.cpp">
       <Filter>Job</Filter>
     </ClCompile>
-    <ClCompile Include="Player.cpp">
+    <ClCompile Include="Player\Player.cpp">
       <Filter>Player</Filter>
     </ClCompile>
-    <ClCompile Include="Enum.pb.cc">
+    <ClCompile Include="Header\Enum.pb.cc">
       <Filter>Packet</Filter>
     </ClCompile>
-    <ClCompile Include="Protocol.pb.cc">
+    <ClCompile Include="Header\Protocol.pb.cc">
       <Filter>Packet</Filter>
     </ClCompile>
-    <ClCompile Include="Struct.pb.cc">
+    <ClCompile Include="Header\Struct.pb.cc">
       <Filter>Packet</Filter>
     </ClCompile>
-    <ClCompile Include="ObjectUtils.cpp">
+    <ClCompile Include="Utils\ObjectUtils.cpp">
       <Filter>Utils</Filter>
     </ClCompile>
-    <ClCompile Include="Room.cpp">
+    <ClCompile Include="Room\Room.cpp">
       <Filter>Room</Filter>
     </ClCompile>
-    <ClCompile Include="Dungeon.cpp">
+    <ClCompile Include="Room\Dungeon.cpp">
       <Filter>Room</Filter>
-    </ClCompile>
-    <ClCompile Include="RedisConnection.cpp">
-      <Filter>DB</Filter>
     </ClCompile>
     <ClCompile Include="DB\RedisConnectionPool.cpp">
       <Filter>DB</Filter>
@@ -136,8 +133,11 @@
     <ClCompile Include="DB\RedisManager.cpp">
       <Filter>DB</Filter>
     </ClCompile>
-    <ClCompile Include="DediSessionManager.cpp">
+    <ClCompile Include="Session\DediSessionManager.cpp">
       <Filter>Session</Filter>
+    </ClCompile>
+    <ClCompile Include="DB\RedisConnection.cpp">
+      <Filter>DB</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -219,29 +219,26 @@
     <ClInclude Include="Utils\pch.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Player.h">
+    <ClInclude Include="Player\Player.h">
       <Filter>Player</Filter>
     </ClInclude>
-    <ClInclude Include="Enum.pb.h">
+    <ClInclude Include="Header\Enum.pb.h">
       <Filter>Packet</Filter>
     </ClInclude>
-    <ClInclude Include="Protocol.pb.h">
+    <ClInclude Include="Header\Protocol.pb.h">
       <Filter>Packet</Filter>
     </ClInclude>
-    <ClInclude Include="Struct.pb.h">
+    <ClInclude Include="Header\Struct.pb.h">
       <Filter>Packet</Filter>
     </ClInclude>
-    <ClInclude Include="ObjectUtils.h">
+    <ClInclude Include="Utils\ObjectUtils.h">
       <Filter>Utils</Filter>
     </ClInclude>
-    <ClInclude Include="Room.h">
+    <ClInclude Include="Room\Room.h">
       <Filter>Room</Filter>
     </ClInclude>
-    <ClInclude Include="Dungeon.h">
+    <ClInclude Include="Room\Dungeon.h">
       <Filter>Room</Filter>
-    </ClInclude>
-    <ClInclude Include="RedisConnection.h">
-      <Filter>DB</Filter>
     </ClInclude>
     <ClInclude Include="DB\RedisConnectionPool.h">
       <Filter>DB</Filter>
@@ -249,8 +246,11 @@
     <ClInclude Include="DB\RedisManager.h">
       <Filter>DB</Filter>
     </ClInclude>
-    <ClInclude Include="DediSessionManager.h">
+    <ClInclude Include="Session\DediSessionManager.h">
       <Filter>Session</Filter>
+    </ClInclude>
+    <ClInclude Include="DB\RedisConnection.h">
+      <Filter>DB</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

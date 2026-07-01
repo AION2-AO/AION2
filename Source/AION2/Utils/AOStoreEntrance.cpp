@@ -42,10 +42,11 @@ void AAOStoreEntrance::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
                                       class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
                                       const FHitResult& SweepResult)
 {
-	if (Cast<ADaeva>(OtherActor))
+	ADaeva* CharacterActor = Cast<ADaeva>(OtherActor);
+	if (CharacterActor!=nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Store OnOverlapBegin"));
-		PC = Cast<AAOPlayerController>(GetWorld()->GetFirstPlayerController());
+		UE_LOG(LogTemp, Log, TEXT("Store OnOverlapBegin")); 
+		PC = Cast<AAOPlayerController>(CharacterActor->GetController());
 		if (PC)
 		{
 			StorePopUpWidget = UIManager->ShowWidget(StorePopUpClass, EUILayer::PopUp);

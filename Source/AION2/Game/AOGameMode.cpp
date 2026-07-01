@@ -5,6 +5,11 @@
 #include "Game/AOGameInstance.h"
 #include "Manager/AONetworkManager.h"
 
+AAOGameMode::AAOGameMode()
+{
+	DefaultPawnClass = nullptr;
+}
+
 void AAOGameMode::BeginPlay()
 {
 	Super::BeginPlay();

@@ -7,11 +7,6 @@
 #include "Types/TalythraTypes.h"
 #include "Talythra.generated.h"
 
-// UI
-class UAOWidgetComponentBase;
-class UAOMonsterHUDWidget;
-
-
 UCLASS()
 class AION2_API ATalythra : public AAOMonsterBase
 {
@@ -206,8 +201,4 @@ public:
 	// MonsterBase¿¡¼­ »ó¼ÓµÊ.
 	int32 DungeonBossIndex = 3;
 
-	// UI
-private:
-	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
 };

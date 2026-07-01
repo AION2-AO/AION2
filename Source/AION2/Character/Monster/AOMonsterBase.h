@@ -10,6 +10,10 @@
 #include "AOMonsterBase.generated.h"
 
 
+class UAOWidgetComponentBase;
+class UAOMonsterHUDWidget_Targetable;
+
+
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeadMontageEnd);
 
 UCLASS()
@@ -123,4 +127,23 @@ protected :
 
 protected :
 	FDelegateHandle HealthChangedDelegateHandle;
+
+
+
+
+// UI
+private:
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
+
+	// Targeting UI
+public:
+	void SetTargetWidgetVisible(bool bVisible);
+
+protected:
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAOWidgetComponentBase> TargetWidgetComponent;
+
+	UPROPERTY(EditDefaultsOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TSubclassOf<UUserWidget> TargetWidgetClass;
 };
