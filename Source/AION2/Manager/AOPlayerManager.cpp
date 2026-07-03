@@ -4,12 +4,15 @@
 #include "AOPlayerManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "Game/AOGameInstance.h"
+#include "Character/Daeva/Daeva.h"
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "Player/AOPlayerController.h"
 #include "Player/AOPlayerState.h"
 #include "UI/AOPlayerHUDWidget.h"
 #include "UI/AOMainHUDWidget.h"
+#include "AOChattingWidget.h"
 #include "AOQuickSlotComponent.h"
+#include "Item/AOItemDataBase.h"
 
 UAOPlayerManager::UAOPlayerManager()
 {
@@ -65,6 +68,7 @@ void UAOPlayerManager::HandleSpawn(uint64 PlayerId, FString PlayerName, uint8 Cl
 		if (GameInstance->GetMyPlayerId() == PlayerId)
 		{
 			MyPlayer = GetWorld()->SpawnActor<AMMODaeva>(SpawnClass, SpawnLocation, SpawnRotation, SpawnParams);
+			//MyPlayer = GetWorld()->SpawnActor<ADaeva>(SpawnClass, SpawnLocation, SpawnRotation, SpawnParams);
 			if (MyPlayer != nullptr)
 			{
 				MyPlayer->SetMyId(PlayerId);
@@ -74,20 +78,20 @@ void UAOPlayerManager::HandleSpawn(uint64 PlayerId, FString PlayerName, uint8 Cl
 				if (PlayerController != nullptr)
 				{
 					PlayerController->Possess(MyPlayer);
-					UAOQuickSlotComponent* InventoryComp = MyPlayer->FindComponentByClass<UAOQuickSlotComponent>();
+						UAOQuickSlotComponent* InventoryComp = MyPlayer->FindComponentByClass<UAOQuickSlotComponent>();
 
-					if (InventoryComp == nullptr)
-					{
-						UE_LOG(LogTemp, Warning, TEXT("Inventory Is Nat Vaild"));
-						return;
-					}
+						if (InventoryComp == nullptr)
+						{
+							UE_LOG(LogTemp, Warning, TEXT("Inventory Is Nat Vaild"));
+							return;
+						}
 
 					UAOMainHUDWidget* MainHUD = PlayerController->GetMainHUD();
 					if (MainHUD == nullptr) return;
 
 					UAOPlayerHUDWidget* PlayerHUD = MainHUD->GetPlayerHUDWidget();
 					if (PlayerHUD == nullptr) return;
-				
+
 					for (const auto& Pair : MyItems)
 					{
 						const Protocol::ItemData& Item = Pair.Value;
@@ -190,5 +194,55 @@ void UAOPlayerManager::HandleDungeonStart(FString ServerURL)
 	if (PC)
 	{
 		PC->ClientTravel(ServerURL, ETravelType::TRAVEL_Absolute);
+	}
+}
+
+void UAOPlayerManager::HandleChatting(FString SenderName, FString SendMessage)
+{
+	AAOPlayerController* PlayerController = Cast<AAOPlayerController>(MyPlayer->GetController());
+	if (PlayerController && PlayerController->GetMainHUD())
+	{
+		if (UAOChattingWidget* ChatWidget = PlayerController->GetMainHUD()->ChattingWidget)
+		{
+			ChatWidget->AddChatMessage(SenderName, SendMessage);
+		}
+	}
+}
+
+void UAOPlayerManager::HandleStorePurchase(Protocol::ItemData ItemInfo)
+{
+	AAOPlayerController* PlayerController = Cast<AAOPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (PlayerController != nullptr)
+	{
+		UAOQuickSlotComponent* InventoryComp = MyPlayer->FindComponentByClass<UAOQuickSlotComponent>();
+
+		if (InventoryComp == nullptr)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Inventory Is Nat Vaild"));
+			return;
+		}
+
+		UAOMainHUDWidget* MainHUD = PlayerController->GetMainHUD();
+		if (MainHUD == nullptr) return;
+
+		UAOPlayerHUDWidget* PlayerHUD = MainHUD->GetPlayerHUDWidget();
+		if (PlayerHUD == nullptr) return;
+
+		int32 InstanceId = ItemInfo.iteminstancedid();
+		int32 TemplateId = ItemInfo.itemtemplateid();
+		int32 SlotIndex = ItemInfo.slotindex();
+		int32 Count = ItemInfo.count();
+
+		FAOSlotData SlotData;
+		SlotData.ItemInstancedId = InstanceId;
+		SlotData.ItemTemplateId = TemplateId;
+		SlotData.SlotIndex = SlotIndex;
+		SlotData.Count = Count;
+		FItemData TemplateData;
+
+		if (InventoryComp->FindItemTemplateData(TemplateId, TemplateData))
+		{
+			PlayerHUD->UpdateItemQuickSlot(SlotIndex, SlotData, TemplateData);
+		}
 	}
 }

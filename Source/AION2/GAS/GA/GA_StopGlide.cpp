@@ -38,7 +38,7 @@ void UGA_StopGlide::OnMontageTaskFinished()
     ADaeva* Daeva = Cast<ADaeva>(GetAvatarActorFromActorInfo());
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(false);
+        Daeva->SetWingVisibilityOnServer(false);
     }
 
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
@@ -49,7 +49,7 @@ void UGA_StopGlide::OnMontageTaskCancelled()
     ADaeva* Daeva = Cast<ADaeva>(GetAvatarActorFromActorInfo());
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(false);
+        Daeva->SetWingVisibilityOnServer(false);
     }
 
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);

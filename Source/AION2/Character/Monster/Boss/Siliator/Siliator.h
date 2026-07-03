@@ -8,6 +8,9 @@ UCLASS()
 class AION2_API ASiliator : public AAOMonsterBase
 {
 	GENERATED_BODY()
+
+public:
+	ASiliator(const FObjectInitializer& ObjectInitializer);
 	
 protected:
 	virtual void BeginPlay() override;

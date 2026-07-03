@@ -34,7 +34,7 @@ redisReply* RedisConnection::Command(const char* format, ...)
 
 	va_list ap;
 	va_start(ap, format);
-	redisReply* reply = (redisReply*)redisCommand(_context, format, ap);
+	redisReply* reply = (redisReply*)redisvCommand(_context, format, ap);
 	va_end(ap);
 
 	return reply;

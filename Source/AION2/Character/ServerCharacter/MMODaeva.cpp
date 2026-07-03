@@ -4,6 +4,9 @@
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "EnhancedInputComponent.h"
+#include "Player/AOPlayerController.h"
+#include "AOChattingWidget.h"
+#include "ui/AOMainHUDWidget.h"
 #include "AION2.h"
 
 void AMMODaeva::BeginPlay()
@@ -120,6 +123,19 @@ void AMMODaeva::InputMoveReleased()
 	RequestStopSprint();
 }
 
+void AMMODaeva::OnChatActivateTriggered()
+{
+	AAOPlayerController* PlayerController = Cast<AAOPlayerController>(GetController());
+	if(PlayerController)
+	{
+		auto HUD = PlayerController->GetMainHUD();
+		if (HUD->ChattingWidget)
+		{
+			HUD->ChattingWidget->ActivateChatInput();
+		}
+	}
+}
+
 bool AMMODaeva::IsCurrentMoving()
 {
 	if (!GetCharacterMovement()) return false;
@@ -156,6 +172,7 @@ void AMMODaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(MoveAction, ETriggerEvent::Triggered, this, &AMMODaeva::Move);
 		EnhancedInputComponent->BindAction(LookAction, ETriggerEvent::Triggered, this, &AMMODaeva::Look);
 		EnhancedInputComponent->BindAction(ZoomAction, ETriggerEvent::Triggered, this, &AMMODaeva::Zoom);
+		EnhancedInputComponent->BindAction(ChatActivateAction, ETriggerEvent::Triggered, this, &AMMODaeva::OnChatActivateTriggered);
 
 		EnhancedInputComponent->BindAction(
 			MoveAction,
@@ -163,6 +180,7 @@ void AMMODaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			this,
 			&AMMODaeva::InputMoveReleased
 		);
+
 	}
 }
 

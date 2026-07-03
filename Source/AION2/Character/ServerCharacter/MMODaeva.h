@@ -48,8 +48,13 @@ private:
 	FVector TargetVel = FVector::ZeroVector;
 
 	bool bWasMovingLastSend = false;
-public:
 
+protected:
+	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UInputAction> ChatActivateAction;
+
+private:
+	void OnChatActivateTriggered();
 
 private:
 	int32 DungeonId;

@@ -82,6 +82,15 @@ public:
 	virtual void InitAttributeSet() override;
 #pragma endregion 
 
+
+
+#pragma region Wave Pattern
+
+	void SpawnWaveBlue();
+	void SpawnWaveRed();
+
+#pragma endregion 
+
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
@@ -123,6 +132,15 @@ protected:
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	TSubclassOf<class ATalythraProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ring")
+	TSubclassOf<class AWaveCircle> WaveCircleBlueClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ring")
+	TSubclassOf<class AWaveCircle> WaveCircleRedClass;
+
+
+
 
 	UPROPERTY(EditAnywhere, Category = "Attack")
 	FName ProjectileSocketName = TEXT("WP_Center");
@@ -194,11 +212,5 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float AttackWarningElapsedTime = 0.0f;
-	
-
-
-public:
-	// MonsterBase¿¡¼­ »ó¼ÓµÊ.
-	int32 DungeonBossIndex = 3;
 
 };

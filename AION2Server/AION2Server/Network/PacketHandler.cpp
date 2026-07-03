@@ -1,6 +1,6 @@
 ﻿#include "pch.h"
 #include "PacketHandler.h"
-#include "GameSession.h"'
+#include "GameSession.h"
 #include "Session/DedicatedSession.h"
 #include "DBConnectionPool.h"
 #include "DBBind.h"
@@ -64,7 +64,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 {
 	std::cout << "Login Request: ID(" << pkt.id() << ") PW(" << pkt.password() << ")" << std::endl;
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
-	DBBind<2, 9> dbBind(*dbConnect, L"{CALL sp_LogIn(?, ?)}");
+	DBBind<2, 10> dbBind(*dbConnect, L"{CALL sp_LogIn(?, ?)}");
 
 	WCHAR wId[51] = { 0, };
 	WCHAR wPassword[51] = { 0, };
@@ -75,6 +75,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 	dbBind.BindParam(0, wId);
 	dbBind.BindParam(1, wPassword);
 
+	int64 playerId = -1;
 	int32 errorCode = -1;
 	int32 playerClass = 0;
 	int32 exp = 0;
@@ -87,14 +88,15 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 
 	std::wcout.imbue(std::locale("kor"));
 	dbBind.BindCol(0, errorCode);
-	dbBind.BindCol(1, playerClass);
-	dbBind.BindCol(2, exp);
-	dbBind.BindCol(3, gold);
-	dbBind.BindCol(4, hp);
-	dbBind.BindCol(5, itemInstanceId);
-	dbBind.BindCol(6, itemTemplateId);
-	dbBind.BindCol(7, slotIndex);
-	dbBind.BindCol(8, itemCount);
+	dbBind.BindCol(1, playerId);
+	dbBind.BindCol(2, playerClass);
+	dbBind.BindCol(3, exp);
+	dbBind.BindCol(4, gold);
+	dbBind.BindCol(5, hp);
+	dbBind.BindCol(6, itemInstanceId);
+	dbBind.BindCol(7, itemTemplateId);
+	dbBind.BindCol(8, slotIndex);
+	dbBind.BindCol(9, itemCount);
 
 	Protocol::S_ItemDataPacket itemPkt;
 	bool isFirstRow = true;
@@ -114,7 +116,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 			{
 				GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 				PlayerRef player = ObjectUtils::CreatePlayer(gameSession);
-				player->SetPlayerInfo(static_cast<Protocol::ClassType>(playerClass), exp, gold, hp);
+				player->SetPlayerInfo(playerId, static_cast<Protocol::ClassType>(playerClass), exp, gold, hp);
 				isFirstRow = false;
 			}
 			if (itemInstanceId != 0)
@@ -191,7 +193,7 @@ bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket
 	return true;
 }
 
-bool PacketHandler::HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHp& pkt)
+bool PacketHandler::HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHpPacket& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	PlayerRef player = gameSession->_player;
@@ -201,7 +203,7 @@ bool PacketHandler::HandleChangeHp(PacketSessionRef& session, Protocol::C_Change
 
 	int32 hp = pkt.hp();
 	std::string name = player->GetName();
-	
+	player->SetHp(hp);
 	GRedisManager.UpdatePlayerHp(name, hp);
 	std::cout << "Player " << player->GetName() << " HP Changed: " << player->GetHp() << " (Redis updated)" << std::endl;
 
@@ -256,12 +258,12 @@ bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_Du
 	return true;
 }
 
-bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchase& pkt)
+bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchasePacket& pkt)
 {
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
 
 	// 플레이어 아이디, 아이템 아이디 넘기고 잔액을 받음
-	DBBind<2, 2> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
+	DBBind<2, 5> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
 
 	int32 characterId = pkt.playerid();
 	int32 itemId = pkt.itemid();
@@ -271,11 +273,14 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 
 	int32 errorCode = -1;
 	int32 remainingGold = 0;
+	int32 itemInstanceId = 0;
+	int32 itemTemplateId = 0;
+	int32 SlotIndex = 0;
+	int32 count = 0;
 
 	std::wcout.imbue(std::locale("kor"));
 	dbBind.BindCol(0, errorCode);
 	dbBind.BindCol(1, remainingGold);
-
 
 	if (dbBind.Execute())
 	{
@@ -290,9 +295,31 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 	}
 	GDBConnectionPool->Push(dbConnect);
 
-	// 골드 + 아이템  count도 넣어서 새로고침 하게 하기
-	Protocol::S_StorePurchase purchasePacket;
+	Protocol::S_StorePurchasePacket purchasePacket;
+	Protocol::ItemData* item = purchasePacket.mutable_iteminfo();
+	item->set_iteminstancedid(itemInstanceId);
+	item->set_itemtemplateid(itemTemplateId);
+	item->set_slotindex(SlotIndex);
+	item->set_count(count);
+
 	purchasePacket.set_gold(remainingGold);
+
 	SendBufferRef purchaseBuffer = PacketHandler::MakeSendBuffer(purchasePacket);
 	session->Send(purchaseBuffer);
+
+	return true;
 }
+
+bool PacketHandler::HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	std::cout << "Chat PlayerId(" << pkt.playerid() << "): " << pkt.chat() << std::endl;
+	Protocol::S_ChatPacket chatPacket;
+	chatPacket.set_playerid(player->GetName());
+	chatPacket.set_chat(pkt.chat());
+	GRoom->DoAsync(&Room::HandleChat, chatPacket);
+	return true;
+}
+

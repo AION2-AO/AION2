@@ -2,6 +2,7 @@
 
 #include "CoreMinimal.h"
 #include "Game/AOGameMode.h"
+#include "Player/AOPlayerState.h"
 #include "AODungeonGameMode.generated.h"
 
 class AAOMonsterBase;
@@ -80,6 +81,11 @@ protected:
 	void RespawnAllDeadPlayersAtBossCheckpoint();
 	APlayerStart* FindBossRespawnPoint(int32 CurrentBossNumber) const;
 
+	// 캐릭터 직업
+	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
+	UPROPERTY(EditDefaultsOnly, Category = "Dungeon|Class")
+	TMap<EDaevaClassType, TSubclassOf<APawn>> JobClassMap;
+
 protected:
 	// 일반 사망 : 죽은 자리에서 부활.
 	TMap<TObjectPtr<APlayerController>, FTransform> PendingRespawnTransforms;
@@ -96,7 +102,6 @@ protected:
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
 	TObjectPtr<AAOMonsterBase> CurrentBoss;
 
-	// 1 = Boss1, 2 = Boss2, 3 = Boss3
 	UPROPERTY()
 	TMap<int32, TObjectPtr<AAOMonsterBase>> PlacedBosses;
 
@@ -130,7 +135,6 @@ private :
 
 	// RespawnTimer
 	TMap<TObjectPtr<APlayerController>, FTimerHandle> RespawnTimerHandles;
-
 
 	FTimerHandle NextBossTimerHandle;
 

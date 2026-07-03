@@ -19,6 +19,7 @@ public:
 	bool HandleLeavePlayer(PlayerRef player);
 	void HandleMove(Protocol::C_MovePacket pkt, PlayerRef player);
 	void HandleSavePlayerHp();
+	void HandleChat(Protocol::S_ChatPacket pkt);
 
 	void AddPlayer(PlayerRef player);
 

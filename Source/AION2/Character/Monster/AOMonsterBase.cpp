@@ -111,6 +111,8 @@ void AAOMonsterBase::PossessedBy(AController* NewController)
     InitGAS();
 
 
+	// 선환 추가 
+	SetGenericTeamId(FGenericTeamId(TEAM_PERCEPTION_DAEVA)); // 플레이어 팀
 
 }
 

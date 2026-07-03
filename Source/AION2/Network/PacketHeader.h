@@ -60,7 +60,11 @@ enum : uint16
 
 	PKT_C_CHANGEHP = 1022,
 
+	PKT_C_CHAT = 1023,
+	PKT_S_CHAT = 1024,
+
 	PKT_DS_DEDICATED = 1100,
+
 };
 
 #include "PacketHeader.generated.h"

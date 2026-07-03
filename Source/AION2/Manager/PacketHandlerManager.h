@@ -5,37 +5,55 @@
 #include "Network/PacketHeader.h"
 
 class UAONetworkManager;
+class UAOGameInstance;
+class UAOPlayerManager;
+class UAOLoginUserWidget;
 
-// ÇÔ¼ö Æ÷ÀÎÅÍ Å¸ÀÔ Á¤ÀÇÇÔ
+class FPacketHandler
+{
+public:
+	FPacketHandler(UAONetworkManager* InMng);
+
+	bool Handle_S_SIGNUP(Protocol::S_SignUpResultPacket& Pkt);
+	bool Handle_S_SLOGIN(Protocol::S_LoginSuccessPacket& Pkt);
+	bool Handle_S_FLOGIN(Protocol::S_LoginFailPacket& Pkt);
+	bool Handle_S_ITEM(Protocol::S_ItemDataPacket& Pkt);
+	bool Handle_S_SPAWN(Protocol::S_SpawnPacket& Pkt);
+	bool Handle_S_MOVE(Protocol::S_MovePacket& Pkt);
+	bool Handle_S_CREATE(Protocol::S_DungeonCreatePacket& Pkt);
+	bool Handle_S_ENTER(Protocol::S_DungeonEnterPacket& Pkt);
+	bool Handle_S_READY(Protocol::S_DungeonReadyPacket& Pkt);
+	bool Handle_S_START(Protocol::S_DungeonStartPacket& Pkt);
+	bool Handle_S_CHAT(Protocol::S_ChatPacket& Pkt);
+	bool Handle_S_STORE(Protocol::S_StorePurchasePacket& Pkt);
+
+private:
+	UAOLoginUserWidget* GetLoginWidget() const;
+
+private:
+	UAONetworkManager* NetworkMng;
+	UAOGameInstance* GameInstance;
+	UAOPlayerManager* PlayerMng;
+};
+
+// í•¨ìˆ˜ í¬ì¸í„° íƒ€ì…
 typedef bool (*PacketHandlerFunc)(UAONetworkManager*, uint8*, int32);
 extern PacketHandlerFunc GAOPacketHandler[UINT16_MAX];
 
 void InitPacketHandler();
 
-// ÆĞÅ¶º° ½ÇÁ¦ Ã³¸® ÇÔ¼ö Àü¹æ ¼±¾ğÇÔ
 bool Handle_INVALID(UAONetworkManager* NetworkMng, uint8* Buffer, int32 Len);
-bool Handle_S_SIGNUP(UAONetworkManager* NetworkMng, Protocol::S_SignUpResultPacket& Pkt);
-bool Handle_S_SLOGIN(UAONetworkManager* NetworkMng, Protocol::S_LoginSuccessPacket& Pkt);
-bool Handle_S_FLOGIN(UAONetworkManager* NetworkMng, Protocol::S_LoginFailPacket& Pkt);
-bool Handle_S_ITEM(UAONetworkManager* NetworkMng, Protocol::S_ItemDataPacket& Pkt);
-bool Handle_S_SPAWN(UAONetworkManager* NetworkMng, Protocol::S_SpawnPacket& Pkt);
-bool Handle_S_MOVE(UAONetworkManager* NetworkMng, Protocol::S_MovePacket& Pkt);
-bool Handle_S_CREATE(UAONetworkManager* NetworkMng, Protocol::S_DungeonCreatePacket& Pkt);
-bool Handle_S_ENTER(UAONetworkManager* NetworkMng, Protocol::S_DungeonEnterPacket& Pkt);
-bool Handle_S_READY(UAONetworkManager* NetworkMng, Protocol::S_DungeonReadyPacket& Pkt);
-bool Handle_S_START(UAONetworkManager* NetworkMng, Protocol::S_DungeonStartPacket& Pkt);
 
-// µ¥µğ ¼­¹ö¿ë ÆĞÅ¶
-
-// ÆĞÅ¶ º¯È¯ ¹× ÆÄ½ÌÀ» ´ëÇàÇØÁÙ ÅÛÇÃ¸´ ÇïÆÛ ÇÔ¼öÀÓ
-template<typename T, typename HandlerFunc>
-bool HandlePacketPolicy(HandlerFunc Handler, UAONetworkManager* NetworkMng, uint8* Buffer, int32 Len)
+// íŒ¨í‚· ë³€í™˜ ë° íŒŒì‹± í…œí”Œë¦¿ í•¨ìˆ˜
+template<typename T, typename MemberFunc>
+bool HandlePacketPolicy(MemberFunc Handler, UAONetworkManager* NetworkMng, uint8* Buffer, int32 Len)
 {
 	T Pkt;
-	// ¸ŞÀÎ ½º·¹µå ½ºÅÃ ¸Ş¸ğ¸® ¾È¿¡¼­ ÆÄ½Ì ¼öÇàÇÔ
+	// ë²„í¼ì—ì„œ íŒ¨í‚· íŒŒì‹±
 	if (Pkt.ParseFromArray(Buffer, Len) == false)
 		return false;
 
-	// ¼º°ø ½Ã ½ÇÁ¦ ÄÁÅÙÃ÷ ·ÎÁ÷ ÇÔ¼ö È£ÃâÇÔ
-	return Handler(NetworkMng, Pkt);
+	// í•¸ë“¤ëŸ¬ í˜¸ì¶œ
+	FPacketHandler Helper(NetworkMng);
+	return (Helper.*Handler)(Pkt);
 }

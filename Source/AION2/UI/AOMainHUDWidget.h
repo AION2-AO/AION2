@@ -15,6 +15,7 @@
 
 class UAOPlayerHUDWidget;
 class UAORaidHUDWidget;
+class UAOChattingWidget;
 class ADaeva;
 
 UCLASS()
@@ -37,4 +38,7 @@ protected:
     UPROPERTY(meta = (BindWidgetOptional), BlueprintReadOnly)
     TObjectPtr<UAORaidHUDWidget> RaidHUDWidget;
 
+public:
+    UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
+    TObjectPtr<UAOChattingWidget> ChattingWidget;
 };

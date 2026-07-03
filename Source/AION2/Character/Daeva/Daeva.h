@@ -1,4 +1,4 @@
-#pragma once
+﻿#pragma once
 
 #include "CoreMinimal.h"
 #include "Character/AOCharacter.h"
@@ -42,6 +42,7 @@ enum class EMontageID : uint8
 	Dash,
 	CombatDash,
 	Glide,
+	GlideDash,
 	GlideLand,
 	StopGlide,
 	LB,
@@ -74,7 +75,8 @@ enum class EAbilityID : uint8
 	Key3,
 	Key4,
 	KeyQ,
-	KeyE
+	KeyE,
+	GlideDash
 };
 
 // UI: Player ASC�� �غ�Ǹ� bind
@@ -112,9 +114,6 @@ public:
 
 	UFUNCTION(NetMulticast, Reliable)
 	void Multicast_PlayWingMontage(EMontageID MontageID, float PlayRate);
-
-	UFUNCTION(NetMulticast, Reliable)
-	void Multicast_SetWingVisibility(bool NewVisible);
 
 	UFUNCTION(Server, Reliable)
 	void Server_SetCurrentTarget(AAOCharacter* NewTarget);
@@ -174,6 +173,9 @@ public:
 	virtual void HandleDeath();
 	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 
+	UFUNCTION(Exec)
+	void TestSetHealth(float NewHealth);
+
 protected:
 	FDelegateHandle HealthChangedDelegateHandle;
 
@@ -223,6 +225,11 @@ private:
 	void SetWeaponVisibility(bool NewVisible);
 	void SetSubWeaponVisibility(bool NewVisible);
 	void SetWingVisibility(bool NewVisible);
+
+public:
+	void SetWingVisibilityOnServer(bool NewVisible);
+	UFUNCTION()
+	void OnRep_WingVisible();
 
 private:
 	void CreatePart(EDaevaPartType PartType, const TCHAR* ComponentName);
@@ -282,6 +289,7 @@ public:
 	void SetMyClass(uint8 ClassType);
 	void SetMyName(FString InName);
 
+	void SendHp(float NewHp);
 private:
 	bool bPlayerUIReady = false;
 
@@ -344,6 +352,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadWrite, Category = "Mesh", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<USkeletalMeshComponent> Wing;
+
+	UPROPERTY(ReplicatedUsing = OnRep_WingVisible)
+	bool bWingVisible = false;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))

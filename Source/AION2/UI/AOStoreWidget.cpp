@@ -22,7 +22,7 @@ void UAOStoreWidget::OnHealPurchase()
 	UAOGameInstance* GI = Cast<UAOGameInstance>(GetWorld()->GetGameInstance());
 	if (!GI) return;
 
-	Protocol::C_StorePurchase PurchasePacket;
+	Protocol::C_StorePurchasePacket PurchasePacket;
 	uint64 PlayerId = GI->GetMyPlayerId();
 	PurchasePacket.set_itemid(1);
 	PurchasePacket.set_playerid(PlayerId);

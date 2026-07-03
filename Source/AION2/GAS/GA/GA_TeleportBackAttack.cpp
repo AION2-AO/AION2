@@ -23,6 +23,10 @@ void UGA_TeleportBackAttack::ActivateAbility(const FGameplayAbilitySpecHandle Ha
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	if (!IsActive())
+	{
+		return;
+	}
 
 	AOCharacter->TeleportBackToTarget();
 }

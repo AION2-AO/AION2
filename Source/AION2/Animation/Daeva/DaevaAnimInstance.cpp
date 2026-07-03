@@ -22,6 +22,7 @@ void UDaevaAnimInstance::NativeUpdateAnimation(float DeltaSeconds)
 
     if (UAbilitySystemComponent* ASC = AOCharacter->GetAbilitySystemComponent())
     {
+        bIsGliding = ASC->HasMatchingGameplayTag(STATE_GLIDING);
         bIsCombat = ASC->HasMatchingGameplayTag(STATE_COMBAT);
     }
 }

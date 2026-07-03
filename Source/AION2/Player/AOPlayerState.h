@@ -42,6 +42,9 @@ public:
 	void SetMyClass(EDaevaClassType InClassType);
 	void SetMyName(FString InName);
 
+	// GetClass function.
+	FORCEINLINE EDaevaClassType GetMyClass() const{ return MyClassType; }
+
 private:
 	UPROPERTY(EditAnywhere, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAbilitySystemComponent> ASC;

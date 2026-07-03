@@ -41,6 +41,8 @@ enum : uint16
 
 	PKT_C_CHANGEHP = 1022,
 
+	PKT_C_CHAT = 1023,
+	PKT_S_CHAT = 1024,
 
 	PKT_DS_DEDICATED = 1100,
 };
@@ -60,7 +62,7 @@ public:
 		GPacketHandler[PKT_C_MAPLOADCOMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MovePacket>(HandleMove, session, buffer, len); };
 
-		GPacketHandler[PKT_C_CHANGEHP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHp>(HandleChangeHp, session, buffer, len); };
+		GPacketHandler[PKT_C_CHANGEHP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHpPacket>(HandleChangeHp, session, buffer, len); };
 
 		GPacketHandler[PKT_DS_DEDICATED] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DedicatedPacket>(HandleDedicated, session, buffer, len); };
 
@@ -69,7 +71,8 @@ public:
 		GPacketHandler[PKT_C_DUNGEONENTER] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonEnteracket>(HandleDungeonEnter, session, buffer, len); };
 		GPacketHandler[PKT_C_DUNGEONSTART] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonStartacket>(HandleDungeonStart, session, buffer, len); };
 
-		GPacketHandler[PKT_C_STOREPURCHASE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_StorePurchase>(HandleStorePurchase, session, buffer, len); };
+		GPacketHandler[PKT_C_STOREPURCHASE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_StorePurchasePacket>(HandleStorePurchase, session, buffer, len); };
+		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChatPacket>(HandleChat, session, buffer, len); };
 
 	}
 
@@ -77,7 +80,7 @@ public:
 	static bool HandleLogin(PacketSessionRef& session, Protocol::C_LoginPacket& pkt);
 	static bool HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt);
 	static bool HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt);
-	static bool HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHp& pkt);
+	static bool HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHpPacket& pkt);
 
 	static bool HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt);
 	static bool HandleDungeonWaitingRoom(PacketSessionRef& session, Protocol::C_DungeonWaitingRoomEnterPacket& pkt);
@@ -85,7 +88,8 @@ public:
 	static bool HandleDungeonEnter(PacketSessionRef& session, Protocol::C_DungeonEnteracket& pkt);
 	static bool HandleDungeonStart(PacketSessionRef& session, Protocol::C_DungeonStartacket& pkt);
 
-	static bool HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchase& pkt);
+	static bool HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchasePacket& pkt);
+	static bool HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket& pkt);
 
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -119,7 +123,9 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONSTART); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonReadyPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONREADY); };
 
-	static SendBufferRef MakeSendBuffer(Protocol::S_StorePurchase& pkt) { return MakeSendBuffer(pkt, PKT_S_STOREPURCHASE); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_StorePurchasePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_STOREPURCHASE); };
+
+	static SendBufferRef MakeSendBuffer(Protocol::S_ChatPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_CHAT); };
 
 private:
 	template<typename PacketType, typename ProcessFunc> 

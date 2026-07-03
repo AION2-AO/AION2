@@ -32,7 +32,7 @@ void UGA_Glide::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const F
     UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::Glide), 1.0f);
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(true);
+        Daeva->SetWingVisibilityOnServer(true);
         Daeva->Multicast_PlayWingMontage(EMontageID::Glide, 1.0f);
     }
     MontageTask->ReadyForActivation();
@@ -59,7 +59,7 @@ void UGA_Glide::OnMontageTaskFinished()
     ADaeva* Daeva = Cast<ADaeva>(GetAvatarActorFromActorInfo());
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(false);
+        Daeva->SetWingVisibilityOnServer(false);
     }
 
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
@@ -70,7 +70,7 @@ void UGA_Glide::OnMontageTaskCancelled()
     ADaeva* Daeva = Cast<ADaeva>(GetAvatarActorFromActorInfo());
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_SetWingVisibility(false);
+        Daeva->SetWingVisibilityOnServer(false);
     }
 
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, true);

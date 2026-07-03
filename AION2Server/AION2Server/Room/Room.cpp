@@ -156,6 +156,7 @@ void Room::HandleSavePlayerHp()
 
 			dbBind.BindParam(0, hp);
 			dbBind.BindParam(1, widBuf);
+			std::cout << "HandleSavePlayerHp:" << pair.first << ", " << hp <<"\n";
 
 			if (dbBind.Execute())
 			{
@@ -167,6 +168,12 @@ void Room::HandleSavePlayerHp()
 		GRedisManager.ClearPendingHpUpdate(successIds);
 		});
 	doThread.detach();
+}
+
+void Room::HandleChat(Protocol::S_ChatPacket pkt)
+{
+	SendBufferRef chatBuffer = PacketHandler::MakeSendBuffer(pkt);
+	Broadcast(chatBuffer, -1);
 }
 
 void Room::AddPlayer(PlayerRef player)

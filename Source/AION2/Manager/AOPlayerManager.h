@@ -9,8 +9,9 @@
 #include "AOPlayerManager.generated.h"
 
 /**
- * 
+ *
  */
+class ADaeva;
 class AMMODaeva;
 UCLASS()
 class AION2_API UAOPlayerManager : public UGameInstanceSubsystem
@@ -18,7 +19,7 @@ class AION2_API UAOPlayerManager : public UGameInstanceSubsystem
 	GENERATED_BODY()
 private:
 	UAOPlayerManager();
-	virtual void Initialize(FSubsystemCollectionBase& Collection) override;	
+	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 
 public:
 	void HandleLogin(uint64 PlayerId, uint8 ClassType);
@@ -28,25 +29,26 @@ public:
 	void HandleDungeonCreate(int32 DungeonId);
 	void HandleDungeonEnter(int32 DungeonId);
 	void HandleDungeonStart(FString ServerURL);
+	void HandleChatting(FString SenderName, FString SendMessage);
+	void HandleStorePurchase(Protocol::ItemData ItemInfo);
 
 private:
-	FVector PlayerStartLocation = FVector(442.0f,-147.0f, 90.0f );
-
-private:	
+	//UPROPERTY()
+	//TObjectPtr<AMMODaeva> MyPlayer;
 	UPROPERTY()
-	TObjectPtr<AMMODaeva> MyPlayer;
+	TObjectPtr<ADaeva> MyPlayer;
 
 	UPROPERTY()
 	TMap<uint64, TObjectPtr<AMMODaeva>> Players;
 
 	UPROPERTY()
 	TMap<uint64, FPlayerInfo> PlayerInfos;
-	
+
 	TSubclassOf <AMMODaeva> PlayerClass;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Spawn")
 	TMap<uint8, TSubclassOf<APawn>> JobClassMap;
-	
+
 	TMap<int32, Protocol::ItemData> MyItems;
 
 private:

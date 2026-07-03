@@ -14,5 +14,8 @@ public:
 
 private:
 	UPROPERTY(BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
+	bool bIsGliding = false;
+
+	UPROPERTY(BlueprintReadOnly, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	bool bIsCombat = false;
 };

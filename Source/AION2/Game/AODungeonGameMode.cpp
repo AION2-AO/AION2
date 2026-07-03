@@ -2,6 +2,7 @@
 
 #include "Character/AOCharacter.h"
 #include "Character/Daeva/Daeva.h"
+#include "Player/AOPlayerState.h"
 
 #include "GameFramework/PlayerController.h"
 #include "GameFramework/PlayerStart.h"
@@ -32,7 +33,6 @@ void AAODungeonGameMode::BeginPlay()
 void AAODungeonGameMode::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
 
 void AAODungeonGameMode::FindPlacedBosses()
@@ -52,7 +52,6 @@ void AAODungeonGameMode::FindPlacedBosses()
 
 		const int32 BossIndex = Boss->DungeonBossIndex;
 
-		// 0은 일반 몬스터, 1~3만 던전 보스
 		if (BossIndex < 1 || BossIndex > 3)
 		{
 			continue;
@@ -60,13 +59,10 @@ void AAODungeonGameMode::FindPlacedBosses()
 
 		if (PlacedBosses.Contains(BossIndex))
 		{
-			UE_LOG(LogTemp,Error,TEXT("[Dungeon] Boss %d is duplicated: %s"),BossIndex,*Boss->GetName());
 			continue;
 		}
 
 		PlacedBosses.Add(BossIndex, Boss);
-
-		UE_LOG(LogTemp,Warning,	TEXT("[Dungeon] Found Boss %d: %s"),BossIndex,*Boss->GetName());
 	}
 
 	for (int32 BossIndex = 1; BossIndex <= 3; ++BossIndex)
@@ -103,6 +99,7 @@ void AAODungeonGameMode::StartDungeon()
 
 	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Start Dungeon"));
 
+	// 현재 테스트 때문에 3번째 보스부터 시작!
 	StartBossPhase(3);
 }
 
@@ -158,8 +155,6 @@ void AAODungeonGameMode::NotifyBossDefeated(AAOMonsterBase* DefeatedBoss)
 		return;
 	}
 
-	UE_LOG(	LogTemp,Warning,TEXT("[Dungeon] Boss %d Defeated"),	CurrentBossNumber);
-
 	SetDefeatedPhase(CurrentBossNumber);
 
 	// 사망 애니메이션을 보여줄 거면 여기서 바로 끄지 말고,
@@ -171,13 +166,7 @@ void AAODungeonGameMode::NotifyBossDefeated(AAOMonsterBase* DefeatedBoss)
 	if (CurrentBossNumber < 3)
 	{
 		OpenGateForNextBoss(CurrentBossNumber);
-
-		GetWorldTimerManager().SetTimer(NextBossTimerHandle,this,
-			&AAODungeonGameMode::StartNextBoss,
-			3.0f,
-			false
-		);
-
+		GetWorldTimerManager().SetTimer(NextBossTimerHandle,this,&AAODungeonGameMode::StartNextBoss,3.0f,false);
 		return;
 	}
 
@@ -211,8 +200,6 @@ void AAODungeonGameMode::FailDungeon()
 
 	CurrentPhase = EDungeonPhase::Failed;
 	ClearAllRespawnTimers();
-
-	UE_LOG(LogTemp, Warning, TEXT("Dungeon Failed"));
 }
 
 void AAODungeonGameMode::ReturnToVillage()
@@ -222,8 +209,6 @@ void AAODungeonGameMode::ReturnToVillage()
 		UE_LOG(LogTemp, Error, TEXT("[Dungeon] VillageMapPath is Empty"));
 		return;
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Return To Village"));
 
 	GetWorld()->ServerTravel(VillageMapPath);
 }
@@ -249,7 +234,6 @@ void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerControlle
 
 	if (!DeadPawn)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Dead player has no Pawn"));
 		return;
 	}
 
@@ -264,8 +248,6 @@ void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerControlle
 
 	if (AlivePlayerCount <= 0)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("All Palyers Dead. Dungeon Failed"));
-
 		StartWipeRespawn();
 		return;
 	}
@@ -330,9 +312,7 @@ void AAODungeonGameMode::StartPlayerRespawnTimer(APlayerController* DeadPlayerCo
 	PendingRespawnTransforms.Add(DeadPlayerController, RespawnTransform);
 
 	FTimerHandle NewRespawnTimerHandle;
-
 	TWeakObjectPtr<APlayerController> WeakPlayerController = DeadPlayerController;
-
 	FTimerDelegate RespawnDelegate;
 	RespawnDelegate.BindLambda([this, WeakPlayerController]()
 		{
@@ -347,14 +327,10 @@ void AAODungeonGameMode::StartPlayerRespawnTimer(APlayerController* DeadPlayerCo
 	GetWorldTimerManager().SetTimer(NewRespawnTimerHandle, RespawnDelegate, RespawnDelay, false);
 
 	RespawnTimerHandles.Add(DeadPlayerController, NewRespawnTimerHandle);
-
-	UE_LOG(LogTemp,Warning, TEXT("Respawn scheduled: %s / %.1f sec"),*DeadPlayerController->GetName(),RespawnDelay);
 }
 
 void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] RespawnPlayer Called"));
-
 	if (!PlayerController)
 	{
 		UE_LOG(LogTemp, Error, TEXT("[Dungeon] PlayerController is null"));
@@ -400,16 +376,12 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 
 	DeadPlayerControllers.Remove(PlayerController);
 	PendingRespawnTransforms.Remove(PlayerController);
-
-	UE_LOG(	LogTemp, Warning, TEXT("Player Respawned: %s"),*PlayerController->GetName());
 }
 
 AActor* AAODungeonGameMode::ChoosePlayerStart_Implementation(AController* Player)
 {
 	TArray<AActor*> FoundPlayerStarts;
-
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
-
 	TArray<APlayerStart*> DungeonStarts;
 
 	for (AActor* Actor : FoundPlayerStarts)
@@ -432,14 +404,10 @@ AActor* AAODungeonGameMode::ChoosePlayerStart_Implementation(AController* Player
 		return Super::ChoosePlayerStart_Implementation(Player);
 	}
 
-	// 접속 순서대로 Start를 하나씩 배정
-	// 배열 범위를 넘지 않도록 인덱스 반복.
 	const int32 StartIndex = NextDungeonStartIndex % DungeonStarts.Num();
 	APlayerStart* SelectedStart = DungeonStarts[StartIndex];
 
 	++NextDungeonStartIndex;
-
-	UE_LOG(LogTemp,Warning,TEXT("[Dungeon] Initial Spawn | Player: %s | Start: %s | Index: %d"),Player ? *Player->GetName() : TEXT("Unknown"),*SelectedStart->GetName(),StartIndex);
 
 	return SelectedStart;
 }
@@ -498,9 +466,7 @@ int32 AAODungeonGameMode::GetAliveDungeonPlayerCount() const
 APlayerStart* AAODungeonGameMode::FindDungeonRespawnPoint() const
 {
 	TArray<AActor*> FoundPlayerStarts;
-
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
-
 	TArray<APlayerStart*> RespawnPoints;
 
 	for (AActor* Actor : FoundPlayerStarts)
@@ -537,18 +503,13 @@ void AAODungeonGameMode::ClearAllRespawnTimers()
 
 	RespawnTimerHandles.Empty();
 	PendingRespawnTransforms.Empty();
-
 }
 
 void AAODungeonGameMode::StartWipeRespawn()
 {
 	ClearAllRespawnTimers();
-
 	GetWorldTimerManager().ClearTimer(WipeRespawnTimerHandle);
-
 	GetWorldTimerManager().SetTimer(WipeRespawnTimerHandle,	this,&AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint,RespawnDelay,false);
-
-	UE_LOG(	LogTemp,Warning,TEXT("Wipe Respawn Scheduled / Boss %d / %.1f sec"),CurrentBossNumber,RespawnDelay);
 }
 
 void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
@@ -557,8 +518,6 @@ void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
 
 	if (!Checkpoint)
 	{
-		UE_LOG(LogTemp,	Error,TEXT("Boss %d Respawn Point Not Found."),CurrentBossNumber);
-
 		return;
 	}
 
@@ -588,8 +547,6 @@ void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
 		{
 			RespawnedPlayer->ResetForDungeonRespawn();
 		}
-
-		UE_LOG(LogTemp,Warning,TEXT("Wipe Respawned: %s / Boss %d"),*PlayerController->GetName(),CurrentBossNumber);
 	}
 
 	DeadPlayerControllers.Empty();
@@ -620,7 +577,6 @@ APlayerStart* AAODungeonGameMode::FindBossRespawnPoint(int32 CurrentBossNumber) 
 	}
 
 	TArray<AActor*> FoundPlayerStarts;
-
 	UGameplayStatics::GetAllActorsOfClass(this, APlayerStart::StaticClass(), FoundPlayerStarts);
 
 	for (AActor* Actor : FoundPlayerStarts)
@@ -634,6 +590,38 @@ APlayerStart* AAODungeonGameMode::FindBossRespawnPoint(int32 CurrentBossNumber) 
 	}
 
 	return nullptr;
+}
+
+APawn* AAODungeonGameMode::SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot)
+{
+	if (!NewPlayer || !StartSpot)
+	{
+		return nullptr;
+	}
+
+	AAOPlayerState* PlayerState = NewPlayer->GetPlayerState<AAOPlayerState>();
+
+	if (!PlayerState)
+	{
+		UE_LOG(LogTemp, Error, TEXT("PlayerState is null."));
+		return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+	}
+
+	const TSubclassOf<APawn>* PawnClass = JobClassMap.Find(PlayerState->GetMyClass());
+
+	if (!PawnClass || !(*PawnClass))
+	{
+		UE_LOG(LogTemp, Error, TEXT("Pawn Class Not Found. ClassType : %d"), static_cast<uint8>(PlayerState->GetMyClass()));
+		return Super::SpawnDefaultPawnFor_Implementation(NewPlayer, StartSpot);
+	}
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AdjustIfPossibleButAlwaysSpawn;
+
+	APawn* SpawnedPawn = GetWorld()->SpawnActor<APawn>(*PawnClass, StartSpot->GetActorTransform(), SpawnParams);
+
+	UE_LOG(LogTemp, Warning, TEXT("%s Spawned as %s"), *NewPlayer->GetName(), SpawnedPawn ? *SpawnedPawn->GetName() : TEXT("NULL"));
+	return SpawnedPawn;
 }
 
 void AAODungeonGameMode::RequestReturnToVillage()

@@ -2,6 +2,7 @@
 
 
 #include "Manager/AOUIManager.h"
+#include "Player/AOPlayerController.h"
 #include "Game/AOGameInstance.h"
 
 void UAOUIManager::Initialize(FSubsystemCollectionBase& collection)
@@ -24,16 +25,16 @@ UUserWidget* UAOUIManager::ShowWidget(TSoftClassPtr<UUserWidget> WidgetClass, EU
 	UUserWidget** FoundWidget = WidgetCache.Find(WidgetClass);
 	UUserWidget* WidgetInstance = FoundWidget ? *FoundWidget : nullptr;
 
+	AAOPlayerController* PC = Cast<AAOPlayerController>(GetWorld()->GetFirstPlayerController());
+	if (!PC || !PC->IsLocalPlayerController()) return nullptr;
+
 	// 없으면 생성
 	if (!WidgetInstance)
 	{
 		UClass* LoadedClass = WidgetClass.LoadSynchronous();
 		if (!LoadedClass) return nullptr;
 
-		UAOGameInstance* GameInstance = Cast<UAOGameInstance>(GetWorld()->GetGameInstance());
-		if (!GameInstance) return nullptr;
-
-		WidgetInstance = CreateWidget<UUserWidget>(GameInstance, LoadedClass);
+		WidgetInstance = CreateWidget<UUserWidget>(PC, LoadedClass);
 		if (WidgetInstance)
 		{
 			WidgetCache.Add(WidgetClass, WidgetInstance);

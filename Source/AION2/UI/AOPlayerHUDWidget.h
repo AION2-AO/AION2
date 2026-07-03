@@ -56,6 +56,7 @@ private:
 public:
     UFUNCTION(BlueprintImplementableEvent, Category = "HUD")
     void UpdateItemQuickSlot(int32 SlotIndex, const FAOSlotData& SlotData, const FItemData& TemplateData);
+
 private:
     ///
     // 중복 Binding/해제 문제에 대한 대안.

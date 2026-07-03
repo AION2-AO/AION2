@@ -38,7 +38,11 @@ public:
 	AActor* Get_CurrentTargetPlayer() { return CurrentTargetPlayer; }	
 
 	UFUNCTION()
-	void OnTargetDead(AActor* DeadActor);
+	virtual void OnTargetDead(AActor* DeadActor);
+
+
+	UFUNCTION()
+	virtual bool RefreshPerceivedTargets();
 
 protected:
 	// State AI Tree ( 상태 트리 AI ) 

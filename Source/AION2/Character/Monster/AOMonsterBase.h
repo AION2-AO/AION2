@@ -7,6 +7,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GameplayTagContainer.h"
+#include "GenericTeamAgentInterface.h"
 #include "AOMonsterBase.generated.h"
 
 
@@ -17,7 +18,7 @@ class UAOMonsterHUDWidget_Targetable;
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeadMontageEnd);
 
 UCLASS()
-class AION2_API AAOMonsterBase : public AAOCharacter
+class AION2_API AAOMonsterBase : public AAOCharacter , public IGenericTeamAgentInterface
 {
 	GENERATED_BODY()
 
@@ -55,6 +56,9 @@ public:
 	FORCEINLINE void Set_State(FGameplayTag _StateFlag) { State = _StateFlag; }
 
 	TObjectPtr<class UAOAttributeSet> GetAttributeSet() { return AttributeSet; }
+
+	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId(TeamID); }
+	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override { TeamID = NewTeamID.GetId(); }
 
 
 protected:
@@ -113,7 +117,7 @@ public:
 	* 2 = b2
 	* 3 = b3
 	*/
-	UPROPERTY(EditInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Dungeon")
 	int32 DungeonBossIndex = 0;
 
 
@@ -128,22 +132,23 @@ protected :
 protected :
 	FDelegateHandle HealthChangedDelegateHandle;
 
-
-
-
-// UI
-private:
-	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
-	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
+	// Seohwan ( aicontroller에서 적 및 동료 판별 기준 ) 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Team")
+	uint8 TeamID = 1;
 
 	// Targeting UI
 public:
 	void SetTargetWidgetVisible(bool bVisible);
 
+	// Stat UI
 protected:
 	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAOWidgetComponentBase> TargetWidgetComponent;
 
 	UPROPERTY(EditDefaultsOnly, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TSubclassOf<UUserWidget> TargetWidgetClass;
+
+	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
+
 };

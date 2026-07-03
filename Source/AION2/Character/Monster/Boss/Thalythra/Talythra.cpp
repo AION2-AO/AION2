@@ -14,6 +14,11 @@
 #include "UI/AOWidgetComponentBase.h"
 #include "UI/AOMonsterHUDWidget.h"
 
+#include "Character/Monster/Boss/Thalythra/Wave/WaveCircle.h"
+#include "Components/CapsuleComponent.h"
+
+
+
 // Sets default values
 ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	:Super(ObjectInitializer)
@@ -53,6 +58,15 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	{
 		ChargeAttackMontage = ChargeAttackMontageRef.Object;
 	}
+
+	// UI
+	DungeonBossIndex = 3;
+
+	OverheadStatusWidgetComponent->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
+	OverheadStatusWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 350.0f));
+	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
+	
+
 }
 
 void ATalythra::PostInitializeComponents()
@@ -615,8 +629,59 @@ void ATalythra::InitAttributeSet()
 
 	AttributeSet->InitStamina(100.f);
 	AttributeSet->InitMaxStamina(100.f);
-
 }
+
+
+
+void ATalythra::SpawnWaveBlue()
+{
+
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	FVector SpawnLocation = GetActorLocation();
+	SpawnLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	SpawnLocation.Z += 100.f;
+
+	AWaveCircle* WaveCircle1 = GetWorld()->SpawnActor<AWaveCircle>(
+		WaveCircleBlueClass,
+		SpawnLocation,
+		GetActorRotation(),
+		SpawnParams
+	);
+}
+
+void ATalythra::SpawnWaveRed()
+{
+	FActorSpawnParameters SpawnParams;
+	SpawnParams.Owner = this;
+	SpawnParams.Instigator = GetInstigator();
+	SpawnParams.SpawnCollisionHandlingOverride =
+		ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+	FVector SpawnLocation = GetActorLocation();
+	SpawnLocation.Z -= GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	SpawnLocation.Z += 100.f;
+
+	AWaveCircle* WaveCircle1 = GetWorld()->SpawnActor<AWaveCircle>(
+		WaveCircleRedClass,
+		SpawnLocation,
+		GetActorRotation(),
+		SpawnParams
+	);
+}
+
+
+
+
+
+
+
+
+
 
 void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
 {

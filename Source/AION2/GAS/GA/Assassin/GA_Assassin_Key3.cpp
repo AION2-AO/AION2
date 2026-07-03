@@ -36,6 +36,10 @@ void UGA_Assassin_Key3::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 	}
 
 	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
+	if (!IsActive())
+	{
+		return;
+	}
 
 	FVector MoveDir = TargetLocation - StartLocation;
 	MoveDir.Z = 0.f;

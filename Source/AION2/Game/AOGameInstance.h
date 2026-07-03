@@ -60,6 +60,9 @@ public:
 	UPROPERTY(BlueprintReadWrite, Category = "UI")
 	TObjectPtr<class UAOLoginUserWidget> LoginWidget;
 
+	UPROPERTY(BlueprintReadWrite, Category = "UI")
+	TObjectPtr<class UAOLoginUserWidget> RegisterWidget;
+
 	FSocket* ClientSocket;
 	class UAONetworkManager* UNetworkManager;
 
