@@ -2,6 +2,7 @@
 #include "GAS/GA/AT/AT_RotateToTarget.h"
 #include "GAS/AOGameplayTags.h"
 #include "Character/Daeva/Daeva.h"
+#include "GAS/AttributeSet/AOAttributeSet.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
@@ -49,6 +50,46 @@ void UGA_RangedAttack::ActivateAbility(
 		return;
 	}
 
+	// Mana code.
+	if (ManaCost > 0.f)
+	{
+		UAbilitySystemComponent* ASC = GetAbilitySystemComponentFromActorInfo();
+
+		if (!ASC)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+
+		const float CurrentMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
+
+		if (CurrentMana < ManaCost)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+
+		if (!ManaCostEffect)
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+
+		FGameplayEffectSpecHandle ManaCostSpec = MakeOutgoingGameplayEffectSpec(ManaCostEffect, 1.f);
+
+		if (!ManaCostSpec.IsValid())
+		{
+			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
+			return;
+		}
+
+		const FGameplayTag SkillManaCost = FGameplayTag::RequestGameplayTag(FName("Data.ManaCost"));
+
+		ManaCostSpec.Data->SetSetByCallerMagnitude(SkillManaCost, -ManaCost);
+
+		ApplyGameplayEffectSpecToOwner(Handle, ActorInfo, ActivationInfo, ManaCostSpec);
+	}
+
 	const float SafePlayRate = FMath::Max(MontagePlayRate, 0.01f);
 
 	const float AttackDuration = AttackMontage->GetPlayLength() / SafePlayRate;
@@ -77,15 +118,12 @@ void UGA_RangedAttack::ActivateAbility(
 			GE_AttackSlow은 Granted Tag에 State.Attacking이 들어있다.
 			그 GE만 Duration을 몽타주 길이로 설정한다.
 		*/
-		const UGameplayEffect* EffectCDO =
-			GameplayEffect->GetDefaultObject<UGameplayEffect>();
+		const UGameplayEffect* EffectCDO = GameplayEffect->GetDefaultObject<UGameplayEffect>();
 
 		if (EffectCDO &&
 			EffectCDO->GetGrantedTags().HasTagExact(AttackingTag))
 		{
 			SpecHandle.Data->SetSetByCallerMagnitude(AttackSlowDurationTag,	AttackDuration);
-
-			UE_LOG(LogTemp,	Log,TEXT("[AttackSlow] Duration=%.2f / GE=%s"),	AttackDuration,*GameplayEffect->GetName());
 		}
 
 		ApplyGameplayEffectSpecToOwner(Handle,ActorInfo,ActivationInfo,	SpecHandle);

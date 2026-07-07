@@ -20,6 +20,13 @@ public:
 		const FGameplayEventData* TriggerEventData
 	) override;
 
+protected :
+	UPROPERTY(EditDefaultsOnly, Category = "Mana")
+	float ManaCost = 0.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Mana")
+	TSubclassOf<UGameplayEffect> ManaCostEffect;
+
 protected:
 	UFUNCTION()
 	void OnMontageTaskFinished();

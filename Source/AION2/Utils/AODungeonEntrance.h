@@ -38,6 +38,8 @@ protected:
 	void EnterDungeon();
 	void EnterDungeonWaitingRoom();
 
+	UFUNCTION()
+	void OnDungeonRoomWidgetClosed();
 public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "UI")
 	TObjectPtr<class UUserWidget> DungeonWaitingRoomWidget;

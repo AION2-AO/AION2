@@ -45,6 +45,9 @@ struct FAttackData
 
 	UPROPERTY(EditDefaultsOnly)
 	FTraceData TraceData;
+
+	UPROPERTY(EditDefaultsOnly)
+	bool bRestoreManaOnHit = false;
 };
 
 class AION2_API ICombatInterface

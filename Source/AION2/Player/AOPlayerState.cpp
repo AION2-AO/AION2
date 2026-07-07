@@ -21,7 +21,9 @@ void AAOPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 {
     Super::GetLifetimeReplicatedProps(OutLifetimeProps);
 
+    DOREPLIFETIME(AAOPlayerState, MyId);
     DOREPLIFETIME(AAOPlayerState, MyClassType);
+    DOREPLIFETIME(AAOPlayerState, MyName);
 }
 
 UAbilitySystemComponent* AAOPlayerState::GetAbilitySystemComponent() const
@@ -60,6 +62,11 @@ void AAOPlayerState::GiveCommonAbilities()
     UE_LOG(LogTemp, Warning, TEXT("Common abilities given. Count: %d"), CommonAbilityHandles.Num());
 }
 
+void AAOPlayerState::SetMyId(uint64 PlayerId)
+{
+    MyId = PlayerId;
+}
+
 void AAOPlayerState::SetMyClass(EDaevaClassType InClassType)
 {
     MyClassType = InClassType;
@@ -68,4 +75,19 @@ void AAOPlayerState::SetMyClass(EDaevaClassType InClassType)
 void AAOPlayerState::SetMyName(FString InName)
 {
     MyName = InName;
+}
+
+
+void AAOPlayerState::SetPlayerInfo(uint64 InPlayerId, const FString& InPlayerName, uint8 InClassType)
+{
+    if (!HasAuthority())
+    {
+        return;
+    }
+
+    MyId = InPlayerId;
+    MyName = InPlayerName;
+    MyClassType = (EDaevaClassType)InClassType;
+
+    UE_LOG(LogTemp, Warning,TEXT("[Dungeon] PlayerInfo Set | Id: %llu | Name: %s | ClassType: %d"), MyId,*MyName, static_cast<int32>(MyClassType));
 }

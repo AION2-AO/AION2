@@ -27,7 +27,7 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[2];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[3];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
@@ -37,11 +37,13 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "\n\nEnum.proto\022\010Protocol*N\n\tClassType\022\016\n\nC"
   "LASS_NONE\020\000\022\014\n\010ASSASSIN\020\001\022\n\n\006CLERIC\020\002\022\n\n"
   "\006RANGER\020\003\022\013\n\007TEMPLAR\020\004*-\n\nRoomStatus\022\016\n\n"
-  "RECRUITING\020\000\022\017\n\013IN_PROGRESS\020\001b\006proto3"
+  "RECRUITING\020\000\022\017\n\013IN_PROGRESS\020\001*/\n\021Dungeon"
+  "FailReason\022\t\n\005Ready\020\000\022\017\n\013FullDungeon\020\001b\006"
+  "proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 157, descriptor_table_protodef_Enum_2eproto,
+    false, false, 206, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -77,6 +79,20 @@ const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* RoomStatus_descriptor() {
   return file_level_enum_descriptors_Enum_2eproto[1];
 }
 bool RoomStatus_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* DungeonFailReason_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[2];
+}
+bool DungeonFailReason_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:

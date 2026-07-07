@@ -16,9 +16,10 @@ void Player::SetPlayerInfo(uint64 playerId, Protocol::ClassType playerClass, int
 
 	_playerPos.set_x(-720.0f);
 	_playerPos.set_y(-1150.f);
-	_playerPos.set_z(300.f);
+	_playerPos.set_z(200.f);
 
 	_playerRot.set_pitch(0);
 	_playerRot.set_yaw(0);
 	_playerRot.set_roll(0);
 }
+

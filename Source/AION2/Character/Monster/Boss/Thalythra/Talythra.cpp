@@ -17,6 +17,10 @@
 #include "Character/Monster/Boss/Thalythra/Wave/WaveCircle.h"
 #include "Components/CapsuleComponent.h"
 
+#include "Character/Monster/Boss/Thalythra/Projectile/TalythraCollectibleOrb.h"
+#include "GAS/AOGameplayTags.h"
+#include "Character/Daeva/Daeva.h"
+#include "Character/Monster/Boss/Thalythra/Shield/TalythraGimmickShield.h"
 
 
 // Sets default values
@@ -65,7 +69,7 @@ ATalythra::ATalythra(const FObjectInitializer& ObjectInitializer)
 	OverheadStatusWidgetComponent->SetRelativeScale3D(FVector(10.0f, 10.0f, 10.0f));
 	OverheadStatusWidgetComponent->SetRelativeLocation(FVector(0.0f, 0.0f, 350.0f));
 	OverheadStatusWidgetComponent->SetRelativeRotation(FRotator(0.0f, 0.0f, 90.0f));
-	
+
 
 }
 
@@ -80,17 +84,6 @@ void ATalythra::BeginPlay()
 	Super::BeginPlay();
 
 	InitAttributeSet();
-
-
-	//@PLZTODO : 이거 위치 바꿔줘야함. 
-	//if (HasAuthority()) // 서버인 경우 
-	//{
-	//	for (const auto& Ability : HasAbilities) // 능력들 저장. 
-	//	{
-	//		FGameplayAbilitySpec AbilitySpec(Ability.Value);
-	//		ASC->GiveAbility(AbilitySpec);
-	//	}
-	//}
 
 
 #pragma region Attack_Line SceneComponents
@@ -131,7 +124,7 @@ void ATalythra::BeginPlay()
 			SceneComp->SetVisibility(false, true);
 		}
 
-		
+
 	}
 
 #pragma endregion 
@@ -148,7 +141,7 @@ void ATalythra::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 	if (HasAuthority() == false)
-		return; 
+		return;
 
 
 	if (bChargeAttack)
@@ -371,6 +364,25 @@ void ATalythra::Teleport_To_Player()
 
 	// replicated는 위에 생성자에서 해줬으므로 mulit rpc 필요 x 
 	TeleportTo(pTargetActor->GetActorLocation(),
+		GetActorRotation(),
+		false, // true면 실제 이동 없이 가능 여부만 테스트
+		true); // true면 충돌 무시하고 강제 이동
+
+
+}
+
+void ATalythra::Teleport_To_Center()
+{
+
+	if (HasAuthority() == false)
+		return;
+
+
+	AAITalythraAIController* pAITalythraAIController = Cast<AAITalythraAIController>(GetController());
+
+
+	// replicated는 위에 생성자에서 해줬으므로 mulit rpc 필요 x 
+	TeleportTo(TeleportCenterLocation,
 		GetActorRotation(),
 		false, // true면 실제 이동 없이 가능 여부만 테스트
 		true); // true면 충돌 무시하고 강제 이동
@@ -629,6 +641,10 @@ void ATalythra::InitAttributeSet()
 
 	AttributeSet->InitStamina(100.f);
 	AttributeSet->InitMaxStamina(100.f);
+
+
+
+
 }
 
 
@@ -674,13 +690,236 @@ void ATalythra::SpawnWaveRed()
 	);
 }
 
+void ATalythra::SpawnColorOrb()
+{
+	if (HasAuthority() == false)
+		return;
+
+	if (ProjectileBlueOrbClass == nullptr || ProjectilePurpleOrbClass == nullptr)
+	{
+		return;
+	}
 
 
 
+	const int32 OrbCount = 12;
+	//const float SpawnRadius = 2000.f; // 보스로부터 스폰 거리 
+	//const float SpawnHeight = 100.f; // 지면에서 띄울 높이 
+
+	const FVector BossLocation = GetActorLocation();
+
+
+	FActorSpawnParameters SpawnParms;
+	SpawnParms.Owner = this; // 이 엑터를 소유하는 관리 주체 ( 소유관계)
+	SpawnParms.Instigator = this;  // 누가 피해를 입혔는지 
+	SpawnParms.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
 
 
+	for (int32 i = 0; i < OrbCount; i++)
+	{
+		// 12등분 각도 ( 360 / 12 = 30도 간격 ) 
+		const float AngleDeg = (360.f / OrbCount) * i;
+		const float AngleRad = FMath::DegreesToRadians(AngleDeg);
 
+
+		// 원 둘레상의 스폰 위치 
+		const FVector OffSet(
+			FMath::Cos(AngleRad) * SpawnRadius,
+			FMath::Sin(AngleRad) * SpawnRadius,
+			SpawnHeight
+		);
+
+
+		const FVector SpawnLocation = BossLocation + OffSet;
+
+		// 보스 (중심)를 향하는 방향 
+		FVector DirToBoss = BossLocation - SpawnLocation;
+		DirToBoss.Z = 0.f;
+		DirToBoss = DirToBoss.GetSafeNormal();
+
+
+		const FRotator SpawnRotation = DirToBoss.Rotation();
+
+		// 짝 홀로 구분하면 될듯 보라 파랑 소환
+		int number = (i + OrbColorOffset) % 2;
+
+		switch (number)
+		{
+		case 0:
+		{
+			ATalythraCollectibleOrb* pOrb = GetWorld()->SpawnActor<ATalythraCollectibleOrb>
+				(
+					ProjectileBlueOrbClass,
+					SpawnLocation,
+					SpawnRotation,
+					SpawnParms
+				);
+
+			if (pOrb)
+			{
+				pOrb->InitVelocityAndDirection(DirToBoss);
+				pOrb->Set_OrbColor(EOrbColor::BLUE);
+			}
+		}
+		break;
+		case 1:
+		{
+			ATalythraCollectibleOrb* pOrb = GetWorld()->SpawnActor<ATalythraCollectibleOrb>
+				(
+					ProjectilePurpleOrbClass,
+					SpawnLocation,
+					SpawnRotation,
+					SpawnParms
+				);
+
+			if (pOrb)
+			{
+
+				pOrb->InitVelocityAndDirection(DirToBoss);
+				pOrb->Set_OrbColor(EOrbColor::PURPLE);
+			}
+		}
+		break;
+		}
+
+	}
+
+	OrbColorOffset++;
+
+}
+
+void ATalythra::Render_PlayerAoeOnOff(bool _bOnOff)
+{
+	for (auto& iter : ArrayOrbHittedDaeva)
+	{
+		iter->Set_AOE_RenderOnOff(_bOnOff);
+	}
+
+}
+
+void ATalythra::Add_OrbHittedDaeva(ADaeva* pDaeva)
+{
+
+	if (ArrayOrbHittedDaeva.Find(pDaeva) == -1)
+	{
+		ArrayOrbHittedDaeva.Add(pDaeva);
+	}
+
+
+}
+
+void ATalythra::Player_Orb_RenderOnOff(bool _bOnOff)
+{
+	for (auto& iter : ArrayOrbHittedDaeva)
+	{
+		iter->Set_BlueOrb_RenderOnOff(_bOnOff);
+		iter->Set_PurpleOrb_RenderOnOff(_bOnOff);
+	}
+}
+
+void ATalythra::Reset_PlayerOrbStackAndColor()
+{
+	for (auto& iter : ArrayOrbHittedDaeva)
+	{
+		iter->Reset_OrbStackAndColor();
+	}
+}
+
+void ATalythra::Destroy_OrbShield()
+{
+	// 여기서 각종 세팅값들 초기화 해주기. 
+
+	for (auto& OrbShield : ArrayOrbShield)
+	{
+		OrbShield->Destroy();
+	}
+
+	for (auto& Daeva : ArrayOrbHittedDaeva)
+	{
+		Daeva->Set_HasSheildColor(EOrbColor::None);
+	}
+
+	// 투사체 맞은 데바들 초기화 하기. 
+	ArrayOrbHittedDaeva.Empty();
+
+
+}
+
+void ATalythra::SpawnColorSheid()
+{
+	if (HasAuthority() == false)
+		return;
+
+	if (ShieldBlueClass == nullptr || ShieldPurpleClass == nullptr)
+	{
+		return;
+	}
+
+
+	for (auto& iter : ArrayOrbHittedDaeva)
+	{
+		FVector ShieldLocation = iter->GetActorLocation();
+		ShieldLocation.Z = -3258.f;
+
+		FActorSpawnParameters SpawnParms;
+		SpawnParms.Owner = this; // 이 엑터를 소유하는 관리 주체 ( 소유관계)
+		SpawnParms.Instigator = this;  // 누가 피해를 입혔는지 
+		SpawnParms.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+		FRotator SpawnRotation = FRotator(0.f, 0.f, 0.f);
+
+		EOrbColor OrbColor = iter->Get_LastOrbColor(); // 오브 색깔
+
+		switch (OrbColor)
+		{
+		case EOrbColor::BLUE:
+		{
+			ATalythraGimmickShield* pShield = GetWorld()->SpawnActorDeferred<ATalythraGimmickShield>
+				(
+					ShieldBlueClass,
+					FTransform(SpawnRotation, ShieldLocation),
+					SpawnParms.Owner,
+					SpawnParms.Instigator,
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+				);
+
+			// 여기서 쉴드에다가 자신의 색상정보를 알려준다.
+			if (pShield)
+			{
+				pShield->Set_ShieldOrbColor(EOrbColor::BLUE);
+				pShield->FinishSpawning(FTransform(SpawnRotation, ShieldLocation));// 이게 있어야 스폰완료 
+				ArrayOrbShield.Add(pShield);
+			}
+
+
+		}
+		break;
+		case EOrbColor::PURPLE:
+		{
+			ATalythraGimmickShield* pShield = GetWorld()->SpawnActorDeferred<ATalythraGimmickShield>
+				(
+					ShieldPurpleClass,
+					FTransform(SpawnRotation, ShieldLocation),
+					SpawnParms.Owner,
+					SpawnParms.Instigator,
+					ESpawnActorCollisionHandlingMethod::AlwaysSpawn
+				);
+
+			// 여기서 쉴드에다가 자신의 색상정보를 알려준다.
+			if (pShield)
+			{
+				pShield->Set_ShieldOrbColor(EOrbColor::PURPLE);
+				pShield->FinishSpawning(FTransform(SpawnRotation, ShieldLocation));// 이게 있어야 스폰완료 
+				ArrayOrbShield.Add(pShield);
+			}
+		}
+		break;
+		}
+
+	}
+
+}
 
 
 void ATalythra::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -824,4 +1063,27 @@ void ATalythra::Multicast_SetChargeMovementParams_Implementation(bool bChargeMod
 		GetCharacterMovement()->BrakingDecelerationWalking = 2048.f;
 		GetCharacterMovement()->BrakingFrictionFactor = 2.f;
 	}
+}
+
+
+void ATalythra::OnHealthChanged(const FOnAttributeChangeData& Data)
+{
+	Super::OnHealthChanged(Data);
+
+	const float Max = AttributeSet->GetMaxHealth();
+	const float Ratio = Max > 0.f ? Data.NewValue / Max : 0.f;
+
+
+	// 기믹 관련 
+	FGameplayTagContainer OwnedTags;
+	ASC->GetOwnedGameplayTags(OwnedTags);
+
+	if (Ratio <= 0.9f
+		&& OwnedTags.HasTagExact(GIMMICK_MONSTER_TH_HP70_DONE) == false
+		&& OwnedTags.HasTagExact(GIMMICK_MONSTER_TH_HP70_PENDING) == false)
+	{
+		ASC->AddLooseGameplayTag(GIMMICK_MONSTER_TH_HP70_PENDING);
+	}
+
+
 }

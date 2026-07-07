@@ -8,6 +8,7 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayAbilitySpecHandle.h"
 #include "GenericTeamAgentInterface.h"
+#include "Types/AOTypes.h"
 #include "Daeva.generated.h"
 
 class USkeletalMeshComponent;
@@ -21,6 +22,8 @@ class UAOWidgetComponentBase;
 class AAOPlayerState;
 class UAbilitySystemComponent;
 class UAOQuickSlotComponent;
+
+class UDA_AbilitySet;
 
 UENUM(BlueprintType)
 enum class EDaevaPartType : uint8
@@ -121,6 +124,7 @@ public:
 	UFUNCTION(Client, Unreliable)
 	void Client_PlayCameraShake();
 
+
 public:
 	bool HasMoveInput();
 	virtual void SearchTarget() override;
@@ -134,6 +138,9 @@ public:
 	virtual FGenericTeamId GetGenericTeamId() const override { return FGenericTeamId(TeamID); }
 	virtual void SetGenericTeamId(const FGenericTeamId& NewTeamID) override { TeamID = NewTeamID.GetId(); }
 
+public:
+	// SuYeon: Daeva should deliver own ability set.
+	const UDA_AbilitySet* GetCombatAbilitySet() const { return CombatAbilitySet; }
 
 protected:
 	virtual void Move(const FInputActionValue& Value);
@@ -165,6 +172,9 @@ private:
 	void InputRBPressed();
 	void InputMoveReleased();
 
+	void InputXPressed();
+	void InputBPressed();
+
 protected:
 	void OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount);
 	void OnRebirthMontageEnded(UAnimMontage* Montage, bool bInterrupted);
@@ -175,6 +185,9 @@ public:
 
 	UFUNCTION(Exec)
 	void TestSetHealth(float NewHealth);
+
+	// SeonHwan 추가 
+	void EatOrb(EOrbColor NewColor);
 
 protected:
 	FDelegateHandle HealthChangedDelegateHandle;
@@ -239,7 +252,7 @@ private:
 	void ChangeCurrentTargetInClient(AAOCharacter* NewTarget);
 
 private:
-	// UI ����. Local Player�� ���� Head-up UI�� �߰��Ѵ�.
+	// SuYeon: Only Local Player Floats Head-up UI.
 	void BindOverheadStatusWidget();
 
 public:
@@ -277,7 +290,7 @@ private:
 	float TargetZoomDistance;
 
 public:
-	// UI: Player ASC�� �غ�Ǹ� UI Bind.
+	// UI: On Player ASC Ready => UI Binds.
 	FOnPlayerUIReady OnPlayerUIReady;
 
 	bool IsPlayerUIReady() const;
@@ -290,8 +303,15 @@ public:
 	void SetMyName(FString InName);
 
 	void SendHp(float NewHp);
+	void SendItem(int32 SlotIndex);
+	void SetItemUse();
 private:
 	bool bPlayerUIReady = false;
+
+	FTimerHandle ItemCoolTimeHandler;
+	float ItemCoolTime = 5.0f;
+
+	bool bCanUseItem = true;
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
@@ -332,6 +352,12 @@ protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UInputAction> KeyEAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> KeyXAction;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> KeyBAction;
 
 private:
 	UPROPERTY(EditDefaultsOnly, Category = "Montage", meta = (AllowPrivateAccess = "true"))
@@ -388,4 +414,53 @@ private:
 protected:
 	
 	uint64 MyId = -1;
+
+
+
+	// Seonhwan 여기서 데바의 색깔 구슬 카운트 하기  
+private:
+	UPROPERTY()
+	EOrbColor LastOrbColor = EOrbColor::None;
+
+	UPROPERTY()
+	int8 OrbStack = 0;
+
+	UPROPERTY(EditAnywhere, Category = "Orb", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USceneComponent> PlayerOrb;
+
+	UPROPERTY(EditAnywhere, Category = "Orb", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraComponent> BlueOrb;
+
+	UPROPERTY(EditAnywhere, Category = "Orb", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<class UNiagaraComponent> PurpleOrb;
+
+
+	UPROPERTY(EditAnywhere, Category = "AOE", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<USceneComponent> PlayerAoeField;
+
+	UPROPERTY(EditAnywhere, Category = "AOE", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UStaticMeshComponent> AoeField;
+
+
+	UPROPERTY(EditAnywhere, Category = "OrbGimmickColor", meta = (AllowPrivateAccess = "true"))
+	EOrbColor HasShieldColor;
+
+
+public:
+	UFUNCTION(NetMulticast, Unreliable)
+	void Set_BlueOrb_RenderOnOff(bool _bOnOff);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Set_PurpleOrb_RenderOnOff(bool _bOnOff);
+
+	UFUNCTION(NetMulticast, Unreliable)
+	void Set_AOE_RenderOnOff(bool _bOnOff);
+
+	void Reset_OrbStackAndColor();
+	void Set_HasSheildColor(EOrbColor _OrbShieldColor) { HasShieldColor = _OrbShieldColor; }
+
+	EOrbColor Get_LastOrbColor() { return LastOrbColor; }
+	EOrbColor Get_CurrentDaevaHasSheildColor() { return HasShieldColor; }
+
+
 };

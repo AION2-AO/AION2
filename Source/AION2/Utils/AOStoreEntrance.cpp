@@ -39,13 +39,13 @@ void AAOStoreEntrance::Tick(float DeltaTime)
 }
 
 void AAOStoreEntrance::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
-                                      class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
-                                      const FHitResult& SweepResult)
+	class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep,
+	const FHitResult& SweepResult)
 {
 	ADaeva* CharacterActor = Cast<ADaeva>(OtherActor);
-	if (CharacterActor!=nullptr)
+	if (CharacterActor != nullptr)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Store OnOverlapBegin")); 
+		UE_LOG(LogTemp, Log, TEXT("Store OnOverlapBegin"));
 		PC = Cast<AAOPlayerController>(CharacterActor->GetController());
 		if (PC)
 		{
@@ -74,7 +74,7 @@ void AAOStoreEntrance::OnOverlapBegin(class UPrimitiveComponent* OverlappedComp,
 }
 
 void AAOStoreEntrance::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, class AActor* OtherActor,
-                                    class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
+	class UPrimitiveComponent* OtherComp, int32 OtherBodyIndex)
 {
 	if (StorePopUpWidget)
 	{
@@ -84,19 +84,39 @@ void AAOStoreEntrance::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, c
 	{
 		UIManager->HideWidget(StoreWidget);
 	}
-
-	PC->SetShowMouseCursor(false);
-	DisableInput(PC);
+	ADaeva* CharacterActor = Cast<ADaeva>(OtherActor);
+	if (CharacterActor != nullptr)
+		PC = Cast<AAOPlayerController>(CharacterActor->GetController());
+	if (PC)
+	{
+		PC->SetShowMouseCursor(false);
+		DisableInput(PC);
+	}
 }
 
 void AAOStoreEntrance::EnterStore()
 {
-	UIManager->HideWidget(StorePopUpWidget);
-
-	StoreWidget = UIManager->ShowWidget(StoreWidgetClass, EUILayer::System);
-	if (PC)
+	if(!bIsOpenStore)
 	{
-		PC->CurrentMouseCursor = EMouseCursor::Default;
-		PC->SetShowMouseCursor(true);
+		UIManager->HideWidget(StorePopUpWidget);
+
+		StoreWidget = UIManager->ShowWidget(StoreWidgetClass, EUILayer::System);
+		if (PC)
+		{
+			//PC->CurrentMouseCursor = EMouseCursor::Default;
+			PC->SetShowMouseCursor(true);
+		}
+	}
+	else
+	{
+		if(StoreWidget)
+			UIManager->HideWidget(StoreWidget);
+
+		StorePopUpWidget = UIManager->ShowWidget(StorePopUpClass, EUILayer::PopUp);
+		if (PC)
+		{
+			//PC->CurrentMouseCursor = EMouseCursor::Default;
+			PC->SetShowMouseCursor(false);
+		}
 	}
 }

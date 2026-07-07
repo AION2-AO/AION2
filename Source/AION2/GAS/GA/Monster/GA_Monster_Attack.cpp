@@ -7,13 +7,19 @@
 #include "Abilities/Tasks/AbilityTask_WaitGameplayEvent.h"
 #include "GAS/AOGameplayTags.h"
 
+UGA_Monster_Attack::UGA_Monster_Attack()
+{
+    InstancingPolicy = EGameplayAbilityInstancingPolicy::InstancedPerActor;
+    NetExecutionPolicy = EGameplayAbilityNetExecutionPolicy::ServerOnly;
+    NetSecurityPolicy = EGameplayAbilityNetSecurityPolicy::ServerOnly;
+}
+
 void UGA_Monster_Attack::ActivateAbility(
 	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
 	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
-
     Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
     AAOMonsterBase* pMonster = CastChecked<AAOMonsterBase>(ActorInfo->AvatarActor.Get());
@@ -21,7 +27,7 @@ void UGA_Monster_Attack::ActivateAbility(
     //pMonster->OnAbilityFinishedEvent.AddDynamic(this, &UGA_Monster_Attack::AbilityEnd);
 
 
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag));
+    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag), FMath::Max(MontagePlayRate, 1.0f));
     MontageTask->OnCompleted.AddDynamic(this, &UGA_Monster_Attack::OnMontageTaskFinished);
     MontageTask->OnBlendOut.AddDynamic(this, &UGA_Monster_Attack::OnMontageTaskFinished);
     MontageTask->OnInterrupted.AddDynamic(this, &UGA_Monster_Attack::OnMontageTaskCancelled);

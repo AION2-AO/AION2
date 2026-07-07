@@ -3,6 +3,7 @@
 #include "CoreMinimal.h"
 #include "Game/AOGameMode.h"
 #include "Player/AOPlayerState.h"
+#include "Network/PacketHeader.h"
 #include "AODungeonGameMode.generated.h"
 
 class AAOMonsterBase;
@@ -38,7 +39,9 @@ public :
 protected:
 	virtual void BeginPlay() override;
 	virtual void Tick(float DeltaTime) override;
-
+	virtual void PreLogin(const FString& Options, const FString& Address, const FUniqueNetIdRepl& UniqueId, FString& ErrorMessage) override;
+	virtual void PostLogin(APlayerController* NewPlayer) override;
+	virtual void InitStartSpot_Implementation(AActor* StartSpot, AController* NewPlayer) override;
 public:
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void StartDungeon();
@@ -79,18 +82,18 @@ protected:
 
 	void StartWipeRespawn();
 	void RespawnAllDeadPlayersAtBossCheckpoint();
-	APlayerStart* FindBossRespawnPoint(int32 CurrentBossNumber) const;
+	TArray<APlayerStart*> FindBossRespawnPoint(int32 CurrentBossNumber) const;
 
-	// Ä³¸¯ÅÍ Á÷¾÷
+	// ìºë¦­í„° ì§ì—…
 	virtual APawn* SpawnDefaultPawnFor_Implementation(AController* NewPlayer, AActor* StartSpot) override;
 	UPROPERTY(EditDefaultsOnly, Category = "Dungeon|Class")
 	TMap<EDaevaClassType, TSubclassOf<APawn>> JobClassMap;
 
 protected:
-	// ÀÏ¹İ »ç¸Á : Á×Àº ÀÚ¸®¿¡¼­ ºÎÈ°.
+	// ì¼ë°˜ ì‚¬ë§ : ì£½ì€ ìë¦¬ì—ì„œ ë¶€í™œ.
 	TMap<TObjectPtr<APlayerController>, FTransform> PendingRespawnTransforms;
 
-	// ÆÀ Àü¸ê : º¸½º ±ÙÃ³ Ã¼Å©Æ÷ÀÎÆ®¿¡¼­ ÀüÃ¼ ºÎÈ°
+	// íŒ€ ì „ë©¸ : ë³´ìŠ¤ ê·¼ì²˜ ì²´í¬í¬ì¸íŠ¸ì—ì„œ ì „ì²´ ë¶€í™œ
 	FTimerHandle WipeRespawnTimerHandle;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
@@ -139,16 +142,33 @@ private :
 	FTimerHandle NextBossTimerHandle;
 
 protected:
-	UFUNCTION(BlueprintImplementableEvent, Category = "Dungeon|Event")
-	void OpenGateForNextBoss(int32 GateIndex);
+	/*UFUNCTION(BlueprintImplementableEvent, Category = "Dungeon|Event")
+	void OpenGateForNextBoss(int32 GateIndex);*/
 
 	UFUNCTION(BlueprintImplementableEvent, Category = "Dungeon|Event")
 	void GiveDungeonReward();
 	
+public:
+	void SetDungeonId(int32 DungeonId) { MyDungeonId = DungeonId; }
+	void SetPrePlayerInfo(const Protocol::S_DungeonStartDediPacket& PlayerInfo);
+
 public :
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void RequestReturnToVillage();
 
-
+	// ì„œë²„ ì „ì†¡	 
+	// ë¯¸ë¦¬ ìŠ¤í°ëœ í”Œë ˆì´ì–´ë“¤
+	UPROPERTY()
+	TArray<class APawn*> SpawnedPlayers;
+private:
+	void SendDungeonComplete();
 	
+	int32 MyDungeonId = 0;
+	Protocol::DPlayerInfo* ValidateToken(FString Token);
+
+	// ì„œë²„ì—ì„œ ë°›ì€ í´ë¼ì´ì–¸íŠ¸ ì¸ì¦ í† í°
+	TMap<FString, Protocol::DPlayerInfo> PrePlayers;
+
+	// ë¡œê·¸ì¸ í† í° ì¸ì¦ìš©
+	TMap<int32, Protocol::DPlayerInfo> PendingPlayers;
 };

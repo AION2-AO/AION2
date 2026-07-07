@@ -27,6 +27,13 @@ void UAOUserWidgetBase::UnbindFromASC()
 	BoundASC = nullptr;
 }
 
+void UAOUserWidgetBase::ClearBinding()
+{
+	UnbindFromASC();
+	BoundAbilitySystemActor = nullptr;
+	BoundPlayerState = nullptr;
+}
+
 void UAOUserWidgetBase::BindToPlayerState(AAOPlayerState* InPlayerState)
 {
 	if (!InPlayerState)
@@ -40,15 +47,25 @@ void UAOUserWidgetBase::BindToPlayerState(AAOPlayerState* InPlayerState)
 
 void UAOUserWidgetBase::BindToAbilitySystemActor(AActor* InActor)
 {
+	if (!IsValid(InActor))
+	{
+		return;
+	}
+
+	if (BoundAbilitySystemActor == InActor && BoundASC)
+	{
+		return;
+	}
+
 	BoundAbilitySystemActor = InActor;
 	BoundPlayerState = Cast<AAOPlayerState>(InActor);
 
 	UAbilitySystemComponent* ASC = nullptr;
-
 	if (IAbilitySystemInterface* ASI = Cast<IAbilitySystemInterface>(InActor))
 	{
 		ASC = ASI->GetAbilitySystemComponent();
 	}
 
 	BindToASC(ASC);
+
 }

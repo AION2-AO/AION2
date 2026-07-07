@@ -31,6 +31,8 @@
 #include "Network/PacketHeader.h"
 #include "AION2.h"
 
+#include "NiagaraComponent.h"
+
 const float TargetTraceRadius = 3000.0f;
 
 
@@ -104,6 +106,31 @@ ADaeva::ADaeva(const FObjectInitializer& ObjectInitializer)
 	}
 
 	QuickSlotComponent = CreateDefaultSubobject<UAOQuickSlotComponent>(TEXT("QuickSlotComponent"));
+
+
+	// 선환 추가 
+		// 선환 추가 
+	PlayerOrb = CreateDefaultSubobject<USceneComponent>(TEXT("PlayerOrb"));
+	PlayerOrb->SetupAttachment(GetCapsuleComponent());
+
+	BlueOrb = CreateDefaultSubobject<UNiagaraComponent>(TEXT("BlueOrb"));
+	BlueOrb->SetupAttachment(PlayerOrb);
+	BlueOrb->SetAutoActivate(false); // 처음엔 꺼두기 
+
+	PurpleOrb = CreateDefaultSubobject<UNiagaraComponent>(TEXT("PurpleOrb"));
+	PurpleOrb->SetupAttachment(PlayerOrb);
+	PurpleOrb->SetAutoActivate(false); // 처음엔 꺼두기 
+
+
+	PlayerAoeField = CreateDefaultSubobject<USceneComponent>(TEXT("AoeIndicator"));
+	PlayerAoeField->SetupAttachment(GetCapsuleComponent());
+
+	AoeField = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("FieldRange"));
+	AoeField->SetupAttachment(PlayerAoeField);
+
+	// 이거 false로 고치기.
+	AoeField->SetVisibility(false, true);
+
 }
 
 void ADaeva::BeginPlay()
@@ -112,6 +139,7 @@ void ADaeva::BeginPlay()
 
 	TargetZoomDistance = SpringArm->TargetArmLength;
 	GetWorldTimerManager().SetTimer(TargetSearchTimer, this, &ThisClass::SearchTarget, 0.25f, true);
+
 }
 
 void ADaeva::Tick(float DeltaTime)
@@ -197,6 +225,9 @@ void ADaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 		EnhancedInputComponent->BindAction(Key4Action, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::Key4));
 		EnhancedInputComponent->BindAction(KeyQAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyQ));
 		EnhancedInputComponent->BindAction(KeyEAction, ETriggerEvent::Triggered, this, &ADaeva::GASInputPressed, static_cast<int32>(EAbilityID::KeyE));
+
+		EnhancedInputComponent->BindAction(KeyXAction, ETriggerEvent::Triggered, this, &ADaeva::SendItem, 0);
+		EnhancedInputComponent->BindAction(KeyBAction, ETriggerEvent::Triggered, this, &ADaeva::SendItem, 1);
 
 		/*EnhancedInputComponent->BindAction(
 			ShiftAction,
@@ -539,6 +570,7 @@ void ADaeva::InitGAS()
 		ASC->AddLooseGameplayTag(TEAM_DAEVA);
 	}
 
+
 	if (!SprintStaminaChangedDelegateHandle.IsValid())
 	{
 		SprintStaminaChangedDelegateHandle =
@@ -563,7 +595,7 @@ void ADaeva::InitGAS()
 		ApplyDashStaminaRegenEffect();
 	}
 
-	// UI ?앹꽦 諛?Bind.
+	// Notify to the PlayerController that the PlayerCharacter is ready.
 	NotifyPlayerUIReady();
 }
 
@@ -571,9 +603,7 @@ void ADaeva::ClearGAS()
 {
 	if (ASC && bMoveSpeedDelegateRegistered)
 	{
-		ASC->GetGameplayAttributeValueChangeDelegate(
-			UAOAttributeSet::GetMoveSpeedAttribute()
-		).Remove(MoveSpeedChangedDelegateHandle);
+		ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetMoveSpeedAttribute()).Remove(MoveSpeedChangedDelegateHandle);
 
 		MoveSpeedChangedDelegateHandle.Reset();
 		bMoveSpeedDelegateRegistered = false;
@@ -581,9 +611,7 @@ void ADaeva::ClearGAS()
 
 	if (ASC && HealthChangedDelegateHandle.IsValid())
 	{
-		ASC->GetGameplayAttributeValueChangeDelegate(
-			UAOAttributeSet::GetHealthAttribute()
-		).Remove(HealthChangedDelegateHandle);
+		ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetHealthAttribute()).Remove(HealthChangedDelegateHandle);
 
 		HealthChangedDelegateHandle.Reset();
 	}
@@ -675,8 +703,6 @@ void ADaeva::OnMoveSpeedChanged(const FOnAttributeChangeData& Data)
 	}
 
 	GetCharacterMovement()->MaxWalkSpeed = Data.NewValue;
-
-	UE_LOG(	LogTemp,Log,TEXT("[MoveSpeed] %.1f -> %.1f"),Data.OldValue,	Data.NewValue);
 }
 
 void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
@@ -685,7 +711,6 @@ void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, 
 
 	PlayCameraShake(bDidShakeCamera);
 
-	// ���� ���� �� ���� ȸ��.
 	if (HasAuthority() && HitManaRegenEffect)
 	{
 		UAbilitySystemComponent* ASC = GetAbilitySystemComponent();
@@ -704,7 +729,11 @@ void ADaeva::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, 
 			return;
 		}
 
-		SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Data.HitManaRegen")), HitManaRegenAmount);
+		if (AttackData.bRestoreManaOnHit)
+		{
+			SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Data.HitManaRegen")), HitManaRegenAmount);
+		}
+		
 		const float BeforeMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
 		ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		const float AfterMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
@@ -836,6 +865,15 @@ void ADaeva::InputMoveReleased()
 	RequestStopSprint();
 }
 
+void ADaeva::InputXPressed()
+{
+	
+}
+
+void ADaeva::InputBPressed()
+{
+}
+
 void ADaeva::OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount)
 {
 	const bool bIsCombat = NewCount > 0;
@@ -949,6 +987,7 @@ void ADaeva::TestSetHealth(float NewHealth)
 		ASC->SetNumericAttributeBase(UAOAttributeSet::GetHealthAttribute(), NewHealth);
 	}
 }
+
 
 void ADaeva::StartSprint()
 {
@@ -1184,6 +1223,7 @@ float ADaeva::CalcDistanceSquaredToScreenCenter(AActor* Other)
 void ADaeva::ChangeCurrentTargetInClient(AAOCharacter* NewTarget)
 {
 	CurrentTarget = NewTarget;
+
 	if (PreviousTarget != CurrentTarget)
 	{
 		Server_SetCurrentTarget(CurrentTarget);
@@ -1191,12 +1231,24 @@ void ADaeva::ChangeCurrentTargetInClient(AAOCharacter* NewTarget)
 		if (AAOMonsterBase* PreviousMonster = Cast<AAOMonsterBase>(PreviousTarget))
 		{
 			PreviousMonster->SetTargetWidgetVisible(false);
-
 		}
 
 		if (AAOMonsterBase* CurrentMonster = Cast<AAOMonsterBase>(CurrentTarget))
 		{
 			CurrentMonster->SetTargetWidgetVisible(true);
+		}
+
+		// Related to MonsterHUD.
+		if (AAOPlayerController* PC = Cast<AAOPlayerController>(GetController()))
+		{
+			if (AAOMonsterBase* CurrentMonster = Cast<AAOMonsterBase>(CurrentTarget))
+			{
+				PC->ShowTargetMonsterHUD(CurrentMonster);
+			}
+			else
+			{
+				PC->HideTargetMonsterHUD();
+			}
 		}
 	}
 }
@@ -1290,4 +1342,112 @@ void ADaeva::SendHp(float NewHp)
 	HpPacket.set_playerid(MyId);
 	HpPacket.set_hp(NewHp);
 	SEND_PACKET(HpPacket, PKT_C_CHANGEHP);
+}
+
+void ADaeva::SendItem(int32 SlotIndex)
+{
+	if (!bCanUseItem) return;
+	bCanUseItem = false;
+	GetWorldTimerManager().SetTimer(ItemCoolTimeHandler, this, &ThisClass::SetItemUse, ItemCoolTime, false);
+
+	Protocol::C_UseItemPacket UseItemPkt;
+	UseItemPkt.set_playerid(MyId);
+	SEND_PACKET(UseItemPkt, PKT_C_USEITEM);
+}
+
+void ADaeva::SetItemUse()
+{
+	bCanUseItem = true;
+}
+
+
+
+void ADaeva::EatOrb(EOrbColor NewColor)
+{
+	if (NewColor == LastOrbColor)
+	{
+		// 같은 색 연속 -> 스택 증가 
+		++OrbStack;
+	}
+
+
+	else
+	{
+		// 다른 색 -> 초기화 후 1로 시작. 
+		OrbStack = 1;
+		LastOrbColor = NewColor;
+	}
+
+
+	// 같은 2번 연속 먹었을 때만 효과 발동 
+	if (OrbStack >= 2)
+	{
+		// 여기서 효과 발동
+
+		switch (NewColor)
+		{
+		case EOrbColor::BLUE:
+		{
+			Set_BlueOrb_RenderOnOff(true);
+		}
+		break;
+		case EOrbColor::PURPLE:
+		{
+			Set_PurpleOrb_RenderOnOff(true);
+		}
+		break;
+		}
+
+
+	}
+
+
+}
+
+
+
+void ADaeva::Set_AOE_RenderOnOff_Implementation(bool _bOnOff)
+{
+	AoeField->SetVisibility(_bOnOff, true);
+
+}
+
+void ADaeva::Set_BlueOrb_RenderOnOff_Implementation(bool _bOnOff)
+{
+	if (_bOnOff == true)
+	{
+		BlueOrb->Activate(_bOnOff);
+	}
+
+	else
+	{
+		BlueOrb->DeactivateImmediate();
+	}
+
+}
+
+
+
+void ADaeva::Set_PurpleOrb_RenderOnOff_Implementation(bool _bOnOff)
+{
+	if (_bOnOff == true)
+	{
+		PurpleOrb->Activate(_bOnOff);
+	}
+
+
+	else
+	{
+		PurpleOrb->DeactivateImmediate();
+	}
+
+}
+
+
+void ADaeva::Reset_OrbStackAndColor()
+{
+	OrbStack = 0;
+	LastOrbColor = EOrbColor::None;
+
+
 }

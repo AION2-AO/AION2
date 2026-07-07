@@ -15,6 +15,9 @@ UCLASS()
 class AION2_API UGA_Monster_Attack : public UGameplayAbility
 {
 	GENERATED_BODY()
+
+public:
+	UGA_Monster_Attack();
 	
 public:
 	virtual void ActivateAbility(
@@ -43,7 +46,7 @@ protected:
 	void OnMontageTaskCancelled();
 
 	UFUNCTION()
-	void OnCheckAttackHitEvent(FGameplayEventData Payload);
+	virtual void OnCheckAttackHitEvent(FGameplayEventData Payload);
 
 	UFUNCTION()
 	void AbilityEnd(); 

@@ -1,4 +1,4 @@
-﻿// AOPacketHandler.cpp
+// AOPacketHandler.cpp
 #include "Manager/PacketHandlerManager.h"
 #include "PacketHandler.h"
 #include "Manager/AOPlayerManager.h"
@@ -8,6 +8,7 @@
 #include "Player/AOPlayerController.h"
 #include "Manager/AOUIManager.h"
 #include "AONetworkManager.h"
+#include "Game/AODungeonGameMode.h"
 
 PacketHandlerFunc GAOPacketHandler[UINT16_MAX];
 
@@ -19,7 +20,9 @@ void InitPacketHandler()
 
 #if UE_SERVER
 	// 서버 핸들러
+	GAOPacketHandler[PKT_S_DUNGEONCREATE] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) {return HandlePacketPolicy<Protocol::S_DungeonCreatePacket>(&FPacketHandler::Handle_S_DEDICREATE, Mng, Buf, Len); };
 
+	GAOPacketHandler[PKT_S_DUNGEONDEDISTART] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) {return HandlePacketPolicy<Protocol::S_DungeonStartDediPacket>(&FPacketHandler::Handle_S_DUNGEONSETPLAYER, Mng, Buf, Len); };
 #else
 
 #if UE_BUILD_DEVELOPMENT
@@ -35,10 +38,19 @@ void InitPacketHandler()
 
 	GAOPacketHandler[PKT_S_STOREPURCHASE] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_StorePurchasePacket>(&FPacketHandler::Handle_S_STORE, Mng, Buf, Len); };
 
+	GAOPacketHandler[PKT_S_USEITEM] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_UseItemPacket>(&FPacketHandler::Handle_S_USEITEM, Mng, Buf, Len); };
+
 	GAOPacketHandler[PKT_S_DUNGEONCREATE] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonCreatePacket>(&FPacketHandler::Handle_S_CREATE, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_DUNGEONWAITINTROOM] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonWaitingRoomEnterPacket>(&FPacketHandler::Handle_S_ENTERWAITING, Mng, Buf, Len); };
 	GAOPacketHandler[PKT_S_DUNGEONENTER] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonEnterPacket>(&FPacketHandler::Handle_S_ENTER, Mng, Buf, Len); };
 	GAOPacketHandler[PKT_S_DUNGEONREADY] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonReadyPacket>(&FPacketHandler::Handle_S_READY, Mng, Buf, Len); };
 	GAOPacketHandler[PKT_S_DUNGEONSTART] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonStartPacket>(&FPacketHandler::Handle_S_START, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_DUNGEONEXIT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonExitPacket>(&FPacketHandler::Handle_S_EXIT, Mng, Buf, Len); };
+
+	GAOPacketHandler[PKT_S_DUNGEONFAIL] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonFailPacket>(&FPacketHandler::Handle_S_DUNGEONFAIL, Mng, Buf, Len); };
+
+	GAOPacketHandler[PKT_S_DISCONNECT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DisconnectPacket>(&FPacketHandler::Handle_S_DISCONNECT, Mng, Buf, Len); };
+
 
 
 #endif
@@ -90,6 +102,7 @@ bool FPacketHandler::Handle_S_SLOGIN(Protocol::S_LoginSuccessPacket& pkt)
 	{
 		uint64 PlayerId = pkt.playerinfo().playerid();
 		uint8 ClassType = static_cast<uint8>(pkt.playerinfo().playerclass());
+
 		PlayerMng->HandleLogin(PlayerId, ClassType);
 		if (GameInstance)
 		{
@@ -186,8 +199,40 @@ bool FPacketHandler::Handle_S_CREATE(Protocol::S_DungeonCreatePacket& Pkt)
 	{
 		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
 		{
-			DungeonWidget->SetLeaderName(LeaderName);
-			DungeonWidget->SetLeaderClass(LeaderClass);
+			PlayerMng->TryUpdateMyDungeonRoomState(*DungeonInfo);
+			DungeonWidget->SetDungeonCreated(*DungeonInfo);
+		}
+	}
+
+	return true;
+}
+
+bool FPacketHandler::Handle_S_DEDICREATE(Protocol::S_DungeonCreatePacket& Pkt)
+{
+	AAODungeonGameMode* GameMode = Cast<AAODungeonGameMode>(GameInstance->GetWorld()->GetAuthGameMode());
+	Protocol::DungeonInfo dungeonInfo = Pkt.dungeoninfo();
+	GameMode->SetDungeonId(dungeonInfo.dungeonid());
+	return false;
+}
+
+bool FPacketHandler::Handle_S_ENTERWAITING(Protocol::S_DungeonWaitingRoomEnterPacket& Pkt)
+{
+	if (PlayerMng)
+	{
+		PlayerMng->UpdateMyDungeonRoomStateFromList(Pkt.dungeoninfos());
+	}
+
+	UAOUIManager* UIManager = GameInstance
+		? GameInstance->GetSubsystem<UAOUIManager>()
+		: nullptr;
+
+	// 서버 결과에 따라 Widget 갱신 불러주기
+	if (UIManager)
+	{
+		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
+		{
+			DungeonWidget->RefreshDungeonRooms(Pkt.dungeoninfos());
+			DungeonWidget->ApplyEntranceState();
 		}
 	}
 
@@ -199,14 +244,38 @@ bool FPacketHandler::Handle_S_ENTER(Protocol::S_DungeonEnterPacket& Pkt)
 	int32 DungeonId = Pkt.dungeonid();
 	Protocol::DungeonPlayerInfo NewPlayer = Pkt.enterplayer();
 	FString NewPlayerName = UTF8_TO_TCHAR(NewPlayer.membername().c_str());
-	Protocol::ClassType NewPlayerClass = NewPlayer.memberclass();
+	//Protocol::ClassType NewPlayerClass = NewPlayer.memberclass();
 	UE_LOG(LogTemp, Log, TEXT("PacketHandler - Handle_S_Enter/LeaderName: %s"), *NewPlayerName);
+	PlayerMng->UpdateMyDungeonEnterState(DungeonId, Pkt.enterplayer());
+	PlayerMng->TryUpdateMyDungeonRoomState(Pkt.dungeoninfo());
+	if (UAOUIManager* UIManager = GameInstance ? GameInstance->GetSubsystem<UAOUIManager>() : nullptr)
+	{
+		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
+		{
+			DungeonWidget->SetDungeonEntered(DungeonId, Pkt.enterplayer());
+			if (PlayerMng->GetMyDungeonRoomState().DungeonId == DungeonId)
+			{
+				DungeonWidget->SetDungeonInfo(Pkt.dungeoninfo());
+			}
+		}
+	}
 
 	return true;
 }
 
 bool FPacketHandler::Handle_S_READY(Protocol::S_DungeonReadyPacket& Pkt)
 {
+	PlayerMng->UpdateMyDungeonReadyState(Pkt.dungeonid(), Pkt.playerid());
+
+	// UI 갱신
+	if (UAOUIManager* UIManager = GameInstance ? GameInstance->GetSubsystem<UAOUIManager>() : nullptr)
+	{
+		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
+		{
+			DungeonWidget->SetDungeonReady(Pkt.dungeonid(), Pkt.playerid(), Pkt.isready());
+		}
+	}
+
 	return true;
 }
 
@@ -218,9 +287,40 @@ bool FPacketHandler::Handle_S_START(Protocol::S_DungeonStartPacket& Pkt)
 	FString ServerIp = UTF8_TO_TCHAR(Pkt.dungeonip().c_str());
 	int32 ServerPort = Pkt.port();
 
-	FString ConnectionURL = FString::Printf(TEXT("%s:%d"), *ServerIp, ServerPort);
+	FString ConnectionURL = FString::Printf(TEXT("%s:%d?Token=%s"), *ServerIp, ServerPort, UTF8_TO_TCHAR(Pkt.clienttoken().c_str()));
 
 	PlayerMng->HandleDungeonStart(ConnectionURL);
+	return true;
+}
+
+bool FPacketHandler::Handle_S_EXIT(Protocol::S_DungeonExitPacket& Pkt)
+{
+	if (!PlayerMng)
+		return false;
+	if (Pkt.playerid() == GameInstance->GetMyPlayerId())
+	{
+		PlayerMng->ClearMyDungeonRoomState();
+	}
+
+	if (UAOUIManager* UIManager = GameInstance ? GameInstance->GetSubsystem<UAOUIManager>() : nullptr)
+	{
+		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
+		{
+			DungeonWidget->SetDungeonExit(Pkt.dungeoninfo().dungeonid(), Pkt.playerid(), Pkt.dungeoninfo());
+		}
+	}
+	return true;
+}
+
+bool FPacketHandler::Handle_S_DUNGEONFAIL(Protocol::S_DungeonFailPacket& Pkt)
+{
+	if (UAOUIManager* UIManager = GameInstance ? GameInstance->GetSubsystem<UAOUIManager>() : nullptr)
+	{
+		if (UAODungeonEntranceWidget* DungeonWidget = UIManager->GetWidget<UAODungeonEntranceWidget>())
+		{
+			DungeonWidget->ShowErrorMessage(Pkt.reason());
+		}
+	}
 	return true;
 }
 
@@ -230,7 +330,7 @@ bool FPacketHandler::Handle_S_CHAT(Protocol::S_ChatPacket& Pkt)
 	FString ChatMsg = UTF8_TO_TCHAR(Pkt.chat().c_str());
 
 	PlayerMng->HandleChatting(SenderName, ChatMsg);
-	return false;
+	return true;
 }
 
 bool FPacketHandler::Handle_S_STORE(Protocol::S_StorePurchasePacket& Pkt)
@@ -238,5 +338,24 @@ bool FPacketHandler::Handle_S_STORE(Protocol::S_StorePurchasePacket& Pkt)
 	Protocol::ItemData Item = Pkt.iteminfo();
 
 	PlayerMng->HandleStorePurchase(Item);
-	return false;
+	return true;
+}
+
+bool FPacketHandler::Handle_S_USEITEM(Protocol::S_UseItemPacket& Pkt)
+{
+	PlayerMng->HandleUseItem(Pkt);
+	return true;
+}
+
+bool FPacketHandler::Handle_S_DISCONNECT(Protocol::S_DisconnectPacket& Pkt)
+{
+	PlayerMng->HandleDisconnect(Pkt.playerid());
+	return true;
+}
+
+
+bool FPacketHandler::Handle_S_DUNGEONSETPLAYER(Protocol::S_DungeonStartDediPacket Pkt)
+{
+	PlayerMng->HandleDungeonSetPlayerInfo(Pkt);
+	return true;
 }

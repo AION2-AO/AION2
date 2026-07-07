@@ -8,10 +8,11 @@
 
 // 방에 이미 참가한 상태인지 => 방생성/빠른참가 || 나가기/시작 버튼 구분
 UENUM(BlueprintType)
-enum class EJoinState : uint8
+enum class EDungeonEntranceState : uint8
 {
-	None,
-	Joined
+	NotJoined,
+	Leader,
+	Member
 };
 
 // [각 Player의 Ready 상태]
@@ -31,18 +32,30 @@ enum class ERaidBoss : uint8
 	Arkanis
 };
 
-// 방 하나의 상태를 저장하는 Struct.
+
+// Player의 던전 참여 상태를 저장하는 Struct.
 USTRUCT(BlueprintType)
-struct FPlayerReadyState
+struct FPlayerDungeonRoomState
 {
 	GENERATED_BODY()
 
-	UPROPERTY(BlueprintReadOnly, Category = "DungeonRoom")
-	EDaevaClassType PlayerClass = EDaevaClassType::None;
-
-	UPROPERTY(BlueprintReadOnly, Category = "DungeonRoom")
-	FString PlayerName = TEXT("");
-
-	UPROPERTY(BlueprintReadOnly, Category = "DungeonRoom")
+	int32 DungeonId = 0;
+	EDungeonEntranceState EntranceState = EDungeonEntranceState::NotJoined;
 	EReadyState ReadyState = EReadyState::None;
+
+	bool IsJoined() const
+	{
+		return EntranceState != EDungeonEntranceState::NotJoined;
+	}
+
+	bool IsLeader() const
+	{
+		return EntranceState == EDungeonEntranceState::Leader;
+	}
+
+	bool IsMember() const
+	{
+		return EntranceState == EDungeonEntranceState::Member;
+	}
 };
+

@@ -18,8 +18,8 @@ void ASiliator::BeginPlay()
 
 void ASiliator::InitAttributeSet()
 {
-	AttributeSet->InitHealth(100000.f);
-	AttributeSet->InitMaxHealth(100000.f);
+	AttributeSet->InitHealth(1000.f);
+	AttributeSet->InitMaxHealth(1000.f);
 	
 	AttributeSet->InitStamina(100.f);
 	AttributeSet->InitMaxStamina(100.f);

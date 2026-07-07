@@ -19,6 +19,9 @@ UAOAttributeSet::UAOAttributeSet()
 
     InitLevel(1.f);
     InitExp(0.f);
+
+    InitGroggy(100.f);
+    InitMaxGroggy(100.f);
 }
 
 void UAOAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const
@@ -40,6 +43,9 @@ void UAOAttributeSet::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutL
 
     DOREPLIFETIME_CONDITION_NOTIFY(UAOAttributeSet, Level, COND_None, REPNOTIFY_Always);
     DOREPLIFETIME_CONDITION_NOTIFY(UAOAttributeSet, Exp, COND_None, REPNOTIFY_Always);
+
+    DOREPLIFETIME_CONDITION_NOTIFY(UAOAttributeSet, Groggy, COND_None, REPNOTIFY_Always);
+    DOREPLIFETIME_CONDITION_NOTIFY(UAOAttributeSet, MaxGroggy, COND_None, REPNOTIFY_Always);
 }
 
 void UAOAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, float& NewValue)
@@ -61,6 +67,10 @@ void UAOAttributeSet::PreAttributeChange(const FGameplayAttribute& Attribute, fl
         NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxStamina());
     }
 
+    if (Attribute == GetGroggyAttribute())
+    {
+        NewValue = FMath::Clamp(NewValue, 0.0f, GetMaxGroggy());
+    }
 
 }
 
@@ -82,7 +92,13 @@ void UAOAttributeSet::PostGameplayEffectExecute(const FGameplayEffectModCallback
     {
         SetStamina(FMath::Clamp(GetStamina(), 0.0f, GetMaxStamina()));
     }
+
+    if (Data.EvaluatedData.Attribute == GetGroggyAttribute())
+    {
+        SetGroggy(FMath::Clamp(GetGroggy(), 0.0f, GetMaxGroggy()));
+    }
 }
+
 
 void UAOAttributeSet::OnRep_Health(const FGameplayAttributeData& OldHealth)
 {
@@ -137,4 +153,14 @@ void UAOAttributeSet::OnRep_Level(const FGameplayAttributeData& OldLevel)
 void UAOAttributeSet::OnRep_Exp(const FGameplayAttributeData& OldExp)
 {
     GAMEPLAYATTRIBUTE_REPNOTIFY(UAOAttributeSet, Exp, OldExp);
+}
+
+void UAOAttributeSet::OnRep_Groggy(const FGameplayAttributeData& OldGroggy)
+{
+    GAMEPLAYATTRIBUTE_REPNOTIFY(UAOAttributeSet, Groggy, OldGroggy);
+}
+
+void UAOAttributeSet::OnRep_MaxGroggy(const FGameplayAttributeData& OldMaxGroggy)
+{
+    GAMEPLAYATTRIBUTE_REPNOTIFY(UAOAttributeSet, MaxGroggy, OldMaxGroggy);
 }

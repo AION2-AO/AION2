@@ -30,8 +30,9 @@ public:
 	void SendDungeonWait();
 	void SetDungeonId(int32 NewDungeonId) { DungeonId = NewDungeonId; }
 
-	bool bHasMoveInput = false;
+	void SetHp(int32 Hp);
 
+	bool bHasMoveInput = false;
 private:
 	void InputMoveReleased();
 

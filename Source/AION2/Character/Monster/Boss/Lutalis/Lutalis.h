@@ -14,7 +14,12 @@ class AION2_API ALutalis : public AAOMonsterBase
 {
 	GENERATED_BODY()
 	
-	
-	
-	
+public:
+
+	ALutalis(const FObjectInitializer& ObjectInitializer);
+
+protected:
+
+	virtual void BeginPlay() override;
+	virtual void InitAttributeSet() override;
 };

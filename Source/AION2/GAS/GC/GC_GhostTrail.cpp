@@ -3,6 +3,11 @@
 #include "Actor/Effect/GhostTrailSpawner.h"
 #include "Actor/Effect/GhostTrailEffect.h"
 
+UGC_GhostTrail::UGC_GhostTrail()
+{
+	GameplayCueTag = FGameplayTag::RequestGameplayTag(TEXT("GameplayCue.GhostTrail"));
+}
+
 bool UGC_GhostTrail::OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const
 {
 	if (!MyTarget)

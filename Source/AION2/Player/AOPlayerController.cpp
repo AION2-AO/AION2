@@ -6,7 +6,8 @@
 #include "UI/AOMainHUDWidget.h"
 #include "Components/Widget.h"
 #include "Player/AOPlayerState.h"
-#include "Game/AORaidGameState.h"
+#include "Character/Monster/AOMonsterBase.h"
+
 
 TAutoConsoleVariable<int32> CVarDrawAttackTrace(TEXT("ao.Debug.DrawAttackTrace"), 0, TEXT("Draw attack trace debug"), ECVF_Cheat);
 
@@ -127,7 +128,6 @@ void AAOPlayerController::HandlePawnASCReady()
 
 void AAOPlayerController::CreateOrBindMainHUD()
 {
-
 	// Exception Handling
 	if (GetNetMode() == NM_DedicatedServer || !IsLocalController())
 	{
@@ -154,3 +154,24 @@ void AAOPlayerController::CreateOrBindMainHUD()
 	AAOPlayerState* AOPlayerState = GetPlayerState<AAOPlayerState>();
 	MainHUD->BindToPlayerState(AOPlayerState);
 }
+
+void AAOPlayerController::ShowTargetMonsterHUD(AAOMonsterBase* InMonster)
+{
+	if (!IsLocalController() || !MainHUD || !InMonster)
+	{
+		return;
+	}
+
+	MainHUD->ShowTargetMonsterHUD(InMonster);
+}
+
+void AAOPlayerController::HideTargetMonsterHUD()
+{
+	if (!IsLocalController() || !MainHUD)
+	{
+		return;
+	}
+
+	MainHUD->HideTargetMonsterHUD();
+}
+

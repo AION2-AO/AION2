@@ -51,7 +51,7 @@ public:
 
 public:
 	void SetMyPlayerId(uint64 playerId) { MyPlayerId = playerId; }
-	uint64 GetMyPlayerId() { return MyPlayerId; }
+	uint64 GetMyPlayerId() const { return MyPlayerId; }
 	
 	void SetMyPlayerClass(uint8 ClassType) { MyPlayerClass = ClassType; }
 	int32 GetMyPlayerClass() { return MyPlayerClass; }

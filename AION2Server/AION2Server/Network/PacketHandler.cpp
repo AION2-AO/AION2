@@ -154,7 +154,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 		session->Send(sendBuffer);
 
 		SendBufferRef itemSendBuffer = PacketHandler::MakeSendBuffer(itemPkt);
-		session->Send(itemSendBuffer);
+		session->Send(itemSendBuffer); 
 
 		GRoom->DoAsync(&Room::AddPlayer, player);
 	}
@@ -238,16 +238,35 @@ bool PacketHandler::HandleDungeonCreate(PacketSessionRef& session, Protocol::C_D
 	return true;
 }
 
-bool PacketHandler::HandleDungeonEnter(PacketSessionRef& session, Protocol::C_DungeonEnteracket& pkt)
+bool PacketHandler::HandleDungeonEnter(PacketSessionRef& session, Protocol::C_DungeonEnterPacket& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	PlayerRef player = gameSession->_player;
-
-	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleEnterDungeon, player);
+	int32 dungeonId = pkt.dungeonid();
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleEnterDungeon, player, dungeonId);
 	return true;
 }
 
-bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_DungeonStartacket& pkt)
+bool PacketHandler::HandleDungeonExit(PacketSessionRef& session, Protocol::C_DungeonExitPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	int32 dungeonId = pkt.dungeonid();
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleExitPacket, player, dungeonId);
+	return false;
+}
+
+bool PacketHandler::HandleDungeonReady(PacketSessionRef& session, Protocol::C_DungeonReadyPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	int32 dungeonId = pkt.dungeonid();
+
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleReadyPacket, player, dungeonId);
+	return true;
+}
+
+bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_DungeonStartPacket& pkt)
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	PlayerRef player = gameSession->_player;
@@ -263,7 +282,7 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
 
 	// 플레이어 아이디, 아이템 아이디 넘기고 잔액을 받음
-	DBBind<2, 5> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
+	DBBind<2, 6> dbBind(*dbConnect, L"{CALL sp_PurchaseItem(?, ?)}");
 
 	int32 characterId = pkt.playerid();
 	int32 itemId = pkt.itemid();
@@ -279,8 +298,13 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 	int32 count = 0;
 
 	std::wcout.imbue(std::locale("kor"));
+
 	dbBind.BindCol(0, errorCode);
 	dbBind.BindCol(1, remainingGold);
+	dbBind.BindCol(2, itemInstanceId);
+	dbBind.BindCol(3, itemTemplateId);
+	dbBind.BindCol(4, SlotIndex);
+	dbBind.BindCol(5, count);
 
 	if (dbBind.Execute())
 	{
@@ -307,6 +331,68 @@ bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_S
 	SendBufferRef purchaseBuffer = PacketHandler::MakeSendBuffer(purchasePacket);
 	session->Send(purchaseBuffer);
 
+	return true;
+}
+
+bool PacketHandler::HandleUseItem(PacketSessionRef& session, Protocol::C_UseItemPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+	DBBind<2, 5> dbBind(*dbConnect, L"{CALL sp_UseItem(?, ?)}");
+	int32 characterId = pkt.playerid();
+	int32 slot = pkt.slotindex();
+
+	dbBind.BindParam(0, characterId);
+	dbBind.BindParam(1, slot);
+
+	int32 errorCode = -1;
+	int32 slotIndex = -1;
+	int32 itemCount = -1;
+	WCHAR effectType[51] = { 0, };
+	int32 effectValue = 0;
+
+	std::wcout.imbue(std::locale("kor"));
+
+	dbBind.BindCol(0, errorCode);
+	dbBind.BindCol(1, slotIndex);
+	dbBind.BindCol(2, itemCount);
+	dbBind.BindCol(3, effectType);
+	dbBind.BindCol(4, effectValue);
+
+	if (dbBind.Execute())
+	{
+		if (dbBind.Fetch())
+		{
+			std::cout << "ResultCode : " << errorCode << std::endl;
+		}
+	}
+	else
+	{
+		return false;
+	}
+
+	// TODO 아이템 실패 패킷 보내기
+	if (errorCode == -1)
+	{
+		GDBConnectionPool->Push(dbConnect);
+		return false;
+	}
+
+	char szEffectType[51] = { 0, };
+	GDBConnectionPool->Push(dbConnect);
+
+	::wcstombs_s(nullptr, szEffectType, sizeof(szEffectType), effectType, _TRUNCATE);
+
+	Protocol::S_UseItemPacket useItemPacket;
+	useItemPacket.set_slotindex(slotIndex);
+	useItemPacket.set_count(itemCount);
+	useItemPacket.set_effecttype(szEffectType);
+	useItemPacket.set_effectvalue(effectValue);
+
+	SendBufferRef useItemBuffer = PacketHandler::MakeSendBuffer(useItemPacket);
+	session->Send(useItemBuffer);
 	return true;
 }
 

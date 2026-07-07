@@ -50,8 +50,7 @@ void Session::Disconnect(const WCHAR* cause)
 
 	// TODO: Logout logic
 	std::wcout << "Disconnected: " << cause << "\n";
-
-
+	OnDisconnected();;
 	RegisterDisConnect();
 }
 
@@ -188,6 +187,7 @@ void Session::ProcessConnect()
 		std::wcout << L"Client Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
 			<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
 	}
+
 	else
 	{
 		std::wcout << L"Dedi Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
@@ -202,6 +202,7 @@ void Session::ProcessDisconnect()
 {
 	GetService()->ReleaseSession(GetSessionRef());
 	// TODO: OnDisconnected override logic
+
 	std::cout << "Client Disconnected!" << std::endl;
 }
 

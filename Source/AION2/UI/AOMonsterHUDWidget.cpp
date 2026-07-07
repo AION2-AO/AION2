@@ -10,6 +10,11 @@
 
 void UAOMonsterHUDWidget::BindToASC(UAbilitySystemComponent* InASC)
 {
+    if (!InASC || BoundASC == InASC)
+    {
+        return;
+    }
+
     Super::BindToASC(InASC);
 
     if (!BoundASC)
@@ -35,7 +40,7 @@ void UAOMonsterHUDWidget::NativeDestruct()
 
 void UAOMonsterHUDWidget::SetMonsterIndex(int32 InMonsterIndex)
 {
-    // TODO: 몬스터 이름 HardCoding. 나중에 바꾸기.
+    // TODO(suyeon): 몬스터 이름 HardCoding. 나중에 바꾸기.
     static FString MonsterName = TEXT("");
     switch (InMonsterIndex)
     {
@@ -56,7 +61,10 @@ void UAOMonsterHUDWidget::SetMonsterIndex(int32 InMonsterIndex)
         break;
     }
 
-    TB_MonsterName->SetText(FText::FromString(MonsterName));
+    if (TB_MonsterName)
+    {
+        TB_MonsterName->SetText(FText::FromString(MonsterName));
+    }
 }
 
 void UAOMonsterHUDWidget::HandleHealthChanged(const FOnAttributeChangeData& Data)
@@ -70,7 +78,7 @@ void UAOMonsterHUDWidget::HandleHealthChanged(const FOnAttributeChangeData& Data
     UpdateHpBar(Data.NewValue, AttributeSet->GetMaxHealth());
 }
 
-void UAOMonsterHUDWidget::HandleStaminaChanged(const FOnAttributeChangeData& Data)
+void UAOMonsterHUDWidget::HandleGroggyChanged(const FOnAttributeChangeData& Data)
 {
     const UAOAttributeSet* AttributeSet = BoundASC->GetSet<UAOAttributeSet>();
     if (!AttributeSet)
@@ -78,7 +86,7 @@ void UAOMonsterHUDWidget::HandleStaminaChanged(const FOnAttributeChangeData& Dat
         return;
     }
 
-    UpdateStaminaBar(Data.NewValue, AttributeSet->GetMaxStamina());
+    UpdateGroggyBar(Data.NewValue, AttributeSet->GetMaxGroggy());
 }
 
 void UAOMonsterHUDWidget::BindASCDelegates()
@@ -87,10 +95,10 @@ void UAOMonsterHUDWidget::BindASCDelegates()
         UAOAttributeSet::GetHealthAttribute()
     ).AddUObject(this, &UAOMonsterHUDWidget::HandleHealthChanged);
 
-    // Stamina Bind
-    StaminaChangedHandle = BoundASC->GetGameplayAttributeValueChangeDelegate(
-        UAOAttributeSet::GetStaminaAttribute()
-    ).AddUObject(this, &UAOMonsterHUDWidget::HandleStaminaChanged);
+    // Groggy Bind
+    GroggyChangedHandle = BoundASC->GetGameplayAttributeValueChangeDelegate(
+        UAOAttributeSet::GetGroggyAttribute()
+    ).AddUObject(this, &UAOMonsterHUDWidget::HandleGroggyChanged);
 }
 
 void UAOMonsterHUDWidget::UnbindASCDelegates()
@@ -109,13 +117,13 @@ void UAOMonsterHUDWidget::UnbindASCDelegates()
         HealthChangedHandle.Reset();
     }
 
-    if (StaminaChangedHandle.IsValid())
+    if (GroggyChangedHandle.IsValid())
     {
         BoundASC->GetGameplayAttributeValueChangeDelegate(
-            UAOAttributeSet::GetStaminaAttribute()
-        ).Remove(StaminaChangedHandle);
+            UAOAttributeSet::GetGroggyAttribute()
+        ).Remove(GroggyChangedHandle);
 
-        StaminaChangedHandle.Reset();
+        GroggyChangedHandle.Reset();
     }
 }
 
@@ -127,11 +135,11 @@ void UAOMonsterHUDWidget::UpdateHpBar(float CurrentValue, float MaxValue)
     }
 }
 
-void UAOMonsterHUDWidget::UpdateStaminaBar(float CurrentValue, float MaxValue)
+void UAOMonsterHUDWidget::UpdateGroggyBar(float CurrentValue, float MaxValue)
 {
-    if (Pb_StaminaBar)
+    if (Pb_GroggyBar)
     {
-        Pb_StaminaBar->SetPercent(MaxValue > 0.0f ? CurrentValue / MaxValue : 0.0f);
+        Pb_GroggyBar->SetPercent(MaxValue > 0.0f ? CurrentValue / MaxValue : 0.0f);
     }
 }
 
@@ -149,5 +157,5 @@ void UAOMonsterHUDWidget::BroadcastInitialAttributes()
     }
 
     UpdateHpBar(AttributeSet->GetHealth(), AttributeSet->GetMaxHealth());
-    UpdateStaminaBar(AttributeSet->GetStamina(), AttributeSet->GetMaxStamina());
+    UpdateGroggyBar(AttributeSet->GetGroggy(), AttributeSet->GetMaxGroggy());
 }

@@ -68,6 +68,14 @@ public :
 	FGameplayAttributeData Exp;
 	ATTRIBUTE_ACCESSORS(UAOAttributeSet, Exp);
 
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_Groggy, Category = "Attributes | Groggy")
+	FGameplayAttributeData Groggy;
+	ATTRIBUTE_ACCESSORS(UAOAttributeSet, Groggy);
+
+	UPROPERTY(BlueprintReadOnly, ReplicatedUsing = OnRep_MaxGroggy, Category = "Attributes | Groggy")
+	FGameplayAttributeData MaxGroggy;
+	ATTRIBUTE_ACCESSORS(UAOAttributeSet, MaxGroggy);
+
 private : 
 	UFUNCTION()
 	void OnRep_Health(const FGameplayAttributeData& OldHealth);	
@@ -101,4 +109,10 @@ private :
 
 	UFUNCTION()
 	void OnRep_Exp(const FGameplayAttributeData& OldExp);
+
+	UFUNCTION()
+	void OnRep_Groggy(const FGameplayAttributeData& OldGroggy);
+
+	UFUNCTION()
+	void OnRep_MaxGroggy(const FGameplayAttributeData& OldMaxGroggy);
 };

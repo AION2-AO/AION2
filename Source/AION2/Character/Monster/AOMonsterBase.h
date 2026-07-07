@@ -127,7 +127,7 @@ public:
 	void Die();
 
 protected :
-	void OnHealthChanged(const FOnAttributeChangeData& Data);
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 
 protected :
 	FDelegateHandle HealthChangedDelegateHandle;
@@ -150,5 +150,24 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, Category = "UI", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<UAOWidgetComponentBase> OverheadStatusWidgetComponent;
+
+	// K.H
+protected :
+	void OnGroggyChanged(const FOnAttributeChangeData& Data);
+
+	void StartGroggy();
+
+public :
+	UFUNCTION(BlueprintCallable, Category = "Groggy")
+	void EndGroggy();
+
+	UFUNCTION(BlueprintPure, Category = "Groggy")
+	bool IsGroggy() const { return bIsGroggy; }
+
+protected :
+	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Groggy")
+	bool bIsGroggy = false;
+
+	FDelegateHandle GroggyChangedDelegateHandle;
 
 };

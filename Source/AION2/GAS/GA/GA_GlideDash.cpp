@@ -46,16 +46,6 @@ void UGA_GlideDash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
     MontageTask->ReadyForActivation();
 }
 
-void UGA_GlideDash::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
-{
-    if (ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get()))
-    {
-
-    }
-
-    Super::EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, bReplicateEndAbility, bWasCancelled);
-}
-
 void UGA_GlideDash::OnMontageTaskFinished()
 {
     EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);

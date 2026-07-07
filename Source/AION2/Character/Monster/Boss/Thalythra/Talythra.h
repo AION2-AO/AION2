@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "Character/Monster/AOMonsterBase.h"
 #include "Types/TalythraTypes.h"
+#include "Types/AOTypes.h"
 #include "Talythra.generated.h"
 
 UCLASS()
@@ -66,6 +67,7 @@ public:
 #pragma region  Teleport 
 	// Teleport 기능 
 	void Teleport_To_Player();
+	void Teleport_To_Center();
 	void Attack_RangeRender(bool _bRenderOnOff);
 #pragma endregion 
 
@@ -90,6 +92,32 @@ public:
 	void SpawnWaveRed();
 
 #pragma endregion 
+
+#pragma region SpawnColorOrb Gimmick 
+
+
+	void SpawnColorOrb();
+	void SpawnColorSheid();
+
+	void Set_OrbColorOffset(int _iOffSset) { OrbColorOffset = _iOffSset; }
+	void Add_OrbHittedDaeva(class ADaeva* pDaeva);
+
+	void Render_PlayerAoeOnOff(bool _bOnOff);
+	void Player_Orb_RenderOnOff(bool _bOnOff);
+
+	void Reset_PlayerOrbStackAndColor();
+
+	FORCEINLINE void Set_OrbAttackColor(EOrbColor _eOrbColor) { AttackOrbColor = _eOrbColor; }
+	TArray<class ADaeva*> Get_ArrayOrbHittedDaeva() { return ArrayOrbHittedDaeva; }
+	EOrbColor Get_AttackOrbColor() { return AttackOrbColor; }
+
+	void Destroy_OrbShield();
+
+#pragma endregion 
+
+
+
+
 
 protected:
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
@@ -128,10 +156,33 @@ protected:
 	UFUNCTION(NetMulticast, Unreliable)
 	void Multicast_AttackRangeRender(bool _bRendrOnOff);
 
+
+
+	// 기믹 관련 HP 설정 
+	virtual void OnHealthChanged(const FOnAttributeChangeData& Data) override;
+
+
+
 	// EFFECT 관련 
 protected:
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
 	TSubclassOf<class ATalythraProjectile> ProjectileClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<class ATalythraCollectibleOrb> ProjectileBlueOrbClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Projectile")
+	TSubclassOf<class ATalythraCollectibleOrb> ProjectilePurpleOrbClass;
+
+
+	// Shield Effect 관련 
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GimmickShield")
+	TSubclassOf<class ATalythraGimmickShield> ShieldBlueClass;
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "GimmickShield")
+	TSubclassOf<class ATalythraGimmickShield> ShieldPurpleClass;
+
+
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Ring")
 	TSubclassOf<class AWaveCircle> WaveCircleBlueClass;
@@ -212,5 +263,30 @@ private:
 
 	UPROPERTY(VisibleAnywhere)
 	float AttackWarningElapsedTime = 0.0f;
+
+
+	// 투사체 생성 거리 및 높이 관련 
+
+	UPROPERTY(EditAnywhere, Category = "ProjectileSpawn", meta = (AllowPrivateAccess = "true"))
+	float SpawnRadius = 2000.f; // 보스로부터 스폰 거리 
+	UPROPERTY(EditAnywhere, Category = "ProjectileSpawn", meta = (AllowPrivateAccess = "true"))
+	float SpawnHeight = 60.f; // 지면에서 띄울 높이 
+
+	UPROPERTY(EditAnywhere, Category = "ProjectileSpawn", meta = (AllowPrivateAccess = "true"))
+	int8 OrbColorOffset = 0;
+
+
+	UPROPERTY(EditAnywhere, Category = "TeleportCenter", meta = (AllowPrivateAccess = "true"))
+	FVector TeleportCenterLocation;
+
+
+
+	// 오브 관련 맞은 플레이어 저장하는 공간 
+	TArray<class ADaeva*> ArrayOrbHittedDaeva;
+	TArray<class ATalythraGimmickShield*> ArrayOrbShield;
+
+	UPROPERTY(EditAnywhere, Category = "AttackOrbGimmick", meta = (AllowPrivateAccess = "true"))
+
+	EOrbColor AttackOrbColor = EOrbColor::None;
 
 };

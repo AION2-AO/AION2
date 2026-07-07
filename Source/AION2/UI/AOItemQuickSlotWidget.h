@@ -23,7 +23,7 @@ public:
 	void UpdateQuickSlot(const FAOSlotData& SlotData, const FItemData& TemplateData);
 
 	UFUNCTION(BlueprintImplementableEvent, BlueprintCallable, Category = "QuickSlot")
-	void ClearQuickSlot();
+	void ClearQuickSlot(const int32 SlotIndex);
 
 protected:
 	UPROPERTY(meta = (BindWidget), BlueprintReadOnly)

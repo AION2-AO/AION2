@@ -108,6 +108,31 @@ inline bool RoomStatus_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<RoomStatus>(
     RoomStatus_descriptor(), name, value);
 }
+enum DungeonFailReason : int {
+  Ready = 0,
+  FullDungeon = 1,
+  DungeonFailReason_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  DungeonFailReason_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool DungeonFailReason_IsValid(int value);
+constexpr DungeonFailReason DungeonFailReason_MIN = Ready;
+constexpr DungeonFailReason DungeonFailReason_MAX = FullDungeon;
+constexpr int DungeonFailReason_ARRAYSIZE = DungeonFailReason_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* DungeonFailReason_descriptor();
+template<typename T>
+inline const std::string& DungeonFailReason_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, DungeonFailReason>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function DungeonFailReason_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    DungeonFailReason_descriptor(), enum_t_value);
+}
+inline bool DungeonFailReason_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, DungeonFailReason* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<DungeonFailReason>(
+    DungeonFailReason_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -139,6 +164,11 @@ template <> struct is_proto_enum< ::Protocol::RoomStatus> : ::std::true_type {};
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::RoomStatus>() {
   return ::Protocol::RoomStatus_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::DungeonFailReason> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::DungeonFailReason>() {
+  return ::Protocol::DungeonFailReason_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

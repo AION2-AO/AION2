@@ -133,6 +133,7 @@ void UGA_Dash::ActivateAbility(
 	}
 
 	MontageTask->OnCompleted.AddDynamic(this, &UGA_Dash::OnDashFinished);
+	MontageTask->OnBlendOut.AddDynamic(this, &UGA_Dash::OnDashFinished);
 	MontageTask->OnInterrupted.AddDynamic(this, &UGA_Dash::OnDashCancelled);
 	MontageTask->OnCancelled.AddDynamic(this, &UGA_Dash::OnDashCancelled);
 

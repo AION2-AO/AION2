@@ -34,7 +34,7 @@ public:
 
 protected:
     void HandleHealthChanged(const FOnAttributeChangeData& Data);
-    void HandleStaminaChanged(const FOnAttributeChangeData& Data);
+    void HandleGroggyChanged(const FOnAttributeChangeData& Data);
 
 private:
     void BindASCDelegates();
@@ -45,7 +45,7 @@ private:
 private:
     // 내부 UI 업데이트
     void UpdateHpBar(float CurrentValue, float MaxValue);
-    void UpdateStaminaBar(float CurrentValue, float MaxValue);
+    void UpdateGroggyBar(float CurrentValue, float MaxValue);
 
 private:
     ///
@@ -53,19 +53,16 @@ private:
     // 기존 Delegate을 저장하고, 재Binding마다 기존 Delegate 제거 후 bind.
     ///
     FDelegateHandle HealthChangedHandle;
-
-    // 여기서 Stamina는 그로기 게이지.
-    FDelegateHandle StaminaChangedHandle;
+    FDelegateHandle GroggyChangedHandle;
 
 protected:
-    UPROPERTY(meta = (BindWidget), BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(meta = (BindWidgetOptional), BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UProgressBar> Pb_HpBar;
 
     UPROPERTY(meta = (BindWidgetOptional), BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
-    TObjectPtr<UProgressBar> Pb_StaminaBar;
+    TObjectPtr<UProgressBar> Pb_GroggyBar;
 
-
-    UPROPERTY(meta = (BindWidget), BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
+    UPROPERTY(meta = (BindWidgetOptional), BlueprintReadWrite, meta = (AllowPrivateAccess = "true"))
     TObjectPtr<UTextBlock> TB_MonsterName;
 
 

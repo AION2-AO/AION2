@@ -7,6 +7,7 @@
 extern TAutoConsoleVariable<int32> CVarDrawAttackTrace;
 
 class UAOMainHUDWidget;
+class AAOMonsterBase;
 
 UENUM()
 enum class EInputType : uint8
@@ -50,7 +51,17 @@ private:
 	void CreateOrBindMainHUD();
 
 public:
+	// ! 신혜님 UI 코드에서 많이 사용 중이라 삭제하면 안됨 !: 추후 분리하든가 할 것.
 	UAOMainHUDWidget* GetMainHUD() const { return MainHUD; }
+
+
+public:
+	// === Monster HUD. ===
+	// Show Full-Screen Monster Stat visibility value & Bind ASC.
+	void ShowTargetMonsterHUD(AAOMonsterBase* InMonster);
+
+	// Hide Full-Screen Monster Stat visibility value & Unbind ASC.
+	void HideTargetMonsterHUD();
 
 private:
 	bool bShowColliderDebug = false;
@@ -71,7 +82,7 @@ private:
 
 protected:
 	// UI 관련
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = RaidHUD)
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = DungeonHUD)
 	TSubclassOf<UAOMainHUDWidget> MainHUDClass;
 
 	TObjectPtr<UAOMainHUDWidget> MainHUD;

@@ -14,9 +14,12 @@
  */
 
 class UAOPlayerHUDWidget;
-class UAORaidHUDWidget;
+class UAODungeonHUDWidget;
 class UAOChattingWidget;
 class ADaeva;
+
+class UAbilitySystemComponent;
+class AAOMonsterBase;
 
 UCLASS()
 class AION2_API UAOMainHUDWidget : public UAOUserWidgetBase
@@ -27,8 +30,15 @@ public:
     void BindToPlayerState(AAOPlayerState* InPlayerState) override;
 
 public:
-    void SetRaidHUDVisible();
-    UAOPlayerHUDWidget* GetPlayerHUDWidget() const { return PlayerHUDWidget; }
+    // Show Full-Screen Monster Stat visibility value & Bind ASC.
+    void ShowTargetMonsterHUD(AAOMonsterBase* InMonster);
+
+    // Hide Full-Screen Monster Stat visibility value & Unbind ASC.
+    void HideTargetMonsterHUD();
+
+public:
+    // 외부에서 PlayerHUDWidget의 함수를 사용할 때.
+    FORCEINLINE UAOPlayerHUDWidget* GetPlayerHUDWidget() const { return PlayerHUDWidget; }
 
 protected:
     UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
@@ -36,9 +46,9 @@ protected:
 
     // 마을에서는 없을 수도 있으니 BindWidgetOptional.
     UPROPERTY(meta = (BindWidgetOptional), BlueprintReadOnly)
-    TObjectPtr<UAORaidHUDWidget> RaidHUDWidget;
+    TObjectPtr<UAODungeonHUDWidget> DungeonHUDWidget;
 
 public:
-    UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
+    UPROPERTY(meta = (BindWidgetOptional), BlueprintReadOnly)
     TObjectPtr<UAOChattingWidget> ChattingWidget;
 };

@@ -42,6 +42,9 @@ public:
 	void SetMyClass(EDaevaClassType InClassType);
 	void SetMyName(FString InName);
 
+	// H.Y.
+	void SetPlayerInfo(uint64 InPalyerId, const FString& InPlayerName, uint8 InCalssType);
+
 	// GetClass function.
 	FORCEINLINE EDaevaClassType GetMyClass() const{ return MyClassType; }
 
@@ -61,6 +64,10 @@ private:
 	bool bCommonAbilitiesGiven = false;
 
 private:
+	// H.Y
+	UPROPERTY(Replicated)
+	uint64 MyId = 0;
+	// 
 	UPROPERTY(Replicated, BlueprintReadOnly, Category = "Info", meta = (AllowPrivateAccess = "true"))
 	EDaevaClassType MyClassType = EDaevaClassType::None;
 

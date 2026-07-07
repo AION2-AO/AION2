@@ -26,6 +26,7 @@ public:
 	*/
 	virtual void BindToASC(UAbilitySystemComponent* InASC);
 	virtual void UnbindFromASC();
+	virtual void ClearBinding();
 
 	// 기존 Player 코드 호환용. 내부에서 BindToASC 호출. 
 	virtual void BindToPlayerState(AAOPlayerState* InPlayerState);

@@ -52,4 +52,6 @@ private:
 	
 	class AAOPlayerController* PC;
 	class UAOUIManager* UIManager;	
+
+	bool bIsOpenStore = false;
 };

@@ -3,6 +3,7 @@
 #include "DediSessionManager.h"
 #include "PacketHandler.h"
 
+
 void DedicatedSession::OnConnected()
 {
 	GDediSessionManager.Add(static_pointer_cast<DedicatedSession>(shared_from_this()));
@@ -23,6 +24,7 @@ void DedicatedSession::OnRecvPacket(BYTE* buffer, int32 len)
 void DedicatedSession::OnSend(int32 len)
 {
 }
+
 
 void DedicatedSession::SetAddrInfo(const std::string& ip, const int32 port)
 {

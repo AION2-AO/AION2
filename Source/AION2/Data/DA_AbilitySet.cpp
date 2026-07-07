@@ -21,3 +21,17 @@ void UDA_AbilitySet::GiveToASC(UAbilitySystemComponent* ASC, TArray<FGameplayAbi
         OutHandles.Add(Handle);
     }
 }
+
+bool UDA_AbilitySet::GetAbilityDataByInputID(int32 AbilityID, FGAData& OutData) const
+{
+    for (const FGAData& Entry : Abilities)
+    {
+        if (Entry.AbilityID == AbilityID)
+        {
+            OutData = Entry;
+            return true;
+        }
+    }
+
+    return false;
+}

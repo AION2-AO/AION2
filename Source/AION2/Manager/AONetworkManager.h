@@ -25,7 +25,7 @@ public:
 	void ReceiveData();
 	void ResetBuffer();
 	void ProcessQueuePackets();
-	
+
 public:
 	class UAOGameInstance* GameInstance; 
 	class UAOPlayerManager* PlayerMng;

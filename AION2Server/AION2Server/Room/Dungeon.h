@@ -53,11 +53,19 @@ public:
 	void HandleWaitingRoom(PlayerRef player);
 	void HandleLeaveWaitingRoom(PlayerRef player);
 	void HandleCreateDungeon(PlayerRef player);
-	void HandleEnterDungeon(PlayerRef player);
+	void HandleEnterDungeon(PlayerRef player, int32 inDungeonId);
 	void HandleDungeonStart(PlayerRef player, int32 dungeonId);
 	void HandleDungeonExit(int32 dungeonId);
 	void HandleReadyPacket(PlayerRef player, int32 dungeonId);
+	void HandleExitPacket(PlayerRef player, int32 dungeonId);
+	void HandleFailDungeon(PlayerRef player, Protocol::DungeonFailReason reason);
 
+	bool CheckMembersReady(DungeonRef dungeon);
+	bool CheckAlreadyIn(uint64 playerId, DungeonRef dungeon);
+
+	void HandleDungeonToken(DungeonRef dungeon);
+
+	void StartDungeonPacket(DungeonRef dungeon);
 	void WaitingRoomBroadcast(SendBufferRef sendBuffer, uint64 exceptId = 0);
 
 private:

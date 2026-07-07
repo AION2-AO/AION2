@@ -51,40 +51,28 @@ void UGA_Attack::ActivateAbility(
 
 		if (!ASC)
 		{
-			UE_LOG(LogTemp, Error, TEXT("[Mana] ASC is null. Ability=%s"), *GetName());
-
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			return;
 		}
 
-		const float CurrentMana =
-			ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
-
-		UE_LOG(LogTemp,Warning,TEXT("[Mana] Check | Ability=%s | Current=%.1f | Cost=%.1f"),*GetName(),CurrentMana,ManaCost);
+		const float CurrentMana = ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
 
 		if (CurrentMana < ManaCost)
 		{
-			UE_LOG(	LogTemp,Warning,TEXT("[Mana] Not enough mana | Current=%.1f | Cost=%.1f"),CurrentMana,ManaCost);
-
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			return;
 		}
 
 		if (!ManaCostEffect)
 		{
-			UE_LOG(	LogTemp,Error,TEXT("[Mana] ManaCostEffect is null. Ability=%s"),*GetName());
-
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			return;
 		}
 
-		FGameplayEffectSpecHandle ManaCostSpec =
-			MakeOutgoingGameplayEffectSpec(ManaCostEffect, 1.0f);
+		FGameplayEffectSpecHandle ManaCostSpec = MakeOutgoingGameplayEffectSpec(ManaCostEffect, 1.0f);
 
 		if (!ManaCostSpec.IsValid())
 		{
-			UE_LOG(	LogTemp,Error,TEXT("[Mana] ManaCostSpec invalid. Effect=%s"),*GetNameSafe(ManaCostEffect));
-
 			EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 			return;
 		}
@@ -92,14 +80,9 @@ void UGA_Attack::ActivateAbility(
 		const FGameplayTag SkillManaCost = FGameplayTag::RequestGameplayTag(FName("Data.ManaCost"));
 
 		ManaCostSpec.Data->SetSetByCallerMagnitude(	SkillManaCost,-ManaCost);
-
-		UE_LOG(	LogTemp,Warning,TEXT("[Mana] Apply Start | GE=%s | SetByCaller=%s | Value=%.1f"),*GetNameSafe(ManaCostEffect),*SkillManaCost.ToString(),-ManaCost);
-
 		ApplyGameplayEffectSpecToOwner(	Handle,	ActorInfo,	ActivationInfo,	ManaCostSpec);
 
 		const float ManaAfterApply =ASC->GetNumericAttribute(UAOAttributeSet::GetManaAttribute());
-		
-		UE_LOG(LogTemp,	Warning,TEXT("[Mana] Apply End | Before=%.1f | After=%.1f | Expected=%.1f"),CurrentMana,ManaAfterApply,	CurrentMana - ManaCost);
 	}
 
 	const float SafePlayRate = FMath::Max(MontagePlayRate, 0.01f);
@@ -134,8 +117,6 @@ void UGA_Attack::ActivateAbility(
 		if (EffectCDO && EffectCDO->GetGrantedTags().HasTagExact(AttackingTag))
 		{
 			SpecHandle.Data->SetSetByCallerMagnitude(AttackSlowDurationTag, AttackDuration);
-
-			UE_LOG(LogTemp,Log,TEXT("[AttackSlow] Duration=%.2f / GE=%s"),AttackDuration,*GameplayEffect->GetName());
 		}
 
 		ApplyGameplayEffectSpecToOwner(Handle,ActorInfo,ActivationInfo,SpecHandle);

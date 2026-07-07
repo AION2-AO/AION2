@@ -145,8 +145,17 @@ void AAOMonsterBase::InitGAS()
 			).AddUObject(this, &AAOMonsterBase::OnHealthChanged);
 	}
 
-	bIsDead = false;
+	//H.Y
+	if (!GroggyChangedDelegateHandle.IsValid())
+	{
+		GroggyChangedDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetGroggyAttribute()).AddUObject(this, &AAOMonsterBase::OnGroggyChanged);
+	}
+	//
 
+	bIsDead = false;
+	//H.Y
+	bIsGroggy = false;
+	//
 
 }
 
@@ -161,6 +170,15 @@ void AAOMonsterBase::ClearGAS()
 		HealthChangedDelegateHandle.Reset();
 	}
 
+	// H.Y
+	if (ASC && GroggyChangedDelegateHandle.IsValid())
+	{
+		ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetGroggyAttribute()).Remove(GroggyChangedDelegateHandle);
+
+		GroggyChangedDelegateHandle.Reset();
+	}
+	//
+
 	Super::ClearGAS();
 }
 
@@ -170,6 +188,10 @@ void AAOMonsterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 
 	DOREPLIFETIME(AAOMonsterBase, Phase);
 	DOREPLIFETIME(AAOMonsterBase, State);
+
+	// H.Y
+	DOREPLIFETIME(AAOMonsterBase, bIsGroggy);
+	//
 }
 
 
@@ -206,6 +228,14 @@ void AAOMonsterBase::HandleBossDeath()
 	}
 
 	bIsDead = true;
+
+	// 수연: 아직 시체만 남은 채로 Head-up Display를 Destroy. | 26.07.05
+	if (OverheadStatusWidgetComponent)
+	{
+		OverheadStatusWidgetComponent->DestroyComponent();
+		OverheadStatusWidgetComponent = nullptr;
+	}
+
 
 }
 
@@ -301,12 +331,88 @@ void AAOMonsterBase::SetTargetWidgetVisible(bool bVisible)
 		if (UAOMonsterHUDWidget_Targetable* StatusWidget =
 			Cast<UAOMonsterHUDWidget_Targetable>(OverheadStatusWidgetComponent->GetUserWidgetObject()))
 		{
-			StatusWidget->SetHiddenUIVisibliblity(bVisible);
+			StatusWidget->SetMonsterHUDVisibility(bVisible);
 		}
 	}
 }
 
 // 호영 작성 
+void AAOMonsterBase::OnGroggyChanged(const FOnAttributeChangeData& Data)
+{
+	UE_LOG(LogTemp, Warning, TEXT("Monster Groggy %s : %.1f -> %.1f"), *GetName(), Data.OldValue, Data.NewValue);
+
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	if (Data.NewValue <= 0.0f && !bIsGroggy && !bIsDead)
+	{
+		StartGroggy();
+	}
+}
+
+void AAOMonsterBase::StartGroggy()
+{
+	if (!HasAuthority() || bIsGroggy || bIsDead)
+	{
+		return;
+	}
+
+	bIsGroggy = true;
+
+	UE_LOG(LogTemp, Warning, TEXT("%s groggy start"), *GetName());
+
+	if (ASC)
+	{
+		const FGameplayTag GroggyTag = FGameplayTag::RequestGameplayTag(FName("State.Groggy"));
+
+		ASC->AddLooseGameplayTag(GroggyTag);
+		ASC->CancelAbilities();
+	}
+
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		AIController->StopMovement();
+
+		if (UBrainComponent* Brain = AIController->GetBrainComponent())
+		{
+			Brain->StopLogic(TEXT("Monster Groggy"));
+		}
+	}
+	GetCharacterMovement()->StopMovementImmediately();
+}
+
+void AAOMonsterBase::EndGroggy()
+{
+	if (!HasAuthority() || !bIsGroggy || bIsDead)
+	{
+		return;
+	}
+
+	bIsGroggy = false;
+
+	if (AttributeSet)
+	{
+		AttributeSet->SetGroggy(AttributeSet->GetMaxGroggy());
+	}
+
+	if (ASC)
+	{
+		const FGameplayTag GroggyTag = FGameplayTag::RequestGameplayTag(FName("State.Groggy"));
+
+		ASC->RemoveLooseGameplayTag(GroggyTag);
+	}
+
+	if (AAIController* AIController = Cast<AAIController>(GetController()))
+	{
+		if (UBrainComponent* Brain = AIController->GetBrainComponent())
+		{
+			Brain->RestartLogic();
+		}
+	}
+}
+
 void AAOMonsterBase::SetDungeonBossActive(bool bActive)
 {
 	// 외형 표시 여부

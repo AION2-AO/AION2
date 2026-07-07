@@ -4,10 +4,13 @@
 #include "GameplayCueNotify_Static.h"
 #include "GC_GhostTrail.generated.h"
 
-UCLASS()
+UCLASS(Blueprintable)
 class AION2_API UGC_GhostTrail : public UGameplayCueNotify_Static
 {
     GENERATED_BODY()
+
+public:
+    UGC_GhostTrail();
 
 public:
     virtual bool OnExecute_Implementation(AActor* MyTarget, const FGameplayCueParameters& Parameters) const override;

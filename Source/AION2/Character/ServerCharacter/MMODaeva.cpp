@@ -14,6 +14,8 @@ void AMMODaeva::BeginPlay()
 	Super::BeginPlay();
 	LastLoc = GetActorLocation();
 	LastRot = GetActorRotation();
+	TargetLoc = LastLoc;
+	TargetRot = LastRot;
 	bWasMovingLastSend = false;
 }
 
@@ -154,6 +156,11 @@ void AMMODaeva::SendDungeonWait()
 	SEND_PACKET(EnterWaitPacket, PKT_C_DUNGEONWAITINTROOM);
 }
 
+void AMMODaeva::SetHp(int32 Hp)
+{
+
+}
+
 void AMMODaeva::ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel)
 {
 	TargetLoc = NewLoc;
@@ -179,7 +186,10 @@ void AMMODaeva::SetupPlayerInputComponent(UInputComponent* PlayerInputComponent)
 			ETriggerEvent::Completed,
 			this,
 			&AMMODaeva::InputMoveReleased
-		);
+		);	
+		
+		EnhancedInputComponent->BindAction(KeyXAction, ETriggerEvent::Triggered, this, &AMMODaeva::SendItem, 0);
+		EnhancedInputComponent->BindAction(KeyBAction, ETriggerEvent::Triggered, this, &AMMODaeva::SendItem, 1);
 
 	}
 }

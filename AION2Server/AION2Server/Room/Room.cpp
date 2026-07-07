@@ -99,6 +99,11 @@ bool Room::HandleEnterPlayer(PlayerRef player)
 bool Room::HandleLeavePlayer(PlayerRef player)
 {
 	LeaveRoom(player);
+
+	Protocol::S_DisconnectPacket disconnectPkt;
+	disconnectPkt.set_playerid(player->GetId());
+	SendBufferRef disconnectBuffer = PacketHandler::MakeSendBuffer(disconnectPkt);
+	Broadcast(disconnectBuffer, player->GetId());
 	return true;
 }
 
@@ -107,8 +112,6 @@ void Room::HandleMove(Protocol::C_MovePacket pkt, PlayerRef player)
 	const uint64 playerId = pkt.playerid();
 	const Protocol::Vector3& targetPos = pkt.playerlocation();
 	const Protocol::Rotator3& targetRot = pkt.playerrotation();
-
-	Protocol::Vector3 startPos = player->GetPos();
 
 	player->SetPos(targetPos);
 	player->SetRot(targetRot);
