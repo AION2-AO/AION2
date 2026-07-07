@@ -61,6 +61,7 @@
 #define PHASE_MONSTER_OUTOFCOMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.OutofCombat"))
 #define PHASE_MONSTER_PRECOMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.PreCombat"))
 #define PHASE_MONSTER_COMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Combat"))
+#define PHASE_MONSTER_GROGGY FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Groggy"))
 #define PHASE_MONSTER_DEAD FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Dead"))
 
 
@@ -102,4 +103,6 @@
 #define GIMMICK_MONSTER_TH_HP70_PENDING FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP70.Pending"))
 
 
+#define GIMMICK_MONSTER_TH_HP35_DONE FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP35.Done"))
+#define GIMMICK_MONSTER_TH_HP35_PENDING FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP35.Pending"))
 

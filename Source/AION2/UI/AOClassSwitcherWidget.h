@@ -20,7 +20,7 @@ public:
 	void SetClassWidget(uint8 ClassType);
 	void SetReadyState(bool InReadyState);
 
-	// LeaderÀÎ ClassSwitcher¿¡ º¸ÀÌ´Â ¾ÆÀÌÄÜÀ» º¸ÀÌµµ·Ï ¼³Á¤
+	// Leaderì¸ ClassSwitcherì— ë³´ì´ëŠ” ì•„ì´ì½˜ì„ ë³´ì´ë„ë¡ ì„¤ì •
 	void SetLeaderState(bool InLeaderState);
 
 	void SetPlayerName(FText InName);
@@ -56,7 +56,7 @@ protected:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> TB_PlayerName;
 
-	// ÁØºñµÇ¸é º¸ÀÏ °Í
+	// ì¤€ë¹„ë˜ë©´ ë³´ì¼ ê²ƒ
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UImage> ReadyImage;
 

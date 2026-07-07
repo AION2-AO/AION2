@@ -21,7 +21,7 @@ void UGA_Monster_Action::ActivateAbility(
     //pMonster->OnAbilityFinishedEvent.AddDynamic(this, &UGA_Monster_Attack::AbilityEnd);
 
 
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag));
+    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag), FMath::Max(MontagePlayRate, 1.0f));
     MontageTask->OnCompleted.AddDynamic(this, &UGA_Monster_Action::OnMontageTaskFinished);
     MontageTask->OnBlendOut.AddDynamic(this, &UGA_Monster_Action::OnMontageTaskFinished);
     MontageTask->OnInterrupted.AddDynamic(this, &UGA_Monster_Action::OnMontageTaskCancelled);

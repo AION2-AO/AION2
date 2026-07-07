@@ -18,7 +18,7 @@ void UAOMainHUDWidget::BindToPlayerState(AAOPlayerState* InPlayerState)
 		PlayerHUDWidget->BindToPlayerState(InPlayerState);
 	}
 
-	// TODO(suyeon): ´øÀü HUD¿¡ °¢ ÆÄÆ¼¿ø Stat Ãß°¡
+	// TODO(suyeon): ë˜ì „ HUDì— ê° íŒŒí‹°ì› Stat ì¶”ê°€
 	if (DungeonHUDWidget)
 	{
 		DungeonHUDWidget->BindToPlayerState(InPlayerState);

@@ -55,7 +55,7 @@ void UGA_Monster_AttackWithCooldown::ActivateAbility(
 
 	AAOMonsterBase* pMonster = CastChecked<AAOMonsterBase>(ActorInfo->AvatarActor.Get());
 
-	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag));
+	UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, pMonster->GetMontageByTag(MontageTag), FMath::Max(MontagePlayRate, 1.0f));
 	MontageTask->OnCompleted.AddDynamic(this, &UGA_Monster_AttackWithCooldown::OnMontageTaskFinished);
 	MontageTask->OnBlendOut.AddDynamic(this, &UGA_Monster_AttackWithCooldown::OnMontageTaskFinished);
 	MontageTask->OnInterrupted.AddDynamic(this, &UGA_Monster_AttackWithCooldown::OnMontageTaskCancelled);

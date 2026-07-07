@@ -9,7 +9,6 @@
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "IPAddress.h"
-#include "HttpModule.h"
 
 void UAOGameInstance::Init()
 {

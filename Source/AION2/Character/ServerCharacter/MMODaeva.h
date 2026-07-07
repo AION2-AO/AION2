@@ -23,6 +23,7 @@ public:
 
 	void SendMovePacket();
 	void ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel);
+	void ToggleMailWidget();
 
 	bool HasMovement();
 	bool IsCurrentMoving();
@@ -31,6 +32,10 @@ public:
 	void SetDungeonId(int32 NewDungeonId) { DungeonId = NewDungeonId; }
 
 	void SetHp(int32 Hp);
+
+	void PlayMontageWithSection(EMontageID MontageID, float PlayRate, FName SectionName);
+
+	virtual void Landed(const FHitResult& Hit) override;
 
 	bool bHasMoveInput = false;
 private:
@@ -53,9 +58,28 @@ private:
 protected:
 	UPROPERTY(EditAnywhere, Category = "Input", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UInputAction> ChatActivateAction;
+	UPROPERTY(EditDefaultsOnly, Category = "Input", meta = (AllowPrivateAccess = "true"))
+	TObjectPtr<UInputAction> MailAction;
 
 private:
 	void OnChatActivateTriggered();
+	void OnMailActivateTriggerd();
+
+protected:
+	bool CanDash() const;
+	void PlayDash();
+
+	UFUNCTION()
+	void OnDashMontageEnded(UAnimMontage* Montage, bool bInterrupted);
+
+	UPROPERTY(EditDefaultsOnly, Category = "Combat|Dash")
+	float DashCooldown = 1.5f;
+
+	float LastDashTime = -10.0f;
+
+private:
+	void MMOInputSpacePressed();
+	void MMOInputShiftPressed();
 
 private:
 	int32 DungeonId;

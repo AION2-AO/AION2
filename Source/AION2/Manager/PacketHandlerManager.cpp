@@ -1,14 +1,19 @@
 // AOPacketHandler.cpp
 #include "Manager/PacketHandlerManager.h"
+#include "AONetworkManager.h"
 #include "PacketHandler.h"
+
 #include "Manager/AOPlayerManager.h"
+#include "Game/AODungeonGameMode.h"
 #include "Game/AOGameInstance.h"
+
+#include "Manager/AOUIManager.h"
 #include "UI/AOLoginUserWidget.h"
 #include "UI/AODungeonEntranceWidget.h"
+#include "UI/Mail/MailListRowWidget.h"
+#include "UI/Mail/MainMailWidget.h"
+#include "UI/Mail/MailData.h"
 #include "Player/AOPlayerController.h"
-#include "Manager/AOUIManager.h"
-#include "AONetworkManager.h"
-#include "Game/AODungeonGameMode.h"
 
 PacketHandlerFunc GAOPacketHandler[UINT16_MAX];
 
@@ -49,6 +54,10 @@ void InitPacketHandler()
 
 	GAOPacketHandler[PKT_S_DUNGEONFAIL] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DungeonFailPacket>(&FPacketHandler::Handle_S_DUNGEONFAIL, Mng, Buf, Len); };
 
+	GAOPacketHandler[PKT_S_MAILLIST] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_MailListPacket>(&FPacketHandler::Handle_S_MAILLIST, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_MAILCONTENT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_MailContentPacket>(&FPacketHandler::Handle_S_MAILCONTENT, Mng, Buf, Len); };
+
+
 	GAOPacketHandler[PKT_S_DISCONNECT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DisconnectPacket>(&FPacketHandler::Handle_S_DISCONNECT, Mng, Buf, Len); };
 
 
@@ -79,6 +88,17 @@ UAOLoginUserWidget* FPacketHandler::GetLoginWidget() const
 	return nullptr;
 }
 
+UAOUIManager* FPacketHandler::GetUIManager() const
+{
+	if (GameInstance)
+	{
+		UAOUIManager* UIManager = GameInstance->GetSubsystem<UAOUIManager>();
+		if (UIManager)
+			return UIManager;
+	}
+	return nullptr;
+}
+#pragma region Member Info
 bool FPacketHandler::Handle_S_SIGNUP(Protocol::S_SignUpResultPacket& Pkt)
 {
 	if (UAOLoginUserWidget* RegisterWidget = GameInstance->RegisterWidget)
@@ -206,6 +226,7 @@ bool FPacketHandler::Handle_S_CREATE(Protocol::S_DungeonCreatePacket& Pkt)
 
 	return true;
 }
+# pragma endregion
 
 bool FPacketHandler::Handle_S_DEDICREATE(Protocol::S_DungeonCreatePacket& Pkt)
 {
@@ -215,6 +236,7 @@ bool FPacketHandler::Handle_S_DEDICREATE(Protocol::S_DungeonCreatePacket& Pkt)
 	return false;
 }
 
+#pragma region Dungeon State
 bool FPacketHandler::Handle_S_ENTERWAITING(Protocol::S_DungeonWaitingRoomEnterPacket& Pkt)
 {
 	if (PlayerMng)
@@ -238,6 +260,7 @@ bool FPacketHandler::Handle_S_ENTERWAITING(Protocol::S_DungeonWaitingRoomEnterPa
 
 	return true;
 }
+
 
 bool FPacketHandler::Handle_S_ENTER(Protocol::S_DungeonEnterPacket& Pkt)
 {
@@ -323,6 +346,7 @@ bool FPacketHandler::Handle_S_DUNGEONFAIL(Protocol::S_DungeonFailPacket& Pkt)
 	}
 	return true;
 }
+#pragma endregion
 
 bool FPacketHandler::Handle_S_CHAT(Protocol::S_ChatPacket& Pkt)
 {
@@ -332,6 +356,76 @@ bool FPacketHandler::Handle_S_CHAT(Protocol::S_ChatPacket& Pkt)
 	PlayerMng->HandleChatting(SenderName, ChatMsg);
 	return true;
 }
+
+bool FPacketHandler::Handle_S_MAILLIST(Protocol::S_MailListPacket& Pkt)
+{
+	TArray<FMailData> MailList;
+	for (int i = 0; i < Pkt.maillists_size(); ++i)
+	{
+		const Protocol::MailListInfo& mailInfo = Pkt.maillists(i);
+		
+		FMailData MailData;
+		MailData.MailUID = mailInfo.mailid();
+		MailData.Title = UTF8_TO_TCHAR(mailInfo.title().c_str());
+		MailData.SenderName = UTF8_TO_TCHAR(mailInfo.sendername().c_str());
+		MailData.ExpiredDate = UTF8_TO_TCHAR(mailInfo.expireddate().c_str());
+		MailData.bIsReceived = mailInfo.hasitem();
+		MailData.bIsRead = false;
+		
+		MailList.Add(MailData);
+	}
+	
+	UAOUIManager* UIManager = GetUIManager();
+	if (UIManager && GameInstance)
+	{
+		AAOPlayerController* PC = Cast<AAOPlayerController>(GameInstance->GetWorld()->GetFirstPlayerController());
+		if (PC)
+		{
+			UUserWidget* OpenedWidget = UIManager->ShowWidget(PC->MainMailWidgetClass, EUILayer::Default);
+			UMainMailWidget* MainMailWidget = Cast<UMainMailWidget>(OpenedWidget);
+			if (MainMailWidget)
+			{
+				FInputModeGameAndUI InputMode;
+				InputMode.SetWidgetToFocus(MainMailWidget->TakeWidget());
+				InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+				PC->SetInputMode(InputMode);
+				PC->bShowMouseCursor = true;
+
+				MainMailWidget->UpdateMailList(MailList);
+			}
+		}
+	}
+
+	return true;
+}
+
+bool FPacketHandler::Handle_S_MAILCONTENT(Protocol::S_MailContentPacket& Pkt)
+{
+	FMailData DetailData;
+	DetailData.MailUID = Pkt.mailid();
+	DetailData.SenderName = UTF8_TO_TCHAR(Pkt.sendername().c_str());
+	DetailData.Title = UTF8_TO_TCHAR(Pkt.title().c_str());
+	DetailData.Content = UTF8_TO_TCHAR(Pkt.content().c_str());
+	DetailData.ExpiredDate = UTF8_TO_TCHAR(Pkt.expireddate().c_str());
+	DetailData.Gold = Pkt.gold();
+	DetailData.ItemId = Pkt.itemid();
+	DetailData.ItemCount = Pkt.itemcount();
+	DetailData.bIsReceived = Pkt.isreceived();
+	DetailData.bIsRead = Pkt.isread();
+
+	UAOUIManager* UIManager = GetUIManager();
+	if (UIManager)
+	{
+		UMainMailWidget* MainMailWidget = UIManager->GetWidget<UMainMailWidget>();
+		if (MainMailWidget)
+		{
+			MainMailWidget->UpdateMailContent(DetailData);
+		}
+	}
+
+	return true;
+}
+
 
 bool FPacketHandler::Handle_S_STORE(Protocol::S_StorePurchasePacket& Pkt)
 {

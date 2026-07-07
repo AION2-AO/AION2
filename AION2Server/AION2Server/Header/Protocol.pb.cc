@@ -520,8 +520,103 @@ struct S_SetDungeonPlayerPacketDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_SetDungeonPlayerPacketDefaultTypeInternal _S_SetDungeonPlayerPacket_default_instance_;
+PROTOBUF_CONSTEXPR C_SendMailPacket::C_SendMailPacket(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.sendername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.receivername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.title_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.content_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.senderid_)*/uint64_t{0u}
+  , /*decltype(_impl_.gold_)*/0
+  , /*decltype(_impl_.itemid_)*/0
+  , /*decltype(_impl_.itemcount_)*/0
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct C_SendMailPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR C_SendMailPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~C_SendMailPacketDefaultTypeInternal() {}
+  union {
+    C_SendMailPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 C_SendMailPacketDefaultTypeInternal _C_SendMailPacket_default_instance_;
+PROTOBUF_CONSTEXPR S_NotifyMailPacket::S_NotifyMailPacket(
+    ::_pbi::ConstantInitialized) {}
+struct S_NotifyMailPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR S_NotifyMailPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~S_NotifyMailPacketDefaultTypeInternal() {}
+  union {
+    S_NotifyMailPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_NotifyMailPacketDefaultTypeInternal _S_NotifyMailPacket_default_instance_;
+PROTOBUF_CONSTEXPR C_MailListPacket::C_MailListPacket(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.playerid_)*/uint64_t{0u}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct C_MailListPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR C_MailListPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~C_MailListPacketDefaultTypeInternal() {}
+  union {
+    C_MailListPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 C_MailListPacketDefaultTypeInternal _C_MailListPacket_default_instance_;
+PROTOBUF_CONSTEXPR S_MailListPacket::S_MailListPacket(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.maillists_)*/{}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct S_MailListPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR S_MailListPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~S_MailListPacketDefaultTypeInternal() {}
+  union {
+    S_MailListPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_MailListPacketDefaultTypeInternal _S_MailListPacket_default_instance_;
+PROTOBUF_CONSTEXPR C_MailContentPacket::C_MailContentPacket(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.mailid_)*/uint64_t{0u}
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct C_MailContentPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR C_MailContentPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~C_MailContentPacketDefaultTypeInternal() {}
+  union {
+    C_MailContentPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 C_MailContentPacketDefaultTypeInternal _C_MailContentPacket_default_instance_;
+PROTOBUF_CONSTEXPR S_MailContentPacket::S_MailContentPacket(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.sendername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.receivername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.title_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.content_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.senddate_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.expireddate_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.mailid_)*/uint64_t{0u}
+  , /*decltype(_impl_.senderid_)*/uint64_t{0u}
+  , /*decltype(_impl_.gold_)*/0
+  , /*decltype(_impl_.itemid_)*/0
+  , /*decltype(_impl_.itemcount_)*/0
+  , /*decltype(_impl_.isreceived_)*/false
+  , /*decltype(_impl_.isread_)*/false
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct S_MailContentPacketDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR S_MailContentPacketDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~S_MailContentPacketDefaultTypeInternal() {}
+  union {
+    S_MailContentPacket _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 S_MailContentPacketDefaultTypeInternal _S_MailContentPacket_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_Protocol_2eproto[36];
+static ::_pb::Metadata file_level_metadata_Protocol_2eproto[42];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_Protocol_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Protocol_2eproto = nullptr;
 
@@ -808,6 +903,66 @@ const uint32_t TableStruct_Protocol_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE
   ~0u,  // no _weak_field_map_
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::S_SetDungeonPlayerPacket, _impl_.playerinfo_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.senderid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.sendername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.receivername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.title_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.content_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.gold_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.itemid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_SendMailPacket, _impl_.itemcount_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_NotifyMailPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_MailListPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_MailListPacket, _impl_.playerid_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailListPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailListPacket, _impl_.maillists_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_MailContentPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::C_MailContentPacket, _impl_.mailid_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.mailid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.senderid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.sendername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.receivername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.title_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.content_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.gold_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.itemid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.itemcount_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.isreceived_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.isread_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.senddate_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::S_MailContentPacket, _impl_.expireddate_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::C_SignUpPacket)},
@@ -846,6 +1001,12 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 257, -1, -1, sizeof(::Protocol::S_UseItemPacket)},
   { 268, -1, -1, sizeof(::Protocol::C_DungeonMapLoadCompletePacket)},
   { 275, -1, -1, sizeof(::Protocol::S_SetDungeonPlayerPacket)},
+  { 282, -1, -1, sizeof(::Protocol::C_SendMailPacket)},
+  { 296, -1, -1, sizeof(::Protocol::S_NotifyMailPacket)},
+  { 302, -1, -1, sizeof(::Protocol::C_MailListPacket)},
+  { 309, -1, -1, sizeof(::Protocol::S_MailListPacket)},
+  { 316, -1, -1, sizeof(::Protocol::C_MailContentPacket)},
+  { 323, -1, -1, sizeof(::Protocol::S_MailContentPacket)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -885,6 +1046,12 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::Protocol::_S_UseItemPacket_default_instance_._instance,
   &::Protocol::_C_DungeonMapLoadCompletePacket_default_instance_._instance,
   &::Protocol::_S_SetDungeonPlayerPacket_default_instance_._instance,
+  &::Protocol::_C_SendMailPacket_default_instance_._instance,
+  &::Protocol::_S_NotifyMailPacket_default_instance_._instance,
+  &::Protocol::_C_MailListPacket_default_instance_._instance,
+  &::Protocol::_S_MailListPacket_default_instance_._instance,
+  &::Protocol::_C_MailContentPacket_default_instance_._instance,
+  &::Protocol::_S_MailContentPacket_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -951,7 +1118,22 @@ const char descriptor_table_protodef_Protocol_2eproto[] PROTOBUF_SECTION_VARIABL
   "tValue\030\005 \001(\005\"3\n\036C_DungeonMapLoadComplete"
   "Packet\022\021\n\tdungeonId\030\001 \001(\005\"E\n\030S_SetDungeo"
   "nPlayerPacket\022)\n\nplayerInfo\030\001 \003(\0132\025.Prot"
-  "ocol.DPlayerInfob\006proto3"
+  "ocol.DPlayerInfo\"\237\001\n\020C_SendMailPacket\022\020\n"
+  "\010senderId\030\001 \001(\004\022\022\n\nsenderName\030\002 \001(\t\022\024\n\014r"
+  "eceiverName\030\003 \001(\t\022\r\n\005title\030\004 \001(\t\022\017\n\007cont"
+  "ent\030\005 \001(\t\022\014\n\004gold\030\006 \001(\005\022\016\n\006itemId\030\007 \001(\005\022"
+  "\021\n\titemCount\030\010 \001(\005\"\024\n\022S_NotifyMailPacket"
+  "\"$\n\020C_MailListPacket\022\020\n\010playerId\030\001 \001(\004\"="
+  "\n\020S_MailListPacket\022)\n\tMailLists\030\001 \003(\0132\026."
+  "Protocol.MailListInfo\"%\n\023C_MailContentPa"
+  "cket\022\016\n\006MailId\030\001 \001(\004\"\375\001\n\023S_MailContentPa"
+  "cket\022\016\n\006MailId\030\001 \001(\004\022\020\n\010senderId\030\002 \001(\004\022\022"
+  "\n\nsenderName\030\003 \001(\t\022\024\n\014receiverName\030\004 \001(\t"
+  "\022\r\n\005title\030\005 \001(\t\022\017\n\007content\030\006 \001(\t\022\014\n\004gold"
+  "\030\007 \001(\005\022\016\n\006itemId\030\010 \001(\005\022\021\n\titemCount\030\t \001("
+  "\005\022\022\n\nIsReceived\030\n \001(\010\022\016\n\006isRead\030\013 \001(\010\022\020\n"
+  "\010sendDate\030\014 \001(\t\022\023\n\013ExpiredDate\030\r \001(\tb\006pr"
+  "oto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_deps[2] = {
   &::descriptor_table_Enum_2eproto,
@@ -959,9 +1141,9 @@ static const ::_pbi::DescriptorTable* const descriptor_table_Protocol_2eproto_de
 };
 static ::_pbi::once_flag descriptor_table_Protocol_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Protocol_2eproto = {
-    false, false, 2544, descriptor_table_protodef_Protocol_2eproto,
+    false, false, 3124, descriptor_table_protodef_Protocol_2eproto,
     "Protocol.proto",
-    &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 36,
+    &descriptor_table_Protocol_2eproto_once, descriptor_table_Protocol_2eproto_deps, 2, 42,
     schemas, file_default_instances, TableStruct_Protocol_2eproto::offsets,
     file_level_metadata_Protocol_2eproto, file_level_enum_descriptors_Protocol_2eproto,
     file_level_service_descriptors_Protocol_2eproto,
@@ -8385,6 +8567,1684 @@ void S_SetDungeonPlayerPacket::InternalSwap(S_SetDungeonPlayerPacket* other) {
       file_level_metadata_Protocol_2eproto[35]);
 }
 
+// ===================================================================
+
+class C_SendMailPacket::_Internal {
+ public:
+};
+
+C_SendMailPacket::C_SendMailPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.C_SendMailPacket)
+}
+C_SendMailPacket::C_SendMailPacket(const C_SendMailPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  C_SendMailPacket* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.sendername_){}
+    , decltype(_impl_.receivername_){}
+    , decltype(_impl_.title_){}
+    , decltype(_impl_.content_){}
+    , decltype(_impl_.senderid_){}
+    , decltype(_impl_.gold_){}
+    , decltype(_impl_.itemid_){}
+    , decltype(_impl_.itemcount_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_sendername().empty()) {
+    _this->_impl_.sendername_.Set(from._internal_sendername(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.receivername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_receivername().empty()) {
+    _this->_impl_.receivername_.Set(from._internal_receivername(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_title().empty()) {
+    _this->_impl_.title_.Set(from._internal_title(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.content_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.content_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_content().empty()) {
+    _this->_impl_.content_.Set(from._internal_content(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.senderid_, &from._impl_.senderid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.itemcount_) -
+    reinterpret_cast<char*>(&_impl_.senderid_)) + sizeof(_impl_.itemcount_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.C_SendMailPacket)
+}
+
+inline void C_SendMailPacket::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.sendername_){}
+    , decltype(_impl_.receivername_){}
+    , decltype(_impl_.title_){}
+    , decltype(_impl_.content_){}
+    , decltype(_impl_.senderid_){uint64_t{0u}}
+    , decltype(_impl_.gold_){0}
+    , decltype(_impl_.itemid_){0}
+    , decltype(_impl_.itemcount_){0}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.receivername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.content_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.content_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+C_SendMailPacket::~C_SendMailPacket() {
+  // @@protoc_insertion_point(destructor:Protocol.C_SendMailPacket)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void C_SendMailPacket::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.sendername_.Destroy();
+  _impl_.receivername_.Destroy();
+  _impl_.title_.Destroy();
+  _impl_.content_.Destroy();
+}
+
+void C_SendMailPacket::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void C_SendMailPacket::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.C_SendMailPacket)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.sendername_.ClearToEmpty();
+  _impl_.receivername_.ClearToEmpty();
+  _impl_.title_.ClearToEmpty();
+  _impl_.content_.ClearToEmpty();
+  ::memset(&_impl_.senderid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.itemcount_) -
+      reinterpret_cast<char*>(&_impl_.senderid_)) + sizeof(_impl_.itemcount_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* C_SendMailPacket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 senderId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.senderid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string senderName = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_sendername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.C_SendMailPacket.senderName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string receiverName = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_receivername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.C_SendMailPacket.receiverName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string title = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_title();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.C_SendMailPacket.title"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string content = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          auto str = _internal_mutable_content();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.C_SendMailPacket.content"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 gold = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 48)) {
+          _impl_.gold_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 itemId = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
+          _impl_.itemid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 itemCount = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
+          _impl_.itemcount_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* C_SendMailPacket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.C_SendMailPacket)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 senderId = 1;
+  if (this->_internal_senderid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_senderid(), target);
+  }
+
+  // string senderName = 2;
+  if (!this->_internal_sendername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_sendername().data(), static_cast<int>(this->_internal_sendername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.C_SendMailPacket.senderName");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_sendername(), target);
+  }
+
+  // string receiverName = 3;
+  if (!this->_internal_receivername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_receivername().data(), static_cast<int>(this->_internal_receivername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.C_SendMailPacket.receiverName");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_receivername(), target);
+  }
+
+  // string title = 4;
+  if (!this->_internal_title().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_title().data(), static_cast<int>(this->_internal_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.C_SendMailPacket.title");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_title(), target);
+  }
+
+  // string content = 5;
+  if (!this->_internal_content().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_content().data(), static_cast<int>(this->_internal_content().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.C_SendMailPacket.content");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_content(), target);
+  }
+
+  // int32 gold = 6;
+  if (this->_internal_gold() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(6, this->_internal_gold(), target);
+  }
+
+  // int32 itemId = 7;
+  if (this->_internal_itemid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(7, this->_internal_itemid(), target);
+  }
+
+  // int32 itemCount = 8;
+  if (this->_internal_itemcount() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(8, this->_internal_itemcount(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.C_SendMailPacket)
+  return target;
+}
+
+size_t C_SendMailPacket::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.C_SendMailPacket)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string senderName = 2;
+  if (!this->_internal_sendername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_sendername());
+  }
+
+  // string receiverName = 3;
+  if (!this->_internal_receivername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_receivername());
+  }
+
+  // string title = 4;
+  if (!this->_internal_title().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_title());
+  }
+
+  // string content = 5;
+  if (!this->_internal_content().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_content());
+  }
+
+  // uint64 senderId = 1;
+  if (this->_internal_senderid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_senderid());
+  }
+
+  // int32 gold = 6;
+  if (this->_internal_gold() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_gold());
+  }
+
+  // int32 itemId = 7;
+  if (this->_internal_itemid() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_itemid());
+  }
+
+  // int32 itemCount = 8;
+  if (this->_internal_itemcount() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_itemcount());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData C_SendMailPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    C_SendMailPacket::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*C_SendMailPacket::GetClassData() const { return &_class_data_; }
+
+
+void C_SendMailPacket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<C_SendMailPacket*>(&to_msg);
+  auto& from = static_cast<const C_SendMailPacket&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.C_SendMailPacket)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_sendername().empty()) {
+    _this->_internal_set_sendername(from._internal_sendername());
+  }
+  if (!from._internal_receivername().empty()) {
+    _this->_internal_set_receivername(from._internal_receivername());
+  }
+  if (!from._internal_title().empty()) {
+    _this->_internal_set_title(from._internal_title());
+  }
+  if (!from._internal_content().empty()) {
+    _this->_internal_set_content(from._internal_content());
+  }
+  if (from._internal_senderid() != 0) {
+    _this->_internal_set_senderid(from._internal_senderid());
+  }
+  if (from._internal_gold() != 0) {
+    _this->_internal_set_gold(from._internal_gold());
+  }
+  if (from._internal_itemid() != 0) {
+    _this->_internal_set_itemid(from._internal_itemid());
+  }
+  if (from._internal_itemcount() != 0) {
+    _this->_internal_set_itemcount(from._internal_itemcount());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void C_SendMailPacket::CopyFrom(const C_SendMailPacket& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.C_SendMailPacket)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool C_SendMailPacket::IsInitialized() const {
+  return true;
+}
+
+void C_SendMailPacket::InternalSwap(C_SendMailPacket* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.sendername_, lhs_arena,
+      &other->_impl_.sendername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.receivername_, lhs_arena,
+      &other->_impl_.receivername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.title_, lhs_arena,
+      &other->_impl_.title_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.content_, lhs_arena,
+      &other->_impl_.content_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(C_SendMailPacket, _impl_.itemcount_)
+      + sizeof(C_SendMailPacket::_impl_.itemcount_)
+      - PROTOBUF_FIELD_OFFSET(C_SendMailPacket, _impl_.senderid_)>(
+          reinterpret_cast<char*>(&_impl_.senderid_),
+          reinterpret_cast<char*>(&other->_impl_.senderid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata C_SendMailPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[36]);
+}
+
+// ===================================================================
+
+class S_NotifyMailPacket::_Internal {
+ public:
+};
+
+S_NotifyMailPacket::S_NotifyMailPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase(arena, is_message_owned) {
+  // @@protoc_insertion_point(arena_constructor:Protocol.S_NotifyMailPacket)
+}
+S_NotifyMailPacket::S_NotifyMailPacket(const S_NotifyMailPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase() {
+  S_NotifyMailPacket* const _this = this; (void)_this;
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Protocol.S_NotifyMailPacket)
+}
+
+
+
+
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S_NotifyMailPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl,
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl,
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S_NotifyMailPacket::GetClassData() const { return &_class_data_; }
+
+
+
+
+
+
+
+::PROTOBUF_NAMESPACE_ID::Metadata S_NotifyMailPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[37]);
+}
+
+// ===================================================================
+
+class C_MailListPacket::_Internal {
+ public:
+};
+
+C_MailListPacket::C_MailListPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.C_MailListPacket)
+}
+C_MailListPacket::C_MailListPacket(const C_MailListPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  C_MailListPacket* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.playerid_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_impl_.playerid_ = from._impl_.playerid_;
+  // @@protoc_insertion_point(copy_constructor:Protocol.C_MailListPacket)
+}
+
+inline void C_MailListPacket::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.playerid_){uint64_t{0u}}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+C_MailListPacket::~C_MailListPacket() {
+  // @@protoc_insertion_point(destructor:Protocol.C_MailListPacket)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void C_MailListPacket::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void C_MailListPacket::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void C_MailListPacket::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.C_MailListPacket)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.playerid_ = uint64_t{0u};
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* C_MailListPacket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 playerId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.playerid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* C_MailListPacket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.C_MailListPacket)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 playerId = 1;
+  if (this->_internal_playerid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_playerid(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.C_MailListPacket)
+  return target;
+}
+
+size_t C_MailListPacket::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.C_MailListPacket)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // uint64 playerId = 1;
+  if (this->_internal_playerid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_playerid());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData C_MailListPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    C_MailListPacket::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*C_MailListPacket::GetClassData() const { return &_class_data_; }
+
+
+void C_MailListPacket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<C_MailListPacket*>(&to_msg);
+  auto& from = static_cast<const C_MailListPacket&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.C_MailListPacket)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_playerid() != 0) {
+    _this->_internal_set_playerid(from._internal_playerid());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void C_MailListPacket::CopyFrom(const C_MailListPacket& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.C_MailListPacket)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool C_MailListPacket::IsInitialized() const {
+  return true;
+}
+
+void C_MailListPacket::InternalSwap(C_MailListPacket* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.playerid_, other->_impl_.playerid_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata C_MailListPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[38]);
+}
+
+// ===================================================================
+
+class S_MailListPacket::_Internal {
+ public:
+};
+
+void S_MailListPacket::clear_maillists() {
+  _impl_.maillists_.Clear();
+}
+S_MailListPacket::S_MailListPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.S_MailListPacket)
+}
+S_MailListPacket::S_MailListPacket(const S_MailListPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  S_MailListPacket* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.maillists_){from._impl_.maillists_}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  // @@protoc_insertion_point(copy_constructor:Protocol.S_MailListPacket)
+}
+
+inline void S_MailListPacket::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.maillists_){arena}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+S_MailListPacket::~S_MailListPacket() {
+  // @@protoc_insertion_point(destructor:Protocol.S_MailListPacket)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void S_MailListPacket::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.maillists_.~RepeatedPtrField();
+}
+
+void S_MailListPacket::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void S_MailListPacket::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.S_MailListPacket)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.maillists_.Clear();
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* S_MailListPacket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // repeated .Protocol.MailListInfo MailLists = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 10)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_maillists(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<10>(ptr));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* S_MailListPacket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S_MailListPacket)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // repeated .Protocol.MailListInfo MailLists = 1;
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_maillists_size()); i < n; i++) {
+    const auto& repfield = this->_internal_maillists(i);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(1, repfield, repfield.GetCachedSize(), target, stream);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S_MailListPacket)
+  return target;
+}
+
+size_t S_MailListPacket::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.S_MailListPacket)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // repeated .Protocol.MailListInfo MailLists = 1;
+  total_size += 1UL * this->_internal_maillists_size();
+  for (const auto& msg : this->_impl_.maillists_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S_MailListPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    S_MailListPacket::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S_MailListPacket::GetClassData() const { return &_class_data_; }
+
+
+void S_MailListPacket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<S_MailListPacket*>(&to_msg);
+  auto& from = static_cast<const S_MailListPacket&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S_MailListPacket)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  _this->_impl_.maillists_.MergeFrom(from._impl_.maillists_);
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void S_MailListPacket::CopyFrom(const S_MailListPacket& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S_MailListPacket)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool S_MailListPacket::IsInitialized() const {
+  return true;
+}
+
+void S_MailListPacket::InternalSwap(S_MailListPacket* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.maillists_.InternalSwap(&other->_impl_.maillists_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata S_MailListPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[39]);
+}
+
+// ===================================================================
+
+class C_MailContentPacket::_Internal {
+ public:
+};
+
+C_MailContentPacket::C_MailContentPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.C_MailContentPacket)
+}
+C_MailContentPacket::C_MailContentPacket(const C_MailContentPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  C_MailContentPacket* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.mailid_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _this->_impl_.mailid_ = from._impl_.mailid_;
+  // @@protoc_insertion_point(copy_constructor:Protocol.C_MailContentPacket)
+}
+
+inline void C_MailContentPacket::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.mailid_){uint64_t{0u}}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+}
+
+C_MailContentPacket::~C_MailContentPacket() {
+  // @@protoc_insertion_point(destructor:Protocol.C_MailContentPacket)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void C_MailContentPacket::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+}
+
+void C_MailContentPacket::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void C_MailContentPacket::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.C_MailContentPacket)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.mailid_ = uint64_t{0u};
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* C_MailContentPacket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 MailId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.mailid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* C_MailContentPacket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.C_MailContentPacket)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 MailId = 1;
+  if (this->_internal_mailid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_mailid(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.C_MailContentPacket)
+  return target;
+}
+
+size_t C_MailContentPacket::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.C_MailContentPacket)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // uint64 MailId = 1;
+  if (this->_internal_mailid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_mailid());
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData C_MailContentPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    C_MailContentPacket::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*C_MailContentPacket::GetClassData() const { return &_class_data_; }
+
+
+void C_MailContentPacket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<C_MailContentPacket*>(&to_msg);
+  auto& from = static_cast<const C_MailContentPacket&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.C_MailContentPacket)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (from._internal_mailid() != 0) {
+    _this->_internal_set_mailid(from._internal_mailid());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void C_MailContentPacket::CopyFrom(const C_MailContentPacket& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.C_MailContentPacket)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool C_MailContentPacket::IsInitialized() const {
+  return true;
+}
+
+void C_MailContentPacket::InternalSwap(C_MailContentPacket* other) {
+  using std::swap;
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  swap(_impl_.mailid_, other->_impl_.mailid_);
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata C_MailContentPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[40]);
+}
+
+// ===================================================================
+
+class S_MailContentPacket::_Internal {
+ public:
+};
+
+S_MailContentPacket::S_MailContentPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.S_MailContentPacket)
+}
+S_MailContentPacket::S_MailContentPacket(const S_MailContentPacket& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  S_MailContentPacket* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.sendername_){}
+    , decltype(_impl_.receivername_){}
+    , decltype(_impl_.title_){}
+    , decltype(_impl_.content_){}
+    , decltype(_impl_.senddate_){}
+    , decltype(_impl_.expireddate_){}
+    , decltype(_impl_.mailid_){}
+    , decltype(_impl_.senderid_){}
+    , decltype(_impl_.gold_){}
+    , decltype(_impl_.itemid_){}
+    , decltype(_impl_.itemcount_){}
+    , decltype(_impl_.isreceived_){}
+    , decltype(_impl_.isread_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_sendername().empty()) {
+    _this->_impl_.sendername_.Set(from._internal_sendername(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.receivername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_receivername().empty()) {
+    _this->_impl_.receivername_.Set(from._internal_receivername(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_title().empty()) {
+    _this->_impl_.title_.Set(from._internal_title(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.content_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.content_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_content().empty()) {
+    _this->_impl_.content_.Set(from._internal_content(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.senddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.senddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_senddate().empty()) {
+    _this->_impl_.senddate_.Set(from._internal_senddate(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.expireddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.expireddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_expireddate().empty()) {
+    _this->_impl_.expireddate_.Set(from._internal_expireddate(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.mailid_, &from._impl_.mailid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.isread_) -
+    reinterpret_cast<char*>(&_impl_.mailid_)) + sizeof(_impl_.isread_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.S_MailContentPacket)
+}
+
+inline void S_MailContentPacket::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.sendername_){}
+    , decltype(_impl_.receivername_){}
+    , decltype(_impl_.title_){}
+    , decltype(_impl_.content_){}
+    , decltype(_impl_.senddate_){}
+    , decltype(_impl_.expireddate_){}
+    , decltype(_impl_.mailid_){uint64_t{0u}}
+    , decltype(_impl_.senderid_){uint64_t{0u}}
+    , decltype(_impl_.gold_){0}
+    , decltype(_impl_.itemid_){0}
+    , decltype(_impl_.itemcount_){0}
+    , decltype(_impl_.isreceived_){false}
+    , decltype(_impl_.isread_){false}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.receivername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.content_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.content_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.senddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.senddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.expireddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.expireddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+S_MailContentPacket::~S_MailContentPacket() {
+  // @@protoc_insertion_point(destructor:Protocol.S_MailContentPacket)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void S_MailContentPacket::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.sendername_.Destroy();
+  _impl_.receivername_.Destroy();
+  _impl_.title_.Destroy();
+  _impl_.content_.Destroy();
+  _impl_.senddate_.Destroy();
+  _impl_.expireddate_.Destroy();
+}
+
+void S_MailContentPacket::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void S_MailContentPacket::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.S_MailContentPacket)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.sendername_.ClearToEmpty();
+  _impl_.receivername_.ClearToEmpty();
+  _impl_.title_.ClearToEmpty();
+  _impl_.content_.ClearToEmpty();
+  _impl_.senddate_.ClearToEmpty();
+  _impl_.expireddate_.ClearToEmpty();
+  ::memset(&_impl_.mailid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.isread_) -
+      reinterpret_cast<char*>(&_impl_.mailid_)) + sizeof(_impl_.isread_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* S_MailContentPacket::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 MailId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.mailid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // uint64 senderId = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 16)) {
+          _impl_.senderid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string senderName = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_sendername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.senderName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string receiverName = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_receivername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.receiverName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string title = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 42)) {
+          auto str = _internal_mutable_title();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.title"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string content = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          auto str = _internal_mutable_content();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.content"));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 gold = 7;
+      case 7:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 56)) {
+          _impl_.gold_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 itemId = 8;
+      case 8:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 64)) {
+          _impl_.itemid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 itemCount = 9;
+      case 9:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 72)) {
+          _impl_.itemcount_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool IsReceived = 10;
+      case 10:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 80)) {
+          _impl_.isreceived_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // bool isRead = 11;
+      case 11:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 88)) {
+          _impl_.isread_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string sendDate = 12;
+      case 12:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 98)) {
+          auto str = _internal_mutable_senddate();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.sendDate"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string ExpiredDate = 13;
+      case 13:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 106)) {
+          auto str = _internal_mutable_expireddate();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.S_MailContentPacket.ExpiredDate"));
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* S_MailContentPacket::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.S_MailContentPacket)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 MailId = 1;
+  if (this->_internal_mailid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_mailid(), target);
+  }
+
+  // uint64 senderId = 2;
+  if (this->_internal_senderid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(2, this->_internal_senderid(), target);
+  }
+
+  // string senderName = 3;
+  if (!this->_internal_sendername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_sendername().data(), static_cast<int>(this->_internal_sendername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.senderName");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_sendername(), target);
+  }
+
+  // string receiverName = 4;
+  if (!this->_internal_receivername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_receivername().data(), static_cast<int>(this->_internal_receivername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.receiverName");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_receivername(), target);
+  }
+
+  // string title = 5;
+  if (!this->_internal_title().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_title().data(), static_cast<int>(this->_internal_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.title");
+    target = stream->WriteStringMaybeAliased(
+        5, this->_internal_title(), target);
+  }
+
+  // string content = 6;
+  if (!this->_internal_content().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_content().data(), static_cast<int>(this->_internal_content().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.content");
+    target = stream->WriteStringMaybeAliased(
+        6, this->_internal_content(), target);
+  }
+
+  // int32 gold = 7;
+  if (this->_internal_gold() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(7, this->_internal_gold(), target);
+  }
+
+  // int32 itemId = 8;
+  if (this->_internal_itemid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(8, this->_internal_itemid(), target);
+  }
+
+  // int32 itemCount = 9;
+  if (this->_internal_itemcount() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(9, this->_internal_itemcount(), target);
+  }
+
+  // bool IsReceived = 10;
+  if (this->_internal_isreceived() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(10, this->_internal_isreceived(), target);
+  }
+
+  // bool isRead = 11;
+  if (this->_internal_isread() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(11, this->_internal_isread(), target);
+  }
+
+  // string sendDate = 12;
+  if (!this->_internal_senddate().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_senddate().data(), static_cast<int>(this->_internal_senddate().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.sendDate");
+    target = stream->WriteStringMaybeAliased(
+        12, this->_internal_senddate(), target);
+  }
+
+  // string ExpiredDate = 13;
+  if (!this->_internal_expireddate().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_expireddate().data(), static_cast<int>(this->_internal_expireddate().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.S_MailContentPacket.ExpiredDate");
+    target = stream->WriteStringMaybeAliased(
+        13, this->_internal_expireddate(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.S_MailContentPacket)
+  return target;
+}
+
+size_t S_MailContentPacket::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.S_MailContentPacket)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string senderName = 3;
+  if (!this->_internal_sendername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_sendername());
+  }
+
+  // string receiverName = 4;
+  if (!this->_internal_receivername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_receivername());
+  }
+
+  // string title = 5;
+  if (!this->_internal_title().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_title());
+  }
+
+  // string content = 6;
+  if (!this->_internal_content().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_content());
+  }
+
+  // string sendDate = 12;
+  if (!this->_internal_senddate().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_senddate());
+  }
+
+  // string ExpiredDate = 13;
+  if (!this->_internal_expireddate().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_expireddate());
+  }
+
+  // uint64 MailId = 1;
+  if (this->_internal_mailid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_mailid());
+  }
+
+  // uint64 senderId = 2;
+  if (this->_internal_senderid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_senderid());
+  }
+
+  // int32 gold = 7;
+  if (this->_internal_gold() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_gold());
+  }
+
+  // int32 itemId = 8;
+  if (this->_internal_itemid() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_itemid());
+  }
+
+  // int32 itemCount = 9;
+  if (this->_internal_itemcount() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_itemcount());
+  }
+
+  // bool IsReceived = 10;
+  if (this->_internal_isreceived() != 0) {
+    total_size += 1 + 1;
+  }
+
+  // bool isRead = 11;
+  if (this->_internal_isread() != 0) {
+    total_size += 1 + 1;
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData S_MailContentPacket::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    S_MailContentPacket::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*S_MailContentPacket::GetClassData() const { return &_class_data_; }
+
+
+void S_MailContentPacket::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<S_MailContentPacket*>(&to_msg);
+  auto& from = static_cast<const S_MailContentPacket&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.S_MailContentPacket)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_sendername().empty()) {
+    _this->_internal_set_sendername(from._internal_sendername());
+  }
+  if (!from._internal_receivername().empty()) {
+    _this->_internal_set_receivername(from._internal_receivername());
+  }
+  if (!from._internal_title().empty()) {
+    _this->_internal_set_title(from._internal_title());
+  }
+  if (!from._internal_content().empty()) {
+    _this->_internal_set_content(from._internal_content());
+  }
+  if (!from._internal_senddate().empty()) {
+    _this->_internal_set_senddate(from._internal_senddate());
+  }
+  if (!from._internal_expireddate().empty()) {
+    _this->_internal_set_expireddate(from._internal_expireddate());
+  }
+  if (from._internal_mailid() != 0) {
+    _this->_internal_set_mailid(from._internal_mailid());
+  }
+  if (from._internal_senderid() != 0) {
+    _this->_internal_set_senderid(from._internal_senderid());
+  }
+  if (from._internal_gold() != 0) {
+    _this->_internal_set_gold(from._internal_gold());
+  }
+  if (from._internal_itemid() != 0) {
+    _this->_internal_set_itemid(from._internal_itemid());
+  }
+  if (from._internal_itemcount() != 0) {
+    _this->_internal_set_itemcount(from._internal_itemcount());
+  }
+  if (from._internal_isreceived() != 0) {
+    _this->_internal_set_isreceived(from._internal_isreceived());
+  }
+  if (from._internal_isread() != 0) {
+    _this->_internal_set_isread(from._internal_isread());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void S_MailContentPacket::CopyFrom(const S_MailContentPacket& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.S_MailContentPacket)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool S_MailContentPacket::IsInitialized() const {
+  return true;
+}
+
+void S_MailContentPacket::InternalSwap(S_MailContentPacket* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.sendername_, lhs_arena,
+      &other->_impl_.sendername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.receivername_, lhs_arena,
+      &other->_impl_.receivername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.title_, lhs_arena,
+      &other->_impl_.title_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.content_, lhs_arena,
+      &other->_impl_.content_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.senddate_, lhs_arena,
+      &other->_impl_.senddate_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.expireddate_, lhs_arena,
+      &other->_impl_.expireddate_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(S_MailContentPacket, _impl_.isread_)
+      + sizeof(S_MailContentPacket::_impl_.isread_)
+      - PROTOBUF_FIELD_OFFSET(S_MailContentPacket, _impl_.mailid_)>(
+          reinterpret_cast<char*>(&_impl_.mailid_),
+          reinterpret_cast<char*>(&other->_impl_.mailid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata S_MailContentPacket::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Protocol_2eproto_getter, &descriptor_table_Protocol_2eproto_once,
+      file_level_metadata_Protocol_2eproto[41]);
+}
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
@@ -8531,6 +10391,30 @@ Arena::CreateMaybeMessage< ::Protocol::C_DungeonMapLoadCompletePacket >(Arena* a
 template<> PROTOBUF_NOINLINE ::Protocol::S_SetDungeonPlayerPacket*
 Arena::CreateMaybeMessage< ::Protocol::S_SetDungeonPlayerPacket >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Protocol::S_SetDungeonPlayerPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::C_SendMailPacket*
+Arena::CreateMaybeMessage< ::Protocol::C_SendMailPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::C_SendMailPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::S_NotifyMailPacket*
+Arena::CreateMaybeMessage< ::Protocol::S_NotifyMailPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::S_NotifyMailPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::C_MailListPacket*
+Arena::CreateMaybeMessage< ::Protocol::C_MailListPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::C_MailListPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::S_MailListPacket*
+Arena::CreateMaybeMessage< ::Protocol::S_MailListPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::S_MailListPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::C_MailContentPacket*
+Arena::CreateMaybeMessage< ::Protocol::C_MailContentPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::C_MailContentPacket >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::S_MailContentPacket*
+Arena::CreateMaybeMessage< ::Protocol::S_MailContentPacket >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::S_MailContentPacket >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

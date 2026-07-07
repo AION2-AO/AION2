@@ -41,6 +41,10 @@ public:
 	// 캐릭터 상태 및 상호작용
 	bool Handle_S_CHAT(Protocol::S_ChatPacket& Pkt);
 
+	// 메일
+	bool Handle_S_MAILLIST(Protocol::S_MailListPacket& Pkt);
+	bool Handle_S_MAILCONTENT(Protocol::S_MailContentPacket& Pkt);
+
 	// 연결 종료
 	bool Handle_S_DISCONNECT(Protocol::S_DisconnectPacket& Pkt);
 
@@ -49,7 +53,7 @@ public:
 
 private:
 	UAOLoginUserWidget* GetLoginWidget() const;
-
+	class UAOUIManager* GetUIManager() const;
 private:
 	UAONetworkManager* NetworkMng;
 	UAOGameInstance* GameInstance;

@@ -167,8 +167,25 @@ struct DPlayerInfoDefaultTypeInternal {
   };
 };
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DPlayerInfoDefaultTypeInternal _DPlayerInfo_default_instance_;
+PROTOBUF_CONSTEXPR MailListInfo::MailListInfo(
+    ::_pbi::ConstantInitialized): _impl_{
+    /*decltype(_impl_.title_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.sendername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.expireddate_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.mailid_)*/uint64_t{0u}
+  , /*decltype(_impl_.hasitem_)*/false
+  , /*decltype(_impl_._cached_size_)*/{}} {}
+struct MailListInfoDefaultTypeInternal {
+  PROTOBUF_CONSTEXPR MailListInfoDefaultTypeInternal()
+      : _instance(::_pbi::ConstantInitialized{}) {}
+  ~MailListInfoDefaultTypeInternal() {}
+  union {
+    MailListInfo _instance;
+  };
+};
+PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 MailListInfoDefaultTypeInternal _MailListInfo_default_instance_;
 }  // namespace Protocol
-static ::_pb::Metadata file_level_metadata_Struct_2eproto[9];
+static ::_pb::Metadata file_level_metadata_Struct_2eproto[10];
 static constexpr ::_pb::EnumDescriptor const** file_level_enum_descriptors_Struct_2eproto = nullptr;
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Struct_2eproto = nullptr;
 
@@ -260,6 +277,17 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playerid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playername_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playerclass_),
+  ~0u,  // no _has_bits_
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _internal_metadata_),
+  ~0u,  // no _extensions_
+  ~0u,  // no _oneof_case_
+  ~0u,  // no _weak_field_map_
+  ~0u,  // no _inlined_string_donated_
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _impl_.mailid_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _impl_.title_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _impl_.sendername_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _impl_.expireddate_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _impl_.hasitem_),
 };
 static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) = {
   { 0, -1, -1, sizeof(::Protocol::ItemData)},
@@ -271,6 +299,7 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 58, -1, -1, sizeof(::Protocol::DungeonInfo)},
   { 68, -1, -1, sizeof(::Protocol::DediDungeonInfo)},
   { 78, -1, -1, sizeof(::Protocol::DPlayerInfo)},
+  { 87, -1, -1, sizeof(::Protocol::MailListInfo)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -283,6 +312,7 @@ static const ::_pb::Message* const file_default_instances[] = {
   &::Protocol::_DungeonInfo_default_instance_._instance,
   &::Protocol::_DediDungeonInfo_default_instance_._instance,
   &::Protocol::_DPlayerInfo_default_instance_._instance,
+  &::Protocol::_MailListInfo_default_instance_._instance,
 };
 
 const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(protodesc_cold) =
@@ -311,16 +341,18 @@ const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "s\030\004 \001(\0162\023.Protocol.ClassType\"]\n\013DPlayerI"
   "nfo\022\020\n\010playerId\030\001 \001(\004\022\022\n\nplayerName\030\002 \001("
   "\t\022(\n\013playerClass\030\003 \001(\0162\023.Protocol.ClassT"
-  "ypeb\006proto3"
+  "ype\"g\n\014MailListInfo\022\016\n\006mailId\030\001 \001(\004\022\r\n\005t"
+  "itle\030\002 \001(\t\022\022\n\nsenderName\030\003 \001(\t\022\023\n\013expire"
+  "dDate\030\004 \001(\t\022\017\n\007hasItem\030\005 \001(\010b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Struct_2eproto_deps[1] = {
   &::descriptor_table_Enum_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_Struct_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Struct_2eproto = {
-    false, false, 1011, descriptor_table_protodef_Struct_2eproto,
+    false, false, 1116, descriptor_table_protodef_Struct_2eproto,
     "Struct.proto",
-    &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 9,
+    &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 10,
     schemas, file_default_instances, TableStruct_Struct_2eproto::offsets,
     file_level_metadata_Struct_2eproto, file_level_enum_descriptors_Struct_2eproto,
     file_level_service_descriptors_Struct_2eproto,
@@ -2881,6 +2913,369 @@ void DPlayerInfo::InternalSwap(DPlayerInfo* other) {
       file_level_metadata_Struct_2eproto[8]);
 }
 
+// ===================================================================
+
+class MailListInfo::_Internal {
+ public:
+};
+
+MailListInfo::MailListInfo(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                         bool is_message_owned)
+  : ::PROTOBUF_NAMESPACE_ID::Message(arena, is_message_owned) {
+  SharedCtor(arena, is_message_owned);
+  // @@protoc_insertion_point(arena_constructor:Protocol.MailListInfo)
+}
+MailListInfo::MailListInfo(const MailListInfo& from)
+  : ::PROTOBUF_NAMESPACE_ID::Message() {
+  MailListInfo* const _this = this; (void)_this;
+  new (&_impl_) Impl_{
+      decltype(_impl_.title_){}
+    , decltype(_impl_.sendername_){}
+    , decltype(_impl_.expireddate_){}
+    , decltype(_impl_.mailid_){}
+    , decltype(_impl_.hasitem_){}
+    , /*decltype(_impl_._cached_size_)*/{}};
+
+  _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_title().empty()) {
+    _this->_impl_.title_.Set(from._internal_title(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_sendername().empty()) {
+    _this->_impl_.sendername_.Set(from._internal_sendername(), 
+      _this->GetArenaForAllocation());
+  }
+  _impl_.expireddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.expireddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_expireddate().empty()) {
+    _this->_impl_.expireddate_.Set(from._internal_expireddate(), 
+      _this->GetArenaForAllocation());
+  }
+  ::memcpy(&_impl_.mailid_, &from._impl_.mailid_,
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.hasitem_) -
+    reinterpret_cast<char*>(&_impl_.mailid_)) + sizeof(_impl_.hasitem_));
+  // @@protoc_insertion_point(copy_constructor:Protocol.MailListInfo)
+}
+
+inline void MailListInfo::SharedCtor(
+    ::_pb::Arena* arena, bool is_message_owned) {
+  (void)arena;
+  (void)is_message_owned;
+  new (&_impl_) Impl_{
+      decltype(_impl_.title_){}
+    , decltype(_impl_.sendername_){}
+    , decltype(_impl_.expireddate_){}
+    , decltype(_impl_.mailid_){uint64_t{0u}}
+    , decltype(_impl_.hasitem_){false}
+    , /*decltype(_impl_._cached_size_)*/{}
+  };
+  _impl_.title_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.title_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.sendername_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  _impl_.expireddate_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.expireddate_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+}
+
+MailListInfo::~MailListInfo() {
+  // @@protoc_insertion_point(destructor:Protocol.MailListInfo)
+  if (auto *arena = _internal_metadata_.DeleteReturnArena<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>()) {
+  (void)arena;
+    return;
+  }
+  SharedDtor();
+}
+
+inline void MailListInfo::SharedDtor() {
+  GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.title_.Destroy();
+  _impl_.sendername_.Destroy();
+  _impl_.expireddate_.Destroy();
+}
+
+void MailListInfo::SetCachedSize(int size) const {
+  _impl_._cached_size_.Set(size);
+}
+
+void MailListInfo::Clear() {
+// @@protoc_insertion_point(message_clear_start:Protocol.MailListInfo)
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  _impl_.title_.ClearToEmpty();
+  _impl_.sendername_.ClearToEmpty();
+  _impl_.expireddate_.ClearToEmpty();
+  ::memset(&_impl_.mailid_, 0, static_cast<size_t>(
+      reinterpret_cast<char*>(&_impl_.hasitem_) -
+      reinterpret_cast<char*>(&_impl_.mailid_)) + sizeof(_impl_.hasitem_));
+  _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
+}
+
+const char* MailListInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ctx) {
+#define CHK_(x) if (PROTOBUF_PREDICT_FALSE(!(x))) goto failure
+  while (!ctx->Done(&ptr)) {
+    uint32_t tag;
+    ptr = ::_pbi::ReadTag(ptr, &tag);
+    switch (tag >> 3) {
+      // uint64 mailId = 1;
+      case 1:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 8)) {
+          _impl_.mailid_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // string title = 2;
+      case 2:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 18)) {
+          auto str = _internal_mutable_title();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.MailListInfo.title"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string senderName = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_sendername();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.MailListInfo.senderName"));
+        } else
+          goto handle_unusual;
+        continue;
+      // string expiredDate = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 34)) {
+          auto str = _internal_mutable_expireddate();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.MailListInfo.expiredDate"));
+        } else
+          goto handle_unusual;
+        continue;
+      // bool hasItem = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          _impl_.hasitem_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      default:
+        goto handle_unusual;
+    }  // switch
+  handle_unusual:
+    if ((tag == 0) || ((tag & 7) == 4)) {
+      CHK_(ptr);
+      ctx->SetLastTag(tag);
+      goto message_done;
+    }
+    ptr = UnknownFieldParse(
+        tag,
+        _internal_metadata_.mutable_unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(),
+        ptr, ctx);
+    CHK_(ptr != nullptr);
+  }  // while
+message_done:
+  return ptr;
+failure:
+  ptr = nullptr;
+  goto message_done;
+#undef CHK_
+}
+
+uint8_t* MailListInfo::_InternalSerialize(
+    uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const {
+  // @@protoc_insertion_point(serialize_to_array_start:Protocol.MailListInfo)
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  // uint64 mailId = 1;
+  if (this->_internal_mailid() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteUInt64ToArray(1, this->_internal_mailid(), target);
+  }
+
+  // string title = 2;
+  if (!this->_internal_title().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_title().data(), static_cast<int>(this->_internal_title().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.MailListInfo.title");
+    target = stream->WriteStringMaybeAliased(
+        2, this->_internal_title(), target);
+  }
+
+  // string senderName = 3;
+  if (!this->_internal_sendername().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_sendername().data(), static_cast<int>(this->_internal_sendername().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.MailListInfo.senderName");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_sendername(), target);
+  }
+
+  // string expiredDate = 4;
+  if (!this->_internal_expireddate().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_expireddate().data(), static_cast<int>(this->_internal_expireddate().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.MailListInfo.expiredDate");
+    target = stream->WriteStringMaybeAliased(
+        4, this->_internal_expireddate(), target);
+  }
+
+  // bool hasItem = 5;
+  if (this->_internal_hasitem() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteBoolToArray(5, this->_internal_hasitem(), target);
+  }
+
+  if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
+    target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
+        _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
+  }
+  // @@protoc_insertion_point(serialize_to_array_end:Protocol.MailListInfo)
+  return target;
+}
+
+size_t MailListInfo::ByteSizeLong() const {
+// @@protoc_insertion_point(message_byte_size_start:Protocol.MailListInfo)
+  size_t total_size = 0;
+
+  uint32_t cached_has_bits = 0;
+  // Prevent compiler warnings about cached_has_bits being unused
+  (void) cached_has_bits;
+
+  // string title = 2;
+  if (!this->_internal_title().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_title());
+  }
+
+  // string senderName = 3;
+  if (!this->_internal_sendername().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_sendername());
+  }
+
+  // string expiredDate = 4;
+  if (!this->_internal_expireddate().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_expireddate());
+  }
+
+  // uint64 mailId = 1;
+  if (this->_internal_mailid() != 0) {
+    total_size += ::_pbi::WireFormatLite::UInt64SizePlusOne(this->_internal_mailid());
+  }
+
+  // bool hasItem = 5;
+  if (this->_internal_hasitem() != 0) {
+    total_size += 1 + 1;
+  }
+
+  return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
+}
+
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData MailListInfo::_class_data_ = {
+    ::PROTOBUF_NAMESPACE_ID::Message::CopyWithSourceCheck,
+    MailListInfo::MergeImpl
+};
+const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*MailListInfo::GetClassData() const { return &_class_data_; }
+
+
+void MailListInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg) {
+  auto* const _this = static_cast<MailListInfo*>(&to_msg);
+  auto& from = static_cast<const MailListInfo&>(from_msg);
+  // @@protoc_insertion_point(class_specific_merge_from_start:Protocol.MailListInfo)
+  GOOGLE_DCHECK_NE(&from, _this);
+  uint32_t cached_has_bits = 0;
+  (void) cached_has_bits;
+
+  if (!from._internal_title().empty()) {
+    _this->_internal_set_title(from._internal_title());
+  }
+  if (!from._internal_sendername().empty()) {
+    _this->_internal_set_sendername(from._internal_sendername());
+  }
+  if (!from._internal_expireddate().empty()) {
+    _this->_internal_set_expireddate(from._internal_expireddate());
+  }
+  if (from._internal_mailid() != 0) {
+    _this->_internal_set_mailid(from._internal_mailid());
+  }
+  if (from._internal_hasitem() != 0) {
+    _this->_internal_set_hasitem(from._internal_hasitem());
+  }
+  _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+}
+
+void MailListInfo::CopyFrom(const MailListInfo& from) {
+// @@protoc_insertion_point(class_specific_copy_from_start:Protocol.MailListInfo)
+  if (&from == this) return;
+  Clear();
+  MergeFrom(from);
+}
+
+bool MailListInfo::IsInitialized() const {
+  return true;
+}
+
+void MailListInfo::InternalSwap(MailListInfo* other) {
+  using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
+  _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.title_, lhs_arena,
+      &other->_impl_.title_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.sendername_, lhs_arena,
+      &other->_impl_.sendername_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.expireddate_, lhs_arena,
+      &other->_impl_.expireddate_, rhs_arena
+  );
+  ::PROTOBUF_NAMESPACE_ID::internal::memswap<
+      PROTOBUF_FIELD_OFFSET(MailListInfo, _impl_.hasitem_)
+      + sizeof(MailListInfo::_impl_.hasitem_)
+      - PROTOBUF_FIELD_OFFSET(MailListInfo, _impl_.mailid_)>(
+          reinterpret_cast<char*>(&_impl_.mailid_),
+          reinterpret_cast<char*>(&other->_impl_.mailid_));
+}
+
+::PROTOBUF_NAMESPACE_ID::Metadata MailListInfo::GetMetadata() const {
+  return ::_pbi::AssignDescriptors(
+      &descriptor_table_Struct_2eproto_getter, &descriptor_table_Struct_2eproto_once,
+      file_level_metadata_Struct_2eproto[9]);
+}
+
 // @@protoc_insertion_point(namespace_scope)
 }  // namespace Protocol
 PROTOBUF_NAMESPACE_OPEN
@@ -2919,6 +3314,10 @@ Arena::CreateMaybeMessage< ::Protocol::DediDungeonInfo >(Arena* arena) {
 template<> PROTOBUF_NOINLINE ::Protocol::DPlayerInfo*
 Arena::CreateMaybeMessage< ::Protocol::DPlayerInfo >(Arena* arena) {
   return Arena::CreateMessageInternal< ::Protocol::DPlayerInfo >(arena);
+}
+template<> PROTOBUF_NOINLINE ::Protocol::MailListInfo*
+Arena::CreateMaybeMessage< ::Protocol::MailListInfo >(Arena* arena) {
+  return Arena::CreateMessageInternal< ::Protocol::MailListInfo >(arena);
 }
 PROTOBUF_NAMESPACE_CLOSE
 

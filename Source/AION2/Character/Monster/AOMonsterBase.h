@@ -16,6 +16,7 @@ class UAOMonsterHUDWidget_Targetable;
 
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeadMontageEnd);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnGroggyMontageEnd);
 
 UCLASS()
 class AION2_API AAOMonsterBase : public AAOCharacter , public IGenericTeamAgentInterface
@@ -106,6 +107,10 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Monster|Death")
 	FOnDeadMontageEnd OnDeadMontageEnd;
 
+	UPROPERTY(BlueprintAssignable, Category = "Monster|Groggy")
+	FOnGroggyMontageEnd OnGroggyMontageEnd;
+
+
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void HandleBossDeathMontageEnd();
 
@@ -159,7 +164,7 @@ protected :
 
 public :
 	UFUNCTION(BlueprintCallable, Category = "Groggy")
-	void EndGroggy();
+	virtual void EndGroggy();
 
 	UFUNCTION(BlueprintPure, Category = "Groggy")
 	bool IsGroggy() const { return bIsGroggy; }

@@ -17,4 +17,6 @@ protected:
 
 public:
 	virtual void InitAttributeSet() override;
+
+	virtual void EndGroggy() override;
 };

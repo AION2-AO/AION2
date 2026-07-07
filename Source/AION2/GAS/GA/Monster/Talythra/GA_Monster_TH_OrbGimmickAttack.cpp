@@ -4,6 +4,7 @@
 #include "GA_Monster_TH_OrbGimmickAttack.h"
 #include "Character/Monster/Boss/Thalythra/Talythra.h"
 #include "Character/Daeva/Daeva.h"
+#include "Components/CapsuleComponent.h"
 
 void UGA_Monster_TH_OrbGimmickAttack::OnCheckAttackHitEvent(FGameplayEventData Payload)
 {
@@ -30,7 +31,8 @@ void UGA_Monster_TH_OrbGimmickAttack::OnCheckAttackHitEvent(FGameplayEventData P
 	// 같다면 공격x 틀리다면 공격 허용  o
 	// 현재 그러면 color만 지정해주면됨 탈리스라에 
 
-	for(auto& iter : ArrayDaeva)
+
+	for (auto& iter : ArrayDaeva)
 	{
 		if (iter->Get_CurrentDaevaHasSheildColor() == pTalythra->Get_AttackOrbColor())
 		{
@@ -38,7 +40,17 @@ void UGA_Monster_TH_OrbGimmickAttack::OnCheckAttackHitEvent(FGameplayEventData P
 		}
 
 		else
-			pTalythra->CheckAttackHit(AttackData);
+		{
+			AAOCharacter* pCharacter = Cast<AAOCharacter>(iter);
+
+			FHitResult HitResult;
+
+			HitResult.ImpactPoint = pCharacter->GetCapsuleComponent()->GetComponentLocation();
+			HitResult.ImpactNormal = FVector(1.f, 1.f, 1.f);
+
+			pCharacter->TakeDamageAO(AttackData, HitResult, pTalythra);
+		}
+
 	}
 
 

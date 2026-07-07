@@ -21,28 +21,28 @@ class AION2_API UAOUserWidgetBase : public UUserWidget
 	
 public:
 	/*
-	* °øÅë Bind/Unbind Èå¸§ Á¦°ø
-	* Server¿¡¼­´Â Àı´ë »ı¼ºµÇÁö ¾Êµµ·Ï ÇÔ.
+	* ê³µí†µ Bind/Unbind íë¦„ ì œê³µ
+	* Serverì—ì„œëŠ” ì ˆëŒ€ ìƒì„±ë˜ì§€ ì•Šë„ë¡ í•¨.
 	*/
 	virtual void BindToASC(UAbilitySystemComponent* InASC);
 	virtual void UnbindFromASC();
 	virtual void ClearBinding();
 
-	// ±âÁ¸ Player ÄÚµå È£È¯¿ë. ³»ºÎ¿¡¼­ BindToASC È£Ãâ. 
+	// ê¸°ì¡´ Player ì½”ë“œ í˜¸í™˜ìš©. ë‚´ë¶€ì—ì„œ BindToASC í˜¸ì¶œ. 
 	virtual void BindToPlayerState(AAOPlayerState* InPlayerState);
 
 	virtual void BindToAbilitySystemActor(AActor* InActor);
 
 protected:
-	// Player State ÀúÀå (Player Àü¿ë º¸Á¶ ÂüÁ¶·Î, Monster Binding ½Ã null).
+	// Player State ì €ì¥ (Player ì „ìš© ë³´ì¡° ì°¸ì¡°ë¡œ, Monster Binding ì‹œ null).
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AAOPlayerState> BoundPlayerState;
 
-	// Ability SystemÀÇ Owning Actor.
+	// Ability Systemì˜ Owning Actor.
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<AActor> BoundAbilitySystemActor;
 
-	// ASC ÀúÀå
+	// ASC ì €ì¥
 	UPROPERTY(BlueprintReadOnly)
 	TObjectPtr<UAbilitySystemComponent> BoundASC;
 	

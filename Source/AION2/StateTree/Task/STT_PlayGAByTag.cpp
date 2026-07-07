@@ -2,8 +2,6 @@
 
 #include "STT_PlayGAByTag.h"
 #include "AbilitySystemComponent.h"
-#include "AbilitySystemGlobals.h"
-#include "AIController.h"
 #include "GameFramework/Pawn.h"
 #include "StateTreeExecutionContext.h"
 

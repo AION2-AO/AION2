@@ -38,7 +38,7 @@ public:
 		const FHitResult& SweepResult
 	);
 
-
+	UFUNCTION()
 	void OnShieldEndOverlapEvent(
 		UPrimitiveComponent* OverlappedComp,
 		AActor* OtherActor,

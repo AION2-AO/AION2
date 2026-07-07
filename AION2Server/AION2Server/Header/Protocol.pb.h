@@ -92,12 +92,21 @@ extern C_DungeonWaitingRoomEnterPacketDefaultTypeInternal _C_DungeonWaitingRoomE
 class C_LoginPacket;
 struct C_LoginPacketDefaultTypeInternal;
 extern C_LoginPacketDefaultTypeInternal _C_LoginPacket_default_instance_;
+class C_MailContentPacket;
+struct C_MailContentPacketDefaultTypeInternal;
+extern C_MailContentPacketDefaultTypeInternal _C_MailContentPacket_default_instance_;
+class C_MailListPacket;
+struct C_MailListPacketDefaultTypeInternal;
+extern C_MailListPacketDefaultTypeInternal _C_MailListPacket_default_instance_;
 class C_MapLoadCompletePacket;
 struct C_MapLoadCompletePacketDefaultTypeInternal;
 extern C_MapLoadCompletePacketDefaultTypeInternal _C_MapLoadCompletePacket_default_instance_;
 class C_MovePacket;
 struct C_MovePacketDefaultTypeInternal;
 extern C_MovePacketDefaultTypeInternal _C_MovePacket_default_instance_;
+class C_SendMailPacket;
+struct C_SendMailPacketDefaultTypeInternal;
+extern C_SendMailPacketDefaultTypeInternal _C_SendMailPacket_default_instance_;
 class C_SignUpPacket;
 struct C_SignUpPacketDefaultTypeInternal;
 extern C_SignUpPacketDefaultTypeInternal _C_SignUpPacket_default_instance_;
@@ -146,9 +155,18 @@ extern S_LoginFailPacketDefaultTypeInternal _S_LoginFailPacket_default_instance_
 class S_LoginSuccessPacket;
 struct S_LoginSuccessPacketDefaultTypeInternal;
 extern S_LoginSuccessPacketDefaultTypeInternal _S_LoginSuccessPacket_default_instance_;
+class S_MailContentPacket;
+struct S_MailContentPacketDefaultTypeInternal;
+extern S_MailContentPacketDefaultTypeInternal _S_MailContentPacket_default_instance_;
+class S_MailListPacket;
+struct S_MailListPacketDefaultTypeInternal;
+extern S_MailListPacketDefaultTypeInternal _S_MailListPacket_default_instance_;
 class S_MovePacket;
 struct S_MovePacketDefaultTypeInternal;
 extern S_MovePacketDefaultTypeInternal _S_MovePacket_default_instance_;
+class S_NotifyMailPacket;
+struct S_NotifyMailPacketDefaultTypeInternal;
+extern S_NotifyMailPacketDefaultTypeInternal _S_NotifyMailPacket_default_instance_;
 class S_SetDungeonPlayerPacket;
 struct S_SetDungeonPlayerPacketDefaultTypeInternal;
 extern S_SetDungeonPlayerPacketDefaultTypeInternal _S_SetDungeonPlayerPacket_default_instance_;
@@ -178,8 +196,11 @@ template<> ::Protocol::C_DungeonReadyPacket* Arena::CreateMaybeMessage<::Protoco
 template<> ::Protocol::C_DungeonStartPacket* Arena::CreateMaybeMessage<::Protocol::C_DungeonStartPacket>(Arena*);
 template<> ::Protocol::C_DungeonWaitingRoomEnterPacket* Arena::CreateMaybeMessage<::Protocol::C_DungeonWaitingRoomEnterPacket>(Arena*);
 template<> ::Protocol::C_LoginPacket* Arena::CreateMaybeMessage<::Protocol::C_LoginPacket>(Arena*);
+template<> ::Protocol::C_MailContentPacket* Arena::CreateMaybeMessage<::Protocol::C_MailContentPacket>(Arena*);
+template<> ::Protocol::C_MailListPacket* Arena::CreateMaybeMessage<::Protocol::C_MailListPacket>(Arena*);
 template<> ::Protocol::C_MapLoadCompletePacket* Arena::CreateMaybeMessage<::Protocol::C_MapLoadCompletePacket>(Arena*);
 template<> ::Protocol::C_MovePacket* Arena::CreateMaybeMessage<::Protocol::C_MovePacket>(Arena*);
+template<> ::Protocol::C_SendMailPacket* Arena::CreateMaybeMessage<::Protocol::C_SendMailPacket>(Arena*);
 template<> ::Protocol::C_SignUpPacket* Arena::CreateMaybeMessage<::Protocol::C_SignUpPacket>(Arena*);
 template<> ::Protocol::C_StorePurchasePacket* Arena::CreateMaybeMessage<::Protocol::C_StorePurchasePacket>(Arena*);
 template<> ::Protocol::C_UseItemPacket* Arena::CreateMaybeMessage<::Protocol::C_UseItemPacket>(Arena*);
@@ -196,7 +217,10 @@ template<> ::Protocol::S_DungeonWaitingRoomEnterPacket* Arena::CreateMaybeMessag
 template<> ::Protocol::S_ItemDataPacket* Arena::CreateMaybeMessage<::Protocol::S_ItemDataPacket>(Arena*);
 template<> ::Protocol::S_LoginFailPacket* Arena::CreateMaybeMessage<::Protocol::S_LoginFailPacket>(Arena*);
 template<> ::Protocol::S_LoginSuccessPacket* Arena::CreateMaybeMessage<::Protocol::S_LoginSuccessPacket>(Arena*);
+template<> ::Protocol::S_MailContentPacket* Arena::CreateMaybeMessage<::Protocol::S_MailContentPacket>(Arena*);
+template<> ::Protocol::S_MailListPacket* Arena::CreateMaybeMessage<::Protocol::S_MailListPacket>(Arena*);
 template<> ::Protocol::S_MovePacket* Arena::CreateMaybeMessage<::Protocol::S_MovePacket>(Arena*);
+template<> ::Protocol::S_NotifyMailPacket* Arena::CreateMaybeMessage<::Protocol::S_NotifyMailPacket>(Arena*);
 template<> ::Protocol::S_SetDungeonPlayerPacket* Arena::CreateMaybeMessage<::Protocol::S_SetDungeonPlayerPacket>(Arena*);
 template<> ::Protocol::S_SignUpResultPacket* Arena::CreateMaybeMessage<::Protocol::S_SignUpResultPacket>(Arena*);
 template<> ::Protocol::S_SpawnPacket* Arena::CreateMaybeMessage<::Protocol::S_SpawnPacket>(Arena*);
@@ -5995,6 +6019,1132 @@ class S_SetDungeonPlayerPacket final :
   union { Impl_ _impl_; };
   friend struct ::TableStruct_Protocol_2eproto;
 };
+// -------------------------------------------------------------------
+
+class C_SendMailPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C_SendMailPacket) */ {
+ public:
+  inline C_SendMailPacket() : C_SendMailPacket(nullptr) {}
+  ~C_SendMailPacket() override;
+  explicit PROTOBUF_CONSTEXPR C_SendMailPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C_SendMailPacket(const C_SendMailPacket& from);
+  C_SendMailPacket(C_SendMailPacket&& from) noexcept
+    : C_SendMailPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline C_SendMailPacket& operator=(const C_SendMailPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C_SendMailPacket& operator=(C_SendMailPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C_SendMailPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C_SendMailPacket* internal_default_instance() {
+    return reinterpret_cast<const C_SendMailPacket*>(
+               &_C_SendMailPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    36;
+
+  friend void swap(C_SendMailPacket& a, C_SendMailPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C_SendMailPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C_SendMailPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C_SendMailPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C_SendMailPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C_SendMailPacket& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C_SendMailPacket& from) {
+    C_SendMailPacket::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C_SendMailPacket* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C_SendMailPacket";
+  }
+  protected:
+  explicit C_SendMailPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSenderNameFieldNumber = 2,
+    kReceiverNameFieldNumber = 3,
+    kTitleFieldNumber = 4,
+    kContentFieldNumber = 5,
+    kSenderIdFieldNumber = 1,
+    kGoldFieldNumber = 6,
+    kItemIdFieldNumber = 7,
+    kItemCountFieldNumber = 8,
+  };
+  // string senderName = 2;
+  void clear_sendername();
+  const std::string& sendername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_sendername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_sendername();
+  PROTOBUF_NODISCARD std::string* release_sendername();
+  void set_allocated_sendername(std::string* sendername);
+  private:
+  const std::string& _internal_sendername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_sendername(const std::string& value);
+  std::string* _internal_mutable_sendername();
+  public:
+
+  // string receiverName = 3;
+  void clear_receivername();
+  const std::string& receivername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_receivername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_receivername();
+  PROTOBUF_NODISCARD std::string* release_receivername();
+  void set_allocated_receivername(std::string* receivername);
+  private:
+  const std::string& _internal_receivername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_receivername(const std::string& value);
+  std::string* _internal_mutable_receivername();
+  public:
+
+  // string title = 4;
+  void clear_title();
+  const std::string& title() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_title(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_title();
+  PROTOBUF_NODISCARD std::string* release_title();
+  void set_allocated_title(std::string* title);
+  private:
+  const std::string& _internal_title() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_title(const std::string& value);
+  std::string* _internal_mutable_title();
+  public:
+
+  // string content = 5;
+  void clear_content();
+  const std::string& content() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_content(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_content();
+  PROTOBUF_NODISCARD std::string* release_content();
+  void set_allocated_content(std::string* content);
+  private:
+  const std::string& _internal_content() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_content(const std::string& value);
+  std::string* _internal_mutable_content();
+  public:
+
+  // uint64 senderId = 1;
+  void clear_senderid();
+  uint64_t senderid() const;
+  void set_senderid(uint64_t value);
+  private:
+  uint64_t _internal_senderid() const;
+  void _internal_set_senderid(uint64_t value);
+  public:
+
+  // int32 gold = 6;
+  void clear_gold();
+  int32_t gold() const;
+  void set_gold(int32_t value);
+  private:
+  int32_t _internal_gold() const;
+  void _internal_set_gold(int32_t value);
+  public:
+
+  // int32 itemId = 7;
+  void clear_itemid();
+  int32_t itemid() const;
+  void set_itemid(int32_t value);
+  private:
+  int32_t _internal_itemid() const;
+  void _internal_set_itemid(int32_t value);
+  public:
+
+  // int32 itemCount = 8;
+  void clear_itemcount();
+  int32_t itemcount() const;
+  void set_itemcount(int32_t value);
+  private:
+  int32_t _internal_itemcount() const;
+  void _internal_set_itemcount(int32_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C_SendMailPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr sendername_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr receivername_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr title_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
+    uint64_t senderid_;
+    int32_t gold_;
+    int32_t itemid_;
+    int32_t itemcount_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S_NotifyMailPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase /* @@protoc_insertion_point(class_definition:Protocol.S_NotifyMailPacket) */ {
+ public:
+  inline S_NotifyMailPacket() : S_NotifyMailPacket(nullptr) {}
+  explicit PROTOBUF_CONSTEXPR S_NotifyMailPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S_NotifyMailPacket(const S_NotifyMailPacket& from);
+  S_NotifyMailPacket(S_NotifyMailPacket&& from) noexcept
+    : S_NotifyMailPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline S_NotifyMailPacket& operator=(const S_NotifyMailPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S_NotifyMailPacket& operator=(S_NotifyMailPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S_NotifyMailPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S_NotifyMailPacket* internal_default_instance() {
+    return reinterpret_cast<const S_NotifyMailPacket*>(
+               &_S_NotifyMailPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    37;
+
+  friend void swap(S_NotifyMailPacket& a, S_NotifyMailPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S_NotifyMailPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S_NotifyMailPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S_NotifyMailPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S_NotifyMailPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyFrom;
+  inline void CopyFrom(const S_NotifyMailPacket& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::CopyImpl(*this, from);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeFrom;
+  void MergeFrom(const S_NotifyMailPacket& from) {
+    ::PROTOBUF_NAMESPACE_ID::internal::ZeroFieldsBase::MergeImpl(*this, from);
+  }
+  public:
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S_NotifyMailPacket";
+  }
+  protected:
+  explicit S_NotifyMailPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  // @@protoc_insertion_point(class_scope:Protocol.S_NotifyMailPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+  };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class C_MailListPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C_MailListPacket) */ {
+ public:
+  inline C_MailListPacket() : C_MailListPacket(nullptr) {}
+  ~C_MailListPacket() override;
+  explicit PROTOBUF_CONSTEXPR C_MailListPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C_MailListPacket(const C_MailListPacket& from);
+  C_MailListPacket(C_MailListPacket&& from) noexcept
+    : C_MailListPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline C_MailListPacket& operator=(const C_MailListPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C_MailListPacket& operator=(C_MailListPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C_MailListPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C_MailListPacket* internal_default_instance() {
+    return reinterpret_cast<const C_MailListPacket*>(
+               &_C_MailListPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    38;
+
+  friend void swap(C_MailListPacket& a, C_MailListPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C_MailListPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C_MailListPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C_MailListPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C_MailListPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C_MailListPacket& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C_MailListPacket& from) {
+    C_MailListPacket::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C_MailListPacket* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C_MailListPacket";
+  }
+  protected:
+  explicit C_MailListPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kPlayerIdFieldNumber = 1,
+  };
+  // uint64 playerId = 1;
+  void clear_playerid();
+  uint64_t playerid() const;
+  void set_playerid(uint64_t value);
+  private:
+  uint64_t _internal_playerid() const;
+  void _internal_set_playerid(uint64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C_MailListPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    uint64_t playerid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S_MailListPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S_MailListPacket) */ {
+ public:
+  inline S_MailListPacket() : S_MailListPacket(nullptr) {}
+  ~S_MailListPacket() override;
+  explicit PROTOBUF_CONSTEXPR S_MailListPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S_MailListPacket(const S_MailListPacket& from);
+  S_MailListPacket(S_MailListPacket&& from) noexcept
+    : S_MailListPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline S_MailListPacket& operator=(const S_MailListPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S_MailListPacket& operator=(S_MailListPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S_MailListPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S_MailListPacket* internal_default_instance() {
+    return reinterpret_cast<const S_MailListPacket*>(
+               &_S_MailListPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    39;
+
+  friend void swap(S_MailListPacket& a, S_MailListPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S_MailListPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S_MailListPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S_MailListPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S_MailListPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S_MailListPacket& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S_MailListPacket& from) {
+    S_MailListPacket::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S_MailListPacket* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S_MailListPacket";
+  }
+  protected:
+  explicit S_MailListPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMailListsFieldNumber = 1,
+  };
+  // repeated .Protocol.MailListInfo MailLists = 1;
+  int maillists_size() const;
+  private:
+  int _internal_maillists_size() const;
+  public:
+  void clear_maillists();
+  ::Protocol::MailListInfo* mutable_maillists(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::MailListInfo >*
+      mutable_maillists();
+  private:
+  const ::Protocol::MailListInfo& _internal_maillists(int index) const;
+  ::Protocol::MailListInfo* _internal_add_maillists();
+  public:
+  const ::Protocol::MailListInfo& maillists(int index) const;
+  ::Protocol::MailListInfo* add_maillists();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::MailListInfo >&
+      maillists() const;
+
+  // @@protoc_insertion_point(class_scope:Protocol.S_MailListPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::MailListInfo > maillists_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class C_MailContentPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.C_MailContentPacket) */ {
+ public:
+  inline C_MailContentPacket() : C_MailContentPacket(nullptr) {}
+  ~C_MailContentPacket() override;
+  explicit PROTOBUF_CONSTEXPR C_MailContentPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  C_MailContentPacket(const C_MailContentPacket& from);
+  C_MailContentPacket(C_MailContentPacket&& from) noexcept
+    : C_MailContentPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline C_MailContentPacket& operator=(const C_MailContentPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline C_MailContentPacket& operator=(C_MailContentPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const C_MailContentPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const C_MailContentPacket* internal_default_instance() {
+    return reinterpret_cast<const C_MailContentPacket*>(
+               &_C_MailContentPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    40;
+
+  friend void swap(C_MailContentPacket& a, C_MailContentPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(C_MailContentPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(C_MailContentPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  C_MailContentPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<C_MailContentPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const C_MailContentPacket& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const C_MailContentPacket& from) {
+    C_MailContentPacket::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(C_MailContentPacket* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.C_MailContentPacket";
+  }
+  protected:
+  explicit C_MailContentPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kMailIdFieldNumber = 1,
+  };
+  // uint64 MailId = 1;
+  void clear_mailid();
+  uint64_t mailid() const;
+  void set_mailid(uint64_t value);
+  private:
+  uint64_t _internal_mailid() const;
+  void _internal_set_mailid(uint64_t value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.C_MailContentPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    uint64_t mailid_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
+// -------------------------------------------------------------------
+
+class S_MailContentPacket final :
+    public ::PROTOBUF_NAMESPACE_ID::Message /* @@protoc_insertion_point(class_definition:Protocol.S_MailContentPacket) */ {
+ public:
+  inline S_MailContentPacket() : S_MailContentPacket(nullptr) {}
+  ~S_MailContentPacket() override;
+  explicit PROTOBUF_CONSTEXPR S_MailContentPacket(::PROTOBUF_NAMESPACE_ID::internal::ConstantInitialized);
+
+  S_MailContentPacket(const S_MailContentPacket& from);
+  S_MailContentPacket(S_MailContentPacket&& from) noexcept
+    : S_MailContentPacket() {
+    *this = ::std::move(from);
+  }
+
+  inline S_MailContentPacket& operator=(const S_MailContentPacket& from) {
+    CopyFrom(from);
+    return *this;
+  }
+  inline S_MailContentPacket& operator=(S_MailContentPacket&& from) noexcept {
+    if (this == &from) return *this;
+    if (GetOwningArena() == from.GetOwningArena()
+  #ifdef PROTOBUF_FORCE_COPY_IN_MOVE
+        && GetOwningArena() != nullptr
+  #endif  // !PROTOBUF_FORCE_COPY_IN_MOVE
+    ) {
+      InternalSwap(&from);
+    } else {
+      CopyFrom(from);
+    }
+    return *this;
+  }
+
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* descriptor() {
+    return GetDescriptor();
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Descriptor* GetDescriptor() {
+    return default_instance().GetMetadata().descriptor;
+  }
+  static const ::PROTOBUF_NAMESPACE_ID::Reflection* GetReflection() {
+    return default_instance().GetMetadata().reflection;
+  }
+  static const S_MailContentPacket& default_instance() {
+    return *internal_default_instance();
+  }
+  static inline const S_MailContentPacket* internal_default_instance() {
+    return reinterpret_cast<const S_MailContentPacket*>(
+               &_S_MailContentPacket_default_instance_);
+  }
+  static constexpr int kIndexInFileMessages =
+    41;
+
+  friend void swap(S_MailContentPacket& a, S_MailContentPacket& b) {
+    a.Swap(&b);
+  }
+  inline void Swap(S_MailContentPacket* other) {
+    if (other == this) return;
+  #ifdef PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() != nullptr &&
+        GetOwningArena() == other->GetOwningArena()) {
+   #else  // PROTOBUF_FORCE_COPY_IN_SWAP
+    if (GetOwningArena() == other->GetOwningArena()) {
+  #endif  // !PROTOBUF_FORCE_COPY_IN_SWAP
+      InternalSwap(other);
+    } else {
+      ::PROTOBUF_NAMESPACE_ID::internal::GenericSwap(this, other);
+    }
+  }
+  void UnsafeArenaSwap(S_MailContentPacket* other) {
+    if (other == this) return;
+    GOOGLE_DCHECK(GetOwningArena() == other->GetOwningArena());
+    InternalSwap(other);
+  }
+
+  // implements Message ----------------------------------------------
+
+  S_MailContentPacket* New(::PROTOBUF_NAMESPACE_ID::Arena* arena = nullptr) const final {
+    return CreateMaybeMessage<S_MailContentPacket>(arena);
+  }
+  using ::PROTOBUF_NAMESPACE_ID::Message::CopyFrom;
+  void CopyFrom(const S_MailContentPacket& from);
+  using ::PROTOBUF_NAMESPACE_ID::Message::MergeFrom;
+  void MergeFrom( const S_MailContentPacket& from) {
+    S_MailContentPacket::MergeImpl(*this, from);
+  }
+  private:
+  static void MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PROTOBUF_NAMESPACE_ID::Message& from_msg);
+  public:
+  PROTOBUF_ATTRIBUTE_REINITIALIZES void Clear() final;
+  bool IsInitialized() const final;
+
+  size_t ByteSizeLong() const final;
+  const char* _InternalParse(const char* ptr, ::PROTOBUF_NAMESPACE_ID::internal::ParseContext* ctx) final;
+  uint8_t* _InternalSerialize(
+      uint8_t* target, ::PROTOBUF_NAMESPACE_ID::io::EpsCopyOutputStream* stream) const final;
+  int GetCachedSize() const final { return _impl_._cached_size_.Get(); }
+
+  private:
+  void SharedCtor(::PROTOBUF_NAMESPACE_ID::Arena* arena, bool is_message_owned);
+  void SharedDtor();
+  void SetCachedSize(int size) const final;
+  void InternalSwap(S_MailContentPacket* other);
+
+  private:
+  friend class ::PROTOBUF_NAMESPACE_ID::internal::AnyMetadata;
+  static ::PROTOBUF_NAMESPACE_ID::StringPiece FullMessageName() {
+    return "Protocol.S_MailContentPacket";
+  }
+  protected:
+  explicit S_MailContentPacket(::PROTOBUF_NAMESPACE_ID::Arena* arena,
+                       bool is_message_owned = false);
+  public:
+
+  static const ClassData _class_data_;
+  const ::PROTOBUF_NAMESPACE_ID::Message::ClassData*GetClassData() const final;
+
+  ::PROTOBUF_NAMESPACE_ID::Metadata GetMetadata() const final;
+
+  // nested types ----------------------------------------------------
+
+  // accessors -------------------------------------------------------
+
+  enum : int {
+    kSenderNameFieldNumber = 3,
+    kReceiverNameFieldNumber = 4,
+    kTitleFieldNumber = 5,
+    kContentFieldNumber = 6,
+    kSendDateFieldNumber = 12,
+    kExpiredDateFieldNumber = 13,
+    kMailIdFieldNumber = 1,
+    kSenderIdFieldNumber = 2,
+    kGoldFieldNumber = 7,
+    kItemIdFieldNumber = 8,
+    kItemCountFieldNumber = 9,
+    kIsReceivedFieldNumber = 10,
+    kIsReadFieldNumber = 11,
+  };
+  // string senderName = 3;
+  void clear_sendername();
+  const std::string& sendername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_sendername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_sendername();
+  PROTOBUF_NODISCARD std::string* release_sendername();
+  void set_allocated_sendername(std::string* sendername);
+  private:
+  const std::string& _internal_sendername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_sendername(const std::string& value);
+  std::string* _internal_mutable_sendername();
+  public:
+
+  // string receiverName = 4;
+  void clear_receivername();
+  const std::string& receivername() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_receivername(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_receivername();
+  PROTOBUF_NODISCARD std::string* release_receivername();
+  void set_allocated_receivername(std::string* receivername);
+  private:
+  const std::string& _internal_receivername() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_receivername(const std::string& value);
+  std::string* _internal_mutable_receivername();
+  public:
+
+  // string title = 5;
+  void clear_title();
+  const std::string& title() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_title(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_title();
+  PROTOBUF_NODISCARD std::string* release_title();
+  void set_allocated_title(std::string* title);
+  private:
+  const std::string& _internal_title() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_title(const std::string& value);
+  std::string* _internal_mutable_title();
+  public:
+
+  // string content = 6;
+  void clear_content();
+  const std::string& content() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_content(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_content();
+  PROTOBUF_NODISCARD std::string* release_content();
+  void set_allocated_content(std::string* content);
+  private:
+  const std::string& _internal_content() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_content(const std::string& value);
+  std::string* _internal_mutable_content();
+  public:
+
+  // string sendDate = 12;
+  void clear_senddate();
+  const std::string& senddate() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_senddate(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_senddate();
+  PROTOBUF_NODISCARD std::string* release_senddate();
+  void set_allocated_senddate(std::string* senddate);
+  private:
+  const std::string& _internal_senddate() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_senddate(const std::string& value);
+  std::string* _internal_mutable_senddate();
+  public:
+
+  // string ExpiredDate = 13;
+  void clear_expireddate();
+  const std::string& expireddate() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_expireddate(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_expireddate();
+  PROTOBUF_NODISCARD std::string* release_expireddate();
+  void set_allocated_expireddate(std::string* expireddate);
+  private:
+  const std::string& _internal_expireddate() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_expireddate(const std::string& value);
+  std::string* _internal_mutable_expireddate();
+  public:
+
+  // uint64 MailId = 1;
+  void clear_mailid();
+  uint64_t mailid() const;
+  void set_mailid(uint64_t value);
+  private:
+  uint64_t _internal_mailid() const;
+  void _internal_set_mailid(uint64_t value);
+  public:
+
+  // uint64 senderId = 2;
+  void clear_senderid();
+  uint64_t senderid() const;
+  void set_senderid(uint64_t value);
+  private:
+  uint64_t _internal_senderid() const;
+  void _internal_set_senderid(uint64_t value);
+  public:
+
+  // int32 gold = 7;
+  void clear_gold();
+  int32_t gold() const;
+  void set_gold(int32_t value);
+  private:
+  int32_t _internal_gold() const;
+  void _internal_set_gold(int32_t value);
+  public:
+
+  // int32 itemId = 8;
+  void clear_itemid();
+  int32_t itemid() const;
+  void set_itemid(int32_t value);
+  private:
+  int32_t _internal_itemid() const;
+  void _internal_set_itemid(int32_t value);
+  public:
+
+  // int32 itemCount = 9;
+  void clear_itemcount();
+  int32_t itemcount() const;
+  void set_itemcount(int32_t value);
+  private:
+  int32_t _internal_itemcount() const;
+  void _internal_set_itemcount(int32_t value);
+  public:
+
+  // bool IsReceived = 10;
+  void clear_isreceived();
+  bool isreceived() const;
+  void set_isreceived(bool value);
+  private:
+  bool _internal_isreceived() const;
+  void _internal_set_isreceived(bool value);
+  public:
+
+  // bool isRead = 11;
+  void clear_isread();
+  bool isread() const;
+  void set_isread(bool value);
+  private:
+  bool _internal_isread() const;
+  void _internal_set_isread(bool value);
+  public:
+
+  // @@protoc_insertion_point(class_scope:Protocol.S_MailContentPacket)
+ private:
+  class _Internal;
+
+  template <typename T> friend class ::PROTOBUF_NAMESPACE_ID::Arena::InternalHelper;
+  typedef void InternalArenaConstructable_;
+  typedef void DestructorSkippable_;
+  struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr sendername_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr receivername_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr title_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr content_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr senddate_;
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr expireddate_;
+    uint64_t mailid_;
+    uint64_t senderid_;
+    int32_t gold_;
+    int32_t itemid_;
+    int32_t itemcount_;
+    bool isreceived_;
+    bool isread_;
+    mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
+  };
+  union { Impl_ _impl_; };
+  friend struct ::TableStruct_Protocol_2eproto;
+};
 // ===================================================================
 
 
@@ -8661,9 +9811,842 @@ S_SetDungeonPlayerPacket::playerinfo() const {
   return _impl_.playerinfo_;
 }
 
+// -------------------------------------------------------------------
+
+// C_SendMailPacket
+
+// uint64 senderId = 1;
+inline void C_SendMailPacket::clear_senderid() {
+  _impl_.senderid_ = uint64_t{0u};
+}
+inline uint64_t C_SendMailPacket::_internal_senderid() const {
+  return _impl_.senderid_;
+}
+inline uint64_t C_SendMailPacket::senderid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.senderId)
+  return _internal_senderid();
+}
+inline void C_SendMailPacket::_internal_set_senderid(uint64_t value) {
+  
+  _impl_.senderid_ = value;
+}
+inline void C_SendMailPacket::set_senderid(uint64_t value) {
+  _internal_set_senderid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.senderId)
+}
+
+// string senderName = 2;
+inline void C_SendMailPacket::clear_sendername() {
+  _impl_.sendername_.ClearToEmpty();
+}
+inline const std::string& C_SendMailPacket::sendername() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.senderName)
+  return _internal_sendername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void C_SendMailPacket::set_sendername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.sendername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.senderName)
+}
+inline std::string* C_SendMailPacket::mutable_sendername() {
+  std::string* _s = _internal_mutable_sendername();
+  // @@protoc_insertion_point(field_mutable:Protocol.C_SendMailPacket.senderName)
+  return _s;
+}
+inline const std::string& C_SendMailPacket::_internal_sendername() const {
+  return _impl_.sendername_.Get();
+}
+inline void C_SendMailPacket::_internal_set_sendername(const std::string& value) {
+  
+  _impl_.sendername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::_internal_mutable_sendername() {
+  
+  return _impl_.sendername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::release_sendername() {
+  // @@protoc_insertion_point(field_release:Protocol.C_SendMailPacket.senderName)
+  return _impl_.sendername_.Release();
+}
+inline void C_SendMailPacket::set_allocated_sendername(std::string* sendername) {
+  if (sendername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.sendername_.SetAllocated(sendername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.sendername_.IsDefault()) {
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C_SendMailPacket.senderName)
+}
+
+// string receiverName = 3;
+inline void C_SendMailPacket::clear_receivername() {
+  _impl_.receivername_.ClearToEmpty();
+}
+inline const std::string& C_SendMailPacket::receivername() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.receiverName)
+  return _internal_receivername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void C_SendMailPacket::set_receivername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.receivername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.receiverName)
+}
+inline std::string* C_SendMailPacket::mutable_receivername() {
+  std::string* _s = _internal_mutable_receivername();
+  // @@protoc_insertion_point(field_mutable:Protocol.C_SendMailPacket.receiverName)
+  return _s;
+}
+inline const std::string& C_SendMailPacket::_internal_receivername() const {
+  return _impl_.receivername_.Get();
+}
+inline void C_SendMailPacket::_internal_set_receivername(const std::string& value) {
+  
+  _impl_.receivername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::_internal_mutable_receivername() {
+  
+  return _impl_.receivername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::release_receivername() {
+  // @@protoc_insertion_point(field_release:Protocol.C_SendMailPacket.receiverName)
+  return _impl_.receivername_.Release();
+}
+inline void C_SendMailPacket::set_allocated_receivername(std::string* receivername) {
+  if (receivername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.receivername_.SetAllocated(receivername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.receivername_.IsDefault()) {
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C_SendMailPacket.receiverName)
+}
+
+// string title = 4;
+inline void C_SendMailPacket::clear_title() {
+  _impl_.title_.ClearToEmpty();
+}
+inline const std::string& C_SendMailPacket::title() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.title)
+  return _internal_title();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void C_SendMailPacket::set_title(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.title_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.title)
+}
+inline std::string* C_SendMailPacket::mutable_title() {
+  std::string* _s = _internal_mutable_title();
+  // @@protoc_insertion_point(field_mutable:Protocol.C_SendMailPacket.title)
+  return _s;
+}
+inline const std::string& C_SendMailPacket::_internal_title() const {
+  return _impl_.title_.Get();
+}
+inline void C_SendMailPacket::_internal_set_title(const std::string& value) {
+  
+  _impl_.title_.Set(value, GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::_internal_mutable_title() {
+  
+  return _impl_.title_.Mutable(GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::release_title() {
+  // @@protoc_insertion_point(field_release:Protocol.C_SendMailPacket.title)
+  return _impl_.title_.Release();
+}
+inline void C_SendMailPacket::set_allocated_title(std::string* title) {
+  if (title != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.title_.SetAllocated(title, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.title_.IsDefault()) {
+    _impl_.title_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C_SendMailPacket.title)
+}
+
+// string content = 5;
+inline void C_SendMailPacket::clear_content() {
+  _impl_.content_.ClearToEmpty();
+}
+inline const std::string& C_SendMailPacket::content() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.content)
+  return _internal_content();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void C_SendMailPacket::set_content(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.content_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.content)
+}
+inline std::string* C_SendMailPacket::mutable_content() {
+  std::string* _s = _internal_mutable_content();
+  // @@protoc_insertion_point(field_mutable:Protocol.C_SendMailPacket.content)
+  return _s;
+}
+inline const std::string& C_SendMailPacket::_internal_content() const {
+  return _impl_.content_.Get();
+}
+inline void C_SendMailPacket::_internal_set_content(const std::string& value) {
+  
+  _impl_.content_.Set(value, GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::_internal_mutable_content() {
+  
+  return _impl_.content_.Mutable(GetArenaForAllocation());
+}
+inline std::string* C_SendMailPacket::release_content() {
+  // @@protoc_insertion_point(field_release:Protocol.C_SendMailPacket.content)
+  return _impl_.content_.Release();
+}
+inline void C_SendMailPacket::set_allocated_content(std::string* content) {
+  if (content != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.content_.SetAllocated(content, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.content_.IsDefault()) {
+    _impl_.content_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.C_SendMailPacket.content)
+}
+
+// int32 gold = 6;
+inline void C_SendMailPacket::clear_gold() {
+  _impl_.gold_ = 0;
+}
+inline int32_t C_SendMailPacket::_internal_gold() const {
+  return _impl_.gold_;
+}
+inline int32_t C_SendMailPacket::gold() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.gold)
+  return _internal_gold();
+}
+inline void C_SendMailPacket::_internal_set_gold(int32_t value) {
+  
+  _impl_.gold_ = value;
+}
+inline void C_SendMailPacket::set_gold(int32_t value) {
+  _internal_set_gold(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.gold)
+}
+
+// int32 itemId = 7;
+inline void C_SendMailPacket::clear_itemid() {
+  _impl_.itemid_ = 0;
+}
+inline int32_t C_SendMailPacket::_internal_itemid() const {
+  return _impl_.itemid_;
+}
+inline int32_t C_SendMailPacket::itemid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.itemId)
+  return _internal_itemid();
+}
+inline void C_SendMailPacket::_internal_set_itemid(int32_t value) {
+  
+  _impl_.itemid_ = value;
+}
+inline void C_SendMailPacket::set_itemid(int32_t value) {
+  _internal_set_itemid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.itemId)
+}
+
+// int32 itemCount = 8;
+inline void C_SendMailPacket::clear_itemcount() {
+  _impl_.itemcount_ = 0;
+}
+inline int32_t C_SendMailPacket::_internal_itemcount() const {
+  return _impl_.itemcount_;
+}
+inline int32_t C_SendMailPacket::itemcount() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_SendMailPacket.itemCount)
+  return _internal_itemcount();
+}
+inline void C_SendMailPacket::_internal_set_itemcount(int32_t value) {
+  
+  _impl_.itemcount_ = value;
+}
+inline void C_SendMailPacket::set_itemcount(int32_t value) {
+  _internal_set_itemcount(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_SendMailPacket.itemCount)
+}
+
+// -------------------------------------------------------------------
+
+// S_NotifyMailPacket
+
+// -------------------------------------------------------------------
+
+// C_MailListPacket
+
+// uint64 playerId = 1;
+inline void C_MailListPacket::clear_playerid() {
+  _impl_.playerid_ = uint64_t{0u};
+}
+inline uint64_t C_MailListPacket::_internal_playerid() const {
+  return _impl_.playerid_;
+}
+inline uint64_t C_MailListPacket::playerid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_MailListPacket.playerId)
+  return _internal_playerid();
+}
+inline void C_MailListPacket::_internal_set_playerid(uint64_t value) {
+  
+  _impl_.playerid_ = value;
+}
+inline void C_MailListPacket::set_playerid(uint64_t value) {
+  _internal_set_playerid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_MailListPacket.playerId)
+}
+
+// -------------------------------------------------------------------
+
+// S_MailListPacket
+
+// repeated .Protocol.MailListInfo MailLists = 1;
+inline int S_MailListPacket::_internal_maillists_size() const {
+  return _impl_.maillists_.size();
+}
+inline int S_MailListPacket::maillists_size() const {
+  return _internal_maillists_size();
+}
+inline ::Protocol::MailListInfo* S_MailListPacket::mutable_maillists(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailListPacket.MailLists)
+  return _impl_.maillists_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::MailListInfo >*
+S_MailListPacket::mutable_maillists() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.S_MailListPacket.MailLists)
+  return &_impl_.maillists_;
+}
+inline const ::Protocol::MailListInfo& S_MailListPacket::_internal_maillists(int index) const {
+  return _impl_.maillists_.Get(index);
+}
+inline const ::Protocol::MailListInfo& S_MailListPacket::maillists(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailListPacket.MailLists)
+  return _internal_maillists(index);
+}
+inline ::Protocol::MailListInfo* S_MailListPacket::_internal_add_maillists() {
+  return _impl_.maillists_.Add();
+}
+inline ::Protocol::MailListInfo* S_MailListPacket::add_maillists() {
+  ::Protocol::MailListInfo* _add = _internal_add_maillists();
+  // @@protoc_insertion_point(field_add:Protocol.S_MailListPacket.MailLists)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::MailListInfo >&
+S_MailListPacket::maillists() const {
+  // @@protoc_insertion_point(field_list:Protocol.S_MailListPacket.MailLists)
+  return _impl_.maillists_;
+}
+
+// -------------------------------------------------------------------
+
+// C_MailContentPacket
+
+// uint64 MailId = 1;
+inline void C_MailContentPacket::clear_mailid() {
+  _impl_.mailid_ = uint64_t{0u};
+}
+inline uint64_t C_MailContentPacket::_internal_mailid() const {
+  return _impl_.mailid_;
+}
+inline uint64_t C_MailContentPacket::mailid() const {
+  // @@protoc_insertion_point(field_get:Protocol.C_MailContentPacket.MailId)
+  return _internal_mailid();
+}
+inline void C_MailContentPacket::_internal_set_mailid(uint64_t value) {
+  
+  _impl_.mailid_ = value;
+}
+inline void C_MailContentPacket::set_mailid(uint64_t value) {
+  _internal_set_mailid(value);
+  // @@protoc_insertion_point(field_set:Protocol.C_MailContentPacket.MailId)
+}
+
+// -------------------------------------------------------------------
+
+// S_MailContentPacket
+
+// uint64 MailId = 1;
+inline void S_MailContentPacket::clear_mailid() {
+  _impl_.mailid_ = uint64_t{0u};
+}
+inline uint64_t S_MailContentPacket::_internal_mailid() const {
+  return _impl_.mailid_;
+}
+inline uint64_t S_MailContentPacket::mailid() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.MailId)
+  return _internal_mailid();
+}
+inline void S_MailContentPacket::_internal_set_mailid(uint64_t value) {
+  
+  _impl_.mailid_ = value;
+}
+inline void S_MailContentPacket::set_mailid(uint64_t value) {
+  _internal_set_mailid(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.MailId)
+}
+
+// uint64 senderId = 2;
+inline void S_MailContentPacket::clear_senderid() {
+  _impl_.senderid_ = uint64_t{0u};
+}
+inline uint64_t S_MailContentPacket::_internal_senderid() const {
+  return _impl_.senderid_;
+}
+inline uint64_t S_MailContentPacket::senderid() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.senderId)
+  return _internal_senderid();
+}
+inline void S_MailContentPacket::_internal_set_senderid(uint64_t value) {
+  
+  _impl_.senderid_ = value;
+}
+inline void S_MailContentPacket::set_senderid(uint64_t value) {
+  _internal_set_senderid(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.senderId)
+}
+
+// string senderName = 3;
+inline void S_MailContentPacket::clear_sendername() {
+  _impl_.sendername_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::sendername() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.senderName)
+  return _internal_sendername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_sendername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.sendername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.senderName)
+}
+inline std::string* S_MailContentPacket::mutable_sendername() {
+  std::string* _s = _internal_mutable_sendername();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.senderName)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_sendername() const {
+  return _impl_.sendername_.Get();
+}
+inline void S_MailContentPacket::_internal_set_sendername(const std::string& value) {
+  
+  _impl_.sendername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_sendername() {
+  
+  return _impl_.sendername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_sendername() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.senderName)
+  return _impl_.sendername_.Release();
+}
+inline void S_MailContentPacket::set_allocated_sendername(std::string* sendername) {
+  if (sendername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.sendername_.SetAllocated(sendername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.sendername_.IsDefault()) {
+    _impl_.sendername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.senderName)
+}
+
+// string receiverName = 4;
+inline void S_MailContentPacket::clear_receivername() {
+  _impl_.receivername_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::receivername() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.receiverName)
+  return _internal_receivername();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_receivername(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.receivername_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.receiverName)
+}
+inline std::string* S_MailContentPacket::mutable_receivername() {
+  std::string* _s = _internal_mutable_receivername();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.receiverName)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_receivername() const {
+  return _impl_.receivername_.Get();
+}
+inline void S_MailContentPacket::_internal_set_receivername(const std::string& value) {
+  
+  _impl_.receivername_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_receivername() {
+  
+  return _impl_.receivername_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_receivername() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.receiverName)
+  return _impl_.receivername_.Release();
+}
+inline void S_MailContentPacket::set_allocated_receivername(std::string* receivername) {
+  if (receivername != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.receivername_.SetAllocated(receivername, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.receivername_.IsDefault()) {
+    _impl_.receivername_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.receiverName)
+}
+
+// string title = 5;
+inline void S_MailContentPacket::clear_title() {
+  _impl_.title_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::title() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.title)
+  return _internal_title();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_title(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.title_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.title)
+}
+inline std::string* S_MailContentPacket::mutable_title() {
+  std::string* _s = _internal_mutable_title();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.title)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_title() const {
+  return _impl_.title_.Get();
+}
+inline void S_MailContentPacket::_internal_set_title(const std::string& value) {
+  
+  _impl_.title_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_title() {
+  
+  return _impl_.title_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_title() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.title)
+  return _impl_.title_.Release();
+}
+inline void S_MailContentPacket::set_allocated_title(std::string* title) {
+  if (title != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.title_.SetAllocated(title, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.title_.IsDefault()) {
+    _impl_.title_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.title)
+}
+
+// string content = 6;
+inline void S_MailContentPacket::clear_content() {
+  _impl_.content_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::content() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.content)
+  return _internal_content();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_content(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.content_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.content)
+}
+inline std::string* S_MailContentPacket::mutable_content() {
+  std::string* _s = _internal_mutable_content();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.content)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_content() const {
+  return _impl_.content_.Get();
+}
+inline void S_MailContentPacket::_internal_set_content(const std::string& value) {
+  
+  _impl_.content_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_content() {
+  
+  return _impl_.content_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_content() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.content)
+  return _impl_.content_.Release();
+}
+inline void S_MailContentPacket::set_allocated_content(std::string* content) {
+  if (content != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.content_.SetAllocated(content, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.content_.IsDefault()) {
+    _impl_.content_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.content)
+}
+
+// int32 gold = 7;
+inline void S_MailContentPacket::clear_gold() {
+  _impl_.gold_ = 0;
+}
+inline int32_t S_MailContentPacket::_internal_gold() const {
+  return _impl_.gold_;
+}
+inline int32_t S_MailContentPacket::gold() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.gold)
+  return _internal_gold();
+}
+inline void S_MailContentPacket::_internal_set_gold(int32_t value) {
+  
+  _impl_.gold_ = value;
+}
+inline void S_MailContentPacket::set_gold(int32_t value) {
+  _internal_set_gold(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.gold)
+}
+
+// int32 itemId = 8;
+inline void S_MailContentPacket::clear_itemid() {
+  _impl_.itemid_ = 0;
+}
+inline int32_t S_MailContentPacket::_internal_itemid() const {
+  return _impl_.itemid_;
+}
+inline int32_t S_MailContentPacket::itemid() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.itemId)
+  return _internal_itemid();
+}
+inline void S_MailContentPacket::_internal_set_itemid(int32_t value) {
+  
+  _impl_.itemid_ = value;
+}
+inline void S_MailContentPacket::set_itemid(int32_t value) {
+  _internal_set_itemid(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.itemId)
+}
+
+// int32 itemCount = 9;
+inline void S_MailContentPacket::clear_itemcount() {
+  _impl_.itemcount_ = 0;
+}
+inline int32_t S_MailContentPacket::_internal_itemcount() const {
+  return _impl_.itemcount_;
+}
+inline int32_t S_MailContentPacket::itemcount() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.itemCount)
+  return _internal_itemcount();
+}
+inline void S_MailContentPacket::_internal_set_itemcount(int32_t value) {
+  
+  _impl_.itemcount_ = value;
+}
+inline void S_MailContentPacket::set_itemcount(int32_t value) {
+  _internal_set_itemcount(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.itemCount)
+}
+
+// bool IsReceived = 10;
+inline void S_MailContentPacket::clear_isreceived() {
+  _impl_.isreceived_ = false;
+}
+inline bool S_MailContentPacket::_internal_isreceived() const {
+  return _impl_.isreceived_;
+}
+inline bool S_MailContentPacket::isreceived() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.IsReceived)
+  return _internal_isreceived();
+}
+inline void S_MailContentPacket::_internal_set_isreceived(bool value) {
+  
+  _impl_.isreceived_ = value;
+}
+inline void S_MailContentPacket::set_isreceived(bool value) {
+  _internal_set_isreceived(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.IsReceived)
+}
+
+// bool isRead = 11;
+inline void S_MailContentPacket::clear_isread() {
+  _impl_.isread_ = false;
+}
+inline bool S_MailContentPacket::_internal_isread() const {
+  return _impl_.isread_;
+}
+inline bool S_MailContentPacket::isread() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.isRead)
+  return _internal_isread();
+}
+inline void S_MailContentPacket::_internal_set_isread(bool value) {
+  
+  _impl_.isread_ = value;
+}
+inline void S_MailContentPacket::set_isread(bool value) {
+  _internal_set_isread(value);
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.isRead)
+}
+
+// string sendDate = 12;
+inline void S_MailContentPacket::clear_senddate() {
+  _impl_.senddate_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::senddate() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.sendDate)
+  return _internal_senddate();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_senddate(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.senddate_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.sendDate)
+}
+inline std::string* S_MailContentPacket::mutable_senddate() {
+  std::string* _s = _internal_mutable_senddate();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.sendDate)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_senddate() const {
+  return _impl_.senddate_.Get();
+}
+inline void S_MailContentPacket::_internal_set_senddate(const std::string& value) {
+  
+  _impl_.senddate_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_senddate() {
+  
+  return _impl_.senddate_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_senddate() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.sendDate)
+  return _impl_.senddate_.Release();
+}
+inline void S_MailContentPacket::set_allocated_senddate(std::string* senddate) {
+  if (senddate != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.senddate_.SetAllocated(senddate, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.senddate_.IsDefault()) {
+    _impl_.senddate_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.sendDate)
+}
+
+// string ExpiredDate = 13;
+inline void S_MailContentPacket::clear_expireddate() {
+  _impl_.expireddate_.ClearToEmpty();
+}
+inline const std::string& S_MailContentPacket::expireddate() const {
+  // @@protoc_insertion_point(field_get:Protocol.S_MailContentPacket.ExpiredDate)
+  return _internal_expireddate();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void S_MailContentPacket::set_expireddate(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.expireddate_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.S_MailContentPacket.ExpiredDate)
+}
+inline std::string* S_MailContentPacket::mutable_expireddate() {
+  std::string* _s = _internal_mutable_expireddate();
+  // @@protoc_insertion_point(field_mutable:Protocol.S_MailContentPacket.ExpiredDate)
+  return _s;
+}
+inline const std::string& S_MailContentPacket::_internal_expireddate() const {
+  return _impl_.expireddate_.Get();
+}
+inline void S_MailContentPacket::_internal_set_expireddate(const std::string& value) {
+  
+  _impl_.expireddate_.Set(value, GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::_internal_mutable_expireddate() {
+  
+  return _impl_.expireddate_.Mutable(GetArenaForAllocation());
+}
+inline std::string* S_MailContentPacket::release_expireddate() {
+  // @@protoc_insertion_point(field_release:Protocol.S_MailContentPacket.ExpiredDate)
+  return _impl_.expireddate_.Release();
+}
+inline void S_MailContentPacket::set_allocated_expireddate(std::string* expireddate) {
+  if (expireddate != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.expireddate_.SetAllocated(expireddate, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.expireddate_.IsDefault()) {
+    _impl_.expireddate_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.S_MailContentPacket.ExpiredDate)
+}
+
 #ifdef __GNUC__
   #pragma GCC diagnostic pop
 #endif  // __GNUC__
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
+// -------------------------------------------------------------------
+
 // -------------------------------------------------------------------
 
 // -------------------------------------------------------------------

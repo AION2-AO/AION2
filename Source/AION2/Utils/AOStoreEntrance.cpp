@@ -90,8 +90,12 @@ void AAOStoreEntrance::OnOverlapEnd(class UPrimitiveComponent* OverlappedComp, c
 	if (PC)
 	{
 		PC->SetShowMouseCursor(false);
+		PC->SetIgnoreLookInput(false);
+		FInputModeGameOnly InputMode;
+		PC->SetInputMode(InputMode);
 		DisableInput(PC);
 	}
+	bIsOpenStore = false;
 }
 
 void AAOStoreEntrance::EnterStore()
@@ -103,9 +107,14 @@ void AAOStoreEntrance::EnterStore()
 		StoreWidget = UIManager->ShowWidget(StoreWidgetClass, EUILayer::System);
 		if (PC)
 		{
-			//PC->CurrentMouseCursor = EMouseCursor::Default;
 			PC->SetShowMouseCursor(true);
+			PC->SetIgnoreLookInput(true);
+			FInputModeGameAndUI InputMode;
+			InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
+			InputMode.SetHideCursorDuringCapture(false);
+			PC->SetInputMode(InputMode);
 		}
+		bIsOpenStore = true;
 	}
 	else
 	{
@@ -115,8 +124,11 @@ void AAOStoreEntrance::EnterStore()
 		StorePopUpWidget = UIManager->ShowWidget(StorePopUpClass, EUILayer::PopUp);
 		if (PC)
 		{
-			//PC->CurrentMouseCursor = EMouseCursor::Default;
 			PC->SetShowMouseCursor(false);
+			PC->SetIgnoreLookInput(false);
+			FInputModeGameOnly InputMode;
+			PC->SetInputMode(InputMode);
 		}
+		bIsOpenStore = false;
 	}
 }

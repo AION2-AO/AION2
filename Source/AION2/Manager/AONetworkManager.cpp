@@ -3,7 +3,6 @@
 
 #include "AONetworkManager.h"
 #include "Game/AOGameInstance.h"
-#include "UI/AOLoginUserWidget.h"
 #include "Network/PacketHeader.h"
 #include "Manager/AOPlayerManager.h"
 #include "Manager/PacketHandlerManager.h"

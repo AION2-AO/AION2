@@ -2,8 +2,7 @@
 
 #include "Network/AONetworkReceiverWorker.h"
 #include "Common/TcpSocketBuilder.h"
-#include "Common/TcpSocketBuilder.h"
-#include "Protocol.pb.h"
+
 constexpr int BUFSIZE = 4096;
 
 AONetworkReceiverWorker::AONetworkReceiverWorker()
@@ -32,10 +31,10 @@ uint32 AONetworkReceiverWorker::Run()
 	TArray<uint8> ReceiverBuffer;
 	uint8 TempData[BUFSIZE];
 
-	// ¼ÒÄÏÀº ±âº»ÀûÀ¸·Î Non-BlockingÀ¸·Î ÇÑ ¹ø¸¸ ¼¼ÆÃÇÔ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½âº»ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Non-Blockingï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 	ClientSocket->SetNonBlocking(false);
 
-	// ½º·¹µå »ý¸íÁÖ±â Á¦¾î ·çÇÁ Ãß°¡ÇÔ
+	// ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ö±ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ß°ï¿½ï¿½ï¿½
 	while (bRunThread)
 	{
 		uint32 DataSize = 0;
@@ -44,7 +43,7 @@ uint32 AONetworkReceiverWorker::Run()
 		if (bHasData && DataSize > 0)
 		{
 			int32 BytesRead = 0;
-			// ´ë±â ÁßÀÎ µ¥ÀÌÅÍ Å©±â¿Í BUFSIZE Áß ÀÛÀº °ª¸¸Å­¸¸ ¾ÈÀüÇÏ°Ô ÀÐÀ½ÀÓ
+			// ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ Å©ï¿½ï¿½ï¿½ BUFSIZE ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½Å­ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Ï°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			int32 ReadSize = FMath::Min(DataSize, static_cast<uint32>(BUFSIZE));
 
 			if (ClientSocket->Recv(TempData, ReadSize, BytesRead) && BytesRead > 0)
@@ -60,13 +59,13 @@ uint32 AONetworkReceiverWorker::Run()
 					if (Header->PacketSize > MAX_PACKET_SIZE || Header->PacketSize < sizeof(FPacketHeader))
 					{
 						UE_LOG(LogTemp, Error, TEXT("Invalid Packet Size: %d"), Header->PacketSize);
-						bRunThread = false; // ·çÇÁ Á¾·á À¯µµÇÔ
+						bRunThread = false; // ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 						break;
 					}
 
 					if (ReceiverBuffer.Num() - ProcessedOffset < Header->PacketSize)
 					{
-						break; // µ¥ÀÌÅÍ ¹Ì¿Ï¼ºÀÌ¹Ç·Î ´ÙÀ½ ¼ö½ÅÀ» ±â´Ù¸²
+						break; // ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½Ì¿Ï¼ï¿½ï¿½Ì¹Ç·ï¿½ ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½Ù¸ï¿½
 					}
 
 					FPacket OnePacket;
@@ -88,7 +87,7 @@ uint32 AONetworkReceiverWorker::Run()
 		}
 		else
 		{
-			// Ã³¸®ÇÒ µ¥ÀÌÅÍ°¡ ¾øÀ¸¸é ¹«Á¶°Ç ½º·¹µå¸¦ ½¬°Ô ÇÏ¿© CPU °úÁ¡À» ¹æÁöÇÔÀÓ
+			// Ã³ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½Í°ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½å¸¦ ï¿½ï¿½ï¿½ï¿½ ï¿½Ï¿ï¿½ CPU ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½
 			FPlatformProcess::Sleep(0.01f);
 		}
 	}

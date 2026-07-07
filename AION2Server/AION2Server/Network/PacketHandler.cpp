@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "PacketHandler.h"
 #include "GameSession.h"
 #include "Session/DedicatedSession.h"
@@ -154,7 +154,7 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 		session->Send(sendBuffer);
 
 		SendBufferRef itemSendBuffer = PacketHandler::MakeSendBuffer(itemPkt);
-		session->Send(itemSendBuffer); 
+		session->Send(itemSendBuffer);
 
 		GRoom->DoAsync(&Room::AddPlayer, player);
 	}
@@ -406,6 +406,142 @@ bool PacketHandler::HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket
 	chatPacket.set_playerid(player->GetName());
 	chatPacket.set_chat(pkt.chat());
 	GRoom->DoAsync(&Room::HandleChat, chatPacket);
+	return true;
+}
+
+bool PacketHandler::HandleMailList(PacketSessionRef& session, Protocol::C_MailListPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+	DBBind <1, 6> dbBind(*dbConnect, L"{CALL sp_GetMail(?)}");
+
+	int32 playerId = player->GetId();
+	dbBind.BindParam(0, playerId);
+
+	int32 mailId = 0;
+	WCHAR senderName[51] = { 0, };
+	WCHAR title[51] = { 0, };
+	int8 isReceived = 0;
+	int8 isRead = 0;
+	WCHAR expiredDate[51] = { 0, };
+
+	std::wcout.imbue(std::locale("kor"));
+
+	dbBind.BindCol(0, mailId);
+	dbBind.BindCol(1, senderName);
+	dbBind.BindCol(2, title);
+	dbBind.BindCol(3, isReceived);
+	dbBind.BindCol(4, isRead);
+	dbBind.BindCol(5, expiredDate);
+
+	Protocol::S_MailListPacket listPacket;
+	if (dbBind.Execute())
+	{
+		while (dbBind.Fetch())
+		{
+			Protocol::MailListInfo* mailInfos = listPacket.add_maillists();
+			
+			char szTitle[51] = { 0, };
+			char szSender[51] = { 0, };
+			char szExpire[51] = { 0, };
+
+			::wcstombs_s(nullptr, szTitle, sizeof(szTitle), title, _TRUNCATE);
+			::wcstombs_s(nullptr, szSender, sizeof(szSender), senderName, _TRUNCATE);
+			::wcstombs_s(nullptr, szExpire, sizeof(szExpire), expiredDate, _TRUNCATE);
+
+			bool hasItem = (isReceived != 0);
+
+			mailInfos->set_mailid(mailId);
+			mailInfos->set_sendername(szSender);
+			mailInfos->set_title(szTitle);
+			mailInfos->set_expireddate(szExpire);
+			mailInfos->set_hasitem(hasItem);
+		}
+	}
+
+	GDBConnectionPool->Push(dbConnect);
+
+	SendBufferRef mailListBuffer = PacketHandler::MakeSendBuffer(listPacket);
+	session->Send(mailListBuffer);
+	return true;
+}
+
+bool PacketHandler::HandleMailContent(PacketSessionRef& session, Protocol::C_MailContentPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+	DBBind <1, 11> dbBind(*dbConnect, L"{CALL sp_GetMailDetail(?)}");
+
+	int32 inMailId = pkt.mailid();
+	dbBind.BindParam(0, inMailId);
+
+	int32 mailId = 0;
+	WCHAR senderName[51] = { 0, };
+	WCHAR title[51] = { 0, };
+	WCHAR content[501] = { 0, };
+	int32 gold = 0;
+	int32 item = -1;
+	int32 itemCount = 0;
+	int8 isReceived = 0;
+	int8 isRead = 0;
+	WCHAR sendDate[51] = { 0, };
+	WCHAR expiredDate[51] = { 0, };
+
+	std::wcout.imbue(std::locale("kor"));
+
+	dbBind.BindCol(0, mailId);
+	dbBind.BindCol(1, senderName);
+	dbBind.BindCol(2, title);
+	dbBind.BindCol(3, content);
+	dbBind.BindCol(4, gold);
+	dbBind.BindCol(5, item);
+	dbBind.BindCol(6, itemCount);
+	dbBind.BindCol(7, isReceived);
+	dbBind.BindCol(8, isRead);
+	dbBind.BindCol(9, sendDate);
+	dbBind.BindCol(10, expiredDate);
+
+	Protocol::S_MailContentPacket contentPacket;
+
+	if (dbBind.Execute())
+	{
+		if (dbBind.Fetch())
+		{
+			char szTitle[51] = { 0, };
+			char szSender[51] = { 0, };
+			char szContent[501] = { 0, };
+			char szSendDate[51] = { 0, };
+			char szExpire[51] = { 0, };
+
+			::wcstombs_s(nullptr, szSender, sizeof(szSender), senderName, _TRUNCATE);
+			::wcstombs_s(nullptr, szTitle, sizeof(szTitle), title, _TRUNCATE);
+			::wcstombs_s(nullptr, szContent, sizeof(szContent), content, _TRUNCATE);
+			::wcstombs_s(nullptr, szSendDate, sizeof(szSendDate), sendDate, _TRUNCATE);
+			::wcstombs_s(nullptr, szExpire, sizeof(szExpire), expiredDate, _TRUNCATE);
+
+			contentPacket.set_mailid(mailId);
+			contentPacket.set_sendername(szSender);
+			contentPacket.set_title(szTitle);
+			contentPacket.set_content(szContent);
+			contentPacket.set_gold(gold);
+			contentPacket.set_itemid(item);
+			contentPacket.set_itemcount(itemCount);
+			contentPacket.set_isreceived(isReceived != 0);
+			contentPacket.set_isread(isRead != 0);
+			contentPacket.set_senddate(szSendDate);
+			contentPacket.set_expireddate(szExpire);
+		}
+	}
+
+	GDBConnectionPool->Push(dbConnect);
+
+	SendBufferRef mailContentBuffer = PacketHandler::MakeSendBuffer(contentPacket);
+	session->Send(mailContentBuffer);
+
 	return true;
 }
 

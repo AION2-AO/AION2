@@ -31,6 +31,8 @@ void UGA_Monster_ChargeAttack::ActivateAbility(
 
 void UGA_Monster_ChargeAttack::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
+	UnBindCapsuleOverlap(); // ¾ÈÀü¸Á - Áß°£ Äµ½½ ´ëºñ 
+	HitActors.Reset();
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 

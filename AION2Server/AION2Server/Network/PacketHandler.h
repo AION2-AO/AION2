@@ -50,6 +50,14 @@ enum : uint16
 	PKT_C_CHAT = 1025,
 	PKT_S_CHAT = 1026,
 
+	// 메일
+	PKT_C_MAILLIST = 1034,
+	PKT_S_MAILLIST = 1035,
+	PKT_C_MAILCONTENT = 1036,
+	PKT_S_MAILCONTENT = 1037,
+	PKT_C_MAILSEND = 1038,
+	PKT_S_MAILSEND = 1039,
+
 	// 연결 종료
 	PKT_S_DISCONNECT = 1027,
 
@@ -90,6 +98,11 @@ public:
 		GPacketHandler[PKT_C_CHANGEHP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHpPacket>(HandleChangeHp, session, buffer, len); };
 		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChatPacket>(HandleChat, session, buffer, len); };
 
+		// 메일
+		GPacketHandler[PKT_C_MAILLIST] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailListPacket>(HandleMailList, session, buffer, len); };
+		GPacketHandler[PKT_C_MAILCONTENT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailContentPacket>(HandleMailContent, session, buffer, len); };
+
+
 		// 기타 (데디케이트 서버)
 		GPacketHandler[PKT_DS_DEDICATED] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DedicatedPacket>(HandleDedicated, session, buffer, len); };
 	}
@@ -112,6 +125,10 @@ public:
 	static bool HandleUseItem(PacketSessionRef& session, Protocol::C_UseItemPacket& pkt);
 	static bool HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket& pkt);
 
+
+	// 메일
+	static bool HandleMailList(PacketSessionRef& session, Protocol::C_MailListPacket& pkt);
+	static bool HandleMailContent(PacketSessionRef& session, Protocol::C_MailContentPacket& pkt);
 
 	static bool HandlePacket(PacketSessionRef& session, BYTE* buffer, int32 len)
 	{
@@ -145,6 +162,8 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonExitPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONEXIT); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonReadyPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONREADY); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONFAIL); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_SetDungeonPlayerPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONSETPLAYER); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartDediPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONDEDISTART); };
 
 	static SendBufferRef MakeSendBuffer(Protocol::S_StorePurchasePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_STOREPURCHASE); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_UseItemPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_USEITEM); };
@@ -152,8 +171,8 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_ChatPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_CHAT); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DisconnectPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DISCONNECT); };
 
-	static SendBufferRef MakeSendBuffer(Protocol::S_SetDungeonPlayerPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONSETPLAYER); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartDediPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONDEDISTART); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_MailListPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAILLIST); }
+	static SendBufferRef MakeSendBuffer(Protocol::S_MailContentPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAILCONTENT); }
 
 private:
 	template<typename PacketType, typename ProcessFunc>

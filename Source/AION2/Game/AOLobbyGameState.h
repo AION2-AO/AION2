@@ -4,7 +4,6 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/GameState.h"
-#include "Types/DungeonRoomTypes.h"
 #include "AOLobbyGameState.generated.h"
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDungeonRoomChanged);

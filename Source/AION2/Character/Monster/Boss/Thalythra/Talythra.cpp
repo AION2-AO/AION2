@@ -639,8 +639,8 @@ void ATalythra::InitAttributeSet()
 	AttributeSet->InitHealth(5000.f);
 	AttributeSet->InitMaxHealth(5000.f);
 
-	AttributeSet->InitStamina(100.f);
-	AttributeSet->InitMaxStamina(100.f);
+	AttributeSet->InitGroggy(100.f);
+	AttributeSet->InitMaxGroggy(100.f);
 
 
 
@@ -793,7 +793,18 @@ void ATalythra::Render_PlayerAoeOnOff(bool _bOnOff)
 {
 	for (auto& iter : ArrayOrbHittedDaeva)
 	{
-		iter->Set_AOE_RenderOnOff(_bOnOff);
+		if (_bOnOff == true)
+		{
+			if (iter->Get_OrbStack() >= 2)
+			{
+				iter->Set_AOE_RenderOnOff(_bOnOff);
+			}
+		}
+
+		else
+		{
+			iter->Set_AOE_RenderOnOff(_bOnOff);
+		}
 	}
 
 }
@@ -843,6 +854,8 @@ void ATalythra::Destroy_OrbShield()
 	// 투사체 맞은 데바들 초기화 하기. 
 	ArrayOrbHittedDaeva.Empty();
 
+	// OrbShield 또한 초기화 해주기 
+	ArrayOrbShield.Empty();
 
 }
 
@@ -859,6 +872,10 @@ void ATalythra::SpawnColorSheid()
 
 	for (auto& iter : ArrayOrbHittedDaeva)
 	{
+		if (iter->Get_OrbStack() < 2)  // 오브스택이 2보다 작으면, 안전 쉘터 제거.
+			continue;
+
+
 		FVector ShieldLocation = iter->GetActorLocation();
 		ShieldLocation.Z = -3258.f;
 
@@ -1084,6 +1101,15 @@ void ATalythra::OnHealthChanged(const FOnAttributeChangeData& Data)
 	{
 		ASC->AddLooseGameplayTag(GIMMICK_MONSTER_TH_HP70_PENDING);
 	}
+
+
+	if (Ratio <= 0.5f
+		&& OwnedTags.HasTagExact(GIMMICK_MONSTER_TH_HP35_DONE) == false
+		&& OwnedTags.HasTagExact(GIMMICK_MONSTER_TH_HP35_PENDING) == false)
+	{
+		ASC->AddLooseGameplayTag(GIMMICK_MONSTER_TH_HP35_PENDING);
+	}
+
 
 
 }

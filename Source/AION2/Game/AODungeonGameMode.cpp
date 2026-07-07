@@ -1,6 +1,5 @@
 #include "Game/AODungeonGameMode.h"
 
-#include "Character/AOCharacter.h"
 #include "Character/Daeva/Daeva.h"
 #include "Player/AOPlayerState.h"
 
@@ -258,10 +257,10 @@ void AAODungeonGameMode::ClearDungeon()
 	ClearAllRespawnTimers();
 
 	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Dungeon Clear"));
-
+	
 	GiveDungeonReward();
 
-	//RequestReturnToVillage();
+	SendDungeonComplete(true);
 }
 
 void AAODungeonGameMode::FailDungeon()
@@ -286,7 +285,7 @@ void AAODungeonGameMode::ReturnToVillage()
 	GetWorld()->ServerTravel(VillageMapPath);
 }
 
-void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerController)
+void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerController, bool bIsFallDeath)
 {
 	if (!DeadPlayerController)
 	{
@@ -310,14 +309,24 @@ void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerControlle
 		return;
 	}
 
-	const FTransform DeathTransform = DeadPawn->GetActorTransform();
-
 	DeadPlayerControllers.Add(DeadPlayerController);
 
 	const int32 ActivePlayerCount = GetActiveDungeonPlayerCount();
 	const int32 AlivePlayerCount = GetAliveDungeonPlayerCount();
 
-	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Player Dead. Alive: %d / %d"), AlivePlayerCount, ActivePlayerCount);
+	if (bIsFallDeath)
+	{
+		int32 RespawnBossIndex = CurrentBossNumber - 1;
+		RespawnBossIndex = FMath::Clamp(RespawnBossIndex, 1, 3);
+
+		PendingRespawnBossIndices.Add(DeadPlayerController,	RespawnBossIndex);
+	}
+	else
+	{
+		const FTransform DeathTransform = DeadPawn->GetActorTransform();
+
+		PendingRespawnTransforms.Add(DeadPlayerController, DeathTransform);
+	}
 
 	if (AlivePlayerCount <= 0)
 	{
@@ -325,7 +334,7 @@ void AAODungeonGameMode::NotifyPlayerDied(APlayerController* DeadPlayerControlle
 		return;
 	}
 
-	StartPlayerRespawnTimer(DeadPlayerController, DeathTransform);
+	StartPlayerRespawnTimer(DeadPlayerController, DeadPawn->GetActorTransform());
 }
 
 void AAODungeonGameMode::SetCombatPhase(int32 BossNumber)
@@ -382,7 +391,7 @@ void AAODungeonGameMode::StartPlayerRespawnTimer(APlayerController* DeadPlayerCo
 		return;
 	}
 
-	PendingRespawnTransforms.Add(DeadPlayerController, RespawnTransform);
+	// PendingRespawnTransforms.Add(DeadPlayerController, RespawnTransform);
 
 	FTimerHandle NewRespawnTimerHandle;
 	TWeakObjectPtr<APlayerController> WeakPlayerController = DeadPlayerController;
@@ -406,13 +415,11 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 {
 	if (!PlayerController)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dungeon] PlayerController is null"));
 		return;
 	}
 
 	if (CurrentPhase == EDungeonPhase::Failed || CurrentPhase == EDungeonPhase::Cleared)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Cannot Respawn. Dungeon Ended."));
 		return;
 	}
 
@@ -420,17 +427,15 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 
 	if (!DeadPlayerControllers.Contains(PlayerController))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Player is not in DeadPlayerControllers"));
 		return;
 	}
 
-	const FTransform* RespawnTransform = PendingRespawnTransforms.Find(PlayerController);
-
+	//const FTransform* RespawnTransform = PendingRespawnTransforms.Find(PlayerController);
+	/*
 	if (!RespawnTransform)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dungeon] Respawn Transform Not Found: %s"), *PlayerController->GetName());
 		return;
-	}
+	}*/
 
 	APawn* OldPawn = PlayerController->GetPawn();
 
@@ -440,15 +445,41 @@ void AAODungeonGameMode::RespawnPlayer(APlayerController* PlayerController)
 		OldPawn->Destroy();
 	}
 
-	RestartPlayerAtTransform(PlayerController, *RespawnTransform);
+	// 낙사
+	if (const int32* RespawnBossIndex = PendingRespawnBossIndices.Find(PlayerController))
+	{
+		TArray<APlayerStart*> Checkpoints = FindBossRespawnPoint(*RespawnBossIndex);
+
+		if (Checkpoints.IsEmpty())
+		{
+			return;
+		}
+
+		const int32 RespawnIndex = FMath::RandRange(0, Checkpoints.Num() - 1);
+
+		RestartPlayerAtPlayerStart(PlayerController, Checkpoints[RespawnIndex]);
+	}
+	// 일반 사명
+	else if (const FTransform* RespawnTransform = PendingRespawnTransforms.Find(PlayerController))
+	{
+		RestartPlayerAtTransform(PlayerController, *RespawnTransform);
+	}
+	else
+	{
+		return;
+	}
 
 	if (ADaeva* RespawnedPlayer = Cast<ADaeva>(PlayerController->GetPawn()))
 	{
+
+		RespawnedPlayer->RestorePlayerInfoFromPlayerState();
 		RespawnedPlayer->ResetForDungeonRespawn();
 	}
 
+
 	DeadPlayerControllers.Remove(PlayerController);
 	PendingRespawnTransforms.Remove(PlayerController);
+	PendingRespawnBossIndices.Remove(PlayerController);
 }
 
 AActor* AAODungeonGameMode::ChoosePlayerStart_Implementation(AController* Player)
@@ -617,6 +648,7 @@ void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
 
 		if (ADaeva* RespawnedPlayer = Cast<ADaeva>(PlayerController->GetPawn()))
 		{
+			RespawnedPlayer->RestorePlayerInfoFromPlayerState();
 			RespawnedPlayer->ResetForDungeonRespawn();
 		}
 	}
@@ -730,12 +762,21 @@ void AAODungeonGameMode::RequestReturnToVillage()
 	ReturnToVillage();
 }
 
-void AAODungeonGameMode::SendDungeonComplete()
+//void AAODungeonGameMode::SendDungeonComplete()
+//{
+//	Protocol::C_DungeonMapLoadCompletePacket MapPkt;
+//	MapPkt.set_dungeonid(MyDungeonId);
+//	SEND_PACKET(MapPkt, PKT_C_DUNGEOMMAPCOMPLETE);
+//}
+
+//H.Y
+void AAODungeonGameMode::SendDungeonComplete(bool bIsClear)
 {
 	Protocol::C_DungeonMapLoadCompletePacket MapPkt;
 	MapPkt.set_dungeonid(MyDungeonId);
 	SEND_PACKET(MapPkt, PKT_C_DUNGEOMMAPCOMPLETE);
 }
+//
 
 Protocol::DPlayerInfo* AAODungeonGameMode::ValidateToken(FString Token)
 {

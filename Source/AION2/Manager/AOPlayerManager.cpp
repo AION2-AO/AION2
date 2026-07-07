@@ -2,12 +2,10 @@
 
 
 #include "AOPlayerManager.h"
-#include "Kismet/GameplayStatics.h"
 #include "Game/AOGameInstance.h"
 #include "Character/Daeva/Daeva.h"
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "Player/AOPlayerController.h"
-#include "Player/AOPlayerState.h"
 #include "UI/AOPlayerHUDWidget.h"
 #include "UI/AOMainHUDWidget.h"
 #include "AOChattingWidget.h"
@@ -265,7 +263,6 @@ void UAOPlayerManager::HandleUseItem(const Protocol::S_UseItemPacket& Pkt)
 			float MaxHealth = ASC->GetNumericAttribute(UAOAttributeSet::GetMaxHealthAttribute());
 			float NewHealth = FMath::Min(CurrentHealth + Pkt.effectvalue(), MaxHealth);
 
-			// 캐릭터의 Health 어트리뷰트 베이스 값 갱신 (자동으로 OnHealthChanged 트리거)
 			ASC->SetNumericAttributeBase(UAOAttributeSet::GetHealthAttribute(), NewHealth);
 
 			UE_LOG(LogTemp, Log, TEXT("[UseItem] Healed %s HP: %.1f -> %.1f"), *MyPlayer->GetName(), CurrentHealth, NewHealth);

@@ -17,6 +17,7 @@
 #include "Data/DA_AbilitySet.h"
 #include "GAS/AttributeSet/AOAttributeSet.h"
 #include "Net/UnrealNetwork.h"
+#include "AI/AIMonsterControllerBase.h"
 
 // Targeting UI
 #include "UI/AOWidgetComponentBase.h"
@@ -363,23 +364,14 @@ void AAOMonsterBase::StartGroggy()
 
 	UE_LOG(LogTemp, Warning, TEXT("%s groggy start"), *GetName());
 
-	if (ASC)
+	AAIMonsterControllerBase* pMonsterController = Cast<AAIMonsterControllerBase>(GetController());
+	if (pMonsterController == nullptr)
 	{
-		const FGameplayTag GroggyTag = FGameplayTag::RequestGameplayTag(FName("State.Groggy"));
-
-		ASC->AddLooseGameplayTag(GroggyTag);
-		ASC->CancelAbilities();
+		UE_LOG(LogTemp, Warning, TEXT("pMonsterController nullptr"));
 	}
 
-	if (AAIController* AIController = Cast<AAIController>(GetController()))
-	{
-		AIController->StopMovement();
-
-		if (UBrainComponent* Brain = AIController->GetBrainComponent())
-		{
-			Brain->StopLogic(TEXT("Monster Groggy"));
-		}
-	}
+	pMonsterController->Set_Phase(PHASE_MONSTER_GROGGY);
+	
 	GetCharacterMovement()->StopMovementImmediately();
 }
 
@@ -397,20 +389,15 @@ void AAOMonsterBase::EndGroggy()
 		AttributeSet->SetGroggy(AttributeSet->GetMaxGroggy());
 	}
 
-	if (ASC)
+	AAIMonsterControllerBase* pMonsterController = Cast<AAIMonsterControllerBase>(GetController());
+	if (pMonsterController == nullptr)
 	{
-		const FGameplayTag GroggyTag = FGameplayTag::RequestGameplayTag(FName("State.Groggy"));
-
-		ASC->RemoveLooseGameplayTag(GroggyTag);
+		UE_LOG(LogTemp, Warning, TEXT("pMonsterController nullptr"));
 	}
 
-	if (AAIController* AIController = Cast<AAIController>(GetController()))
-	{
-		if (UBrainComponent* Brain = AIController->GetBrainComponent())
-		{
-			Brain->RestartLogic();
-		}
-	}
+	// 만약 PreCombat 페이즈를 안쓰신다면 EndGroggy를 virtual 함수로 선언하신 뒤 
+	// Set_Phase를 다른걸로 사용하시면 될 거 같습니다.
+	pMonsterController->Set_Phase(PHASE_MONSTER_PRECOMBAT);
 }
 
 void AAOMonsterBase::SetDungeonBossActive(bool bActive)
