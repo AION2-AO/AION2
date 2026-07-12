@@ -12,6 +12,7 @@
  */
 
 class UTextBlock;
+class UImage;
 
 UCLASS()
 class AION2_API UAOItemQuickSlotWidget : public UAOSlotWidgetBase

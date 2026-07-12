@@ -23,6 +23,7 @@ public:
 
 	void SendMovePacket();
 	void ReceiveMovePacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel);
+	void ReceiveDashPacket(FVector& NewLoc, FRotator& NewRot, FVector& NewVel);
 	void ToggleMailWidget();
 
 	bool HasMovement();
@@ -35,7 +36,6 @@ public:
 
 	void PlayMontageWithSection(EMontageID MontageID, float PlayRate, FName SectionName);
 
-	virtual void Landed(const FHitResult& Hit) override;
 
 	bool bHasMoveInput = false;
 private:
@@ -78,7 +78,6 @@ protected:
 	float LastDashTime = -10.0f;
 
 private:
-	void MMOInputSpacePressed();
 	void MMOInputShiftPressed();
 
 private:

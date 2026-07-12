@@ -1,4 +1,4 @@
-#pragma once
+ï»¿#pragma once
 
 #include "CoreMinimal.h"
 #include "Engine/DataAsset.h"
@@ -23,22 +23,16 @@ struct FGAData
     UPROPERTY(EditDefaultsOnly, Category = "Ability")
     int32 AbilityID = -1;
 
-    // == Skill¿¡ µû¸¥ UI ¹İÀÀ ==
-    // HUD¿¡¼­ ¸î ¹øÂ° ½ºÅ³ ½½·Ô¿¡ µé¾î°¥Áö
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-    int32 SlotIndex = -1;
+    // == Skillì— ë”°ë¥¸ UI ë°˜ì‘ ==
+    /*
+    * HUDì—ì„œ ëª‡ ë²ˆì§¸ ìŠ¤í‚¬ ìŠ¬ë¡¯ì— ë“¤ì–´ê°ˆì§€.
+    * ì§€ê¸ˆì€ ì½¤ë³´ Skillì„ í†µí•´ í•œ Slotì— ì—¬ëŸ¬ í‚¤ê°€ ë“¤ì–´ê°€ë„ë¡ í•˜ëŠ” ë° ì‚¬ìš©.
+    * ì¶”í›„ ìœ ì €ê°€ Skillì„ ììœ  ë°°ì¹˜í•  ìˆ˜ ìˆë„ë¡ í—ˆìš©í•  ë•Œë„ ì•„ë˜ Indexë¥¼ ì“¸ ìˆ˜ ìˆìŒ.
+    */
 
-    // ½ºÅ³ ¹öÆ° ¾ÆÀÌÄÜ
+    // ìŠ¤í‚¬ ë²„íŠ¼ ì•„ì´ì½˜
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
     TObjectPtr<UTexture2D> Icon = nullptr;
-
-    // ÀÌ ½ºÅ³ÀÇ ÄğÅ¸ÀÓ ÅÂ±×. ¿¹: Cooldown.Assassin.Key1
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (Categories = "Cooldown"))
-    FGameplayTag CooldownTag;
-
-    // ½ºÅ³ »ç¿ë ½Ã HUD¿¡ ¶ç¿ï È¿°ú À§Á¬ (¸¸¾à ÀÖ´Ù¸é)
-    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
-    TSubclassOf<UUserWidget> EffectWidgetClass;
 };
 
 UCLASS()
@@ -52,7 +46,7 @@ public:
 
     void GiveToASC(class UAbilitySystemComponent* ASC, TArray<FGameplayAbilitySpecHandle>& OutHandles) const;
 
-    // UI¿¡¼­ Data¸¦ °¡Á®°¥ ¼ö ÀÖµµ·Ï ÇÏ´Â ÇÔ¼ö
+    // UIì—ì„œ Dataë¥¼ ê°€ì ¸ê°ˆ ìˆ˜ ìˆë„ë¡ í•˜ëŠ” í•¨ìˆ˜
     UFUNCTION(BlueprintCallable, Category = "Ability Set")
     bool GetAbilityDataByInputID(int32 AbilityID, FGAData& OutData) const;
 

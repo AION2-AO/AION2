@@ -18,7 +18,7 @@ AAIMonsterControllerBase::AAIMonsterControllerBase()
 
 void AAIMonsterControllerBase::BeginPlay()
 {
-	Super::BeginPlay(); 
+	Super::BeginPlay();
 
 
 	if (AIPerceptionComponent)
@@ -48,19 +48,21 @@ void AAIMonsterControllerBase::BeginPlay()
 
 void AAIMonsterControllerBase::Tick(float DeltaSeconds)
 {
-	Super::Tick(DeltaSeconds); 
+	Super::Tick(DeltaSeconds);
 
 	if (HasAuthority() == false)
 		return;
 
-	if (ControlledMonster && CurrentTargetPlayer)
+	if (ControlledMonster == nullptr)
+		return;
+
+	if (CurrentTargetPlayer)
 	{
 		DistanceToTarget = FVector::Dist(
 			ControlledMonster->GetActorLocation(),
 			CurrentTargetPlayer->GetActorLocation()
 		);
 	}
-
 	else
 	{
 		DistanceToTarget = TNumericLimits<float>::Max();
@@ -82,6 +84,54 @@ void AAIMonsterControllerBase::OnPossess(APawn* InPawn)
 
 	ControlledMonster = Cast<AAOMonsterBase>(GetPawn());
 
+}
+
+void AAIMonsterControllerBase::RemoveTarget(AActor* Target)
+{
+	if (ADaeva* pPlayer = Cast<ADaeva>(Target))
+	{
+		pPlayer->OnPlayerDead.RemoveDynamic(this, &AAIMonsterControllerBase::OnTargetDead);
+	}
+	ArrayTargetPlayers.Remove(Target);
+}
+
+bool AAIMonsterControllerBase::RefreshOrReset()
+{
+	// 배열에 살아있는 후보가 남아있으면 그 중 하나 선택
+	if (ArrayTargetPlayers.Num() == 0)
+	{
+		if (RefreshPerceivedTargets() == false)
+		{
+			// 보스 HP 및 Groggy 게이지 초기화. 
+			UAOAttributeSet* pAttributeSet = ControlledMonster->GetAttributeSet();
+			pAttributeSet->SetHealth(pAttributeSet->GetMaxHealth());
+			pAttributeSet->SetGroggy(pAttributeSet->GetMaxGroggy());
+			
+			if (ControlledMonster->Get_GimmickArray() != nullptr)
+			{
+				TArray<AAOMonsterBase::FGimmickEntry>* ArrayGimmick = ControlledMonster->Get_GimmickArray();
+
+				for (auto& iter : *ArrayGimmick)
+				{
+					iter.bTriggered = false;
+				}
+			}
+
+			
+			// =================================
+
+
+
+			Set_Phase(PHASE_MONSTER_RESET);	
+			Set_State(STATE_MONSTER_TH_IDLE);
+			CurrentTargetPlayer = nullptr;
+			HasDetectedTarget = false;
+			return false;
+		}
+	}
+
+	CurrentTargetPlayer = ArrayTargetPlayers[0];
+	return true;
 }
 
 
@@ -111,7 +161,6 @@ void AAIMonsterControllerBase::TargetPerceptionOn(AActor* Actor, FAIStimulus Sti
 		if (HasDetectedTarget == false)
 		{
 			PhaseTag = PHASE_MONSTER_PRECOMBAT;
-			ControlledMonster->Set_Phase(PHASE_MONSTER_PRECOMBAT);
 			CurrentTargetPlayer = Actor;
 			HasDetectedTarget = true;
 		}
@@ -127,7 +176,16 @@ void AAIMonsterControllerBase::TargetPerceptionOn(AActor* Actor, FAIStimulus Sti
 	// 감지 범위 밖으로 벗어나 감지가 실패했을 때 
 	else
 	{
-
+		// 이거 있으면 어쌔신 뒤잡기할때 타겟 목록에 사라져서 문제 생김. 
+		// 시야에서 완전히 벗어남 → 후보에서 제거 + 언바인딩
+		//
+		//RemoveTarget(Actor);
+		//
+		//// 벗어난 게 현재 타겟이면 갱신
+		//if (Actor == CurrentTargetPlayer)
+		//{
+		//	RefreshOrReset();
+		//}
 	}
 
 
@@ -137,33 +195,12 @@ void AAIMonsterControllerBase::TargetPerceptionOn(AActor* Actor, FAIStimulus Sti
 
 void AAIMonsterControllerBase::OnTargetDead(AActor* DeadActor)
 {
-	// 해당 함수는 플레이어 데바가 isDead가 true일 때 델리게이트에 의해 호출되는 곳 입니다.
+	RemoveTarget(DeadActor);
 
-	// 현재 바라보는 타겟이 죽었을때 호출되는 곳 
-	// 각 보스마다 타겟 설정 로직을 다르게 설정하고 싶으시다면, override하시면 됩니다!. 
-
-	// 기본 로직은 다음과 같습니다. 
-	ArrayTargetPlayers.Remove(DeadActor);
-
-	// 죽은게 현재 타겟이 아니면 갱신이 불필요
 	if (DeadActor != CurrentTargetPlayer)
 		return;
 
-
-	if (ArrayTargetPlayers.Num() == 0)
-	{
-		if (RefreshPerceivedTargets() == false)
-		{
-			Set_Phase(PHASE_MONSTER_OUTOFCOMBAT);
-			Set_State(STATE_MONSTER_TH_IDLE);
-			CurrentTargetPlayer = nullptr;
-			HasDetectedTarget = false;
-			return;
-		}
-
-	}
-
-	CurrentTargetPlayer = ArrayTargetPlayers[0];
+	RefreshOrReset();
 
 }
 
@@ -197,17 +234,7 @@ bool AAIMonsterControllerBase::RefreshPerceivedTargets()
 		}
 	}
 
-
-	// 여기서 그럼 그래도 현재 시야범위에 아무도 없다면, 
-	// 보스 초기화 되도록 설정
-	if (ArrayTargetPlayers.Num() == 0)
-	{
-		// 여기서 hp 및 stamina 량 다시 max로 올려주고 
-		// 보스 원래 위치로 보내기. 
-		return false;
-	}
-
-	return true;
+	return ArrayTargetPlayers.Num() > 0;
 
 }
 

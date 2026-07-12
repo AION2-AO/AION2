@@ -1,120 +1,35 @@
-[2026.07.06-09.36.11:094][332]LogTemp: Warning: [Dungeon] PlayerInfo Set | Id: 1016 | Name: 11 | ClassType: 3
-[2026.07.06-09.36.11:096][332]LogTemp: [Dungeon] PostLogin: Success and SetPlayerInfo (Key: 2059430761), PlayerId: 1016
-[2026.07.06-09.36.11:096][332]LogGameMode: Display: Match State Changed from WaitingToStart to InProgress
-[2026.07.06-09.36.11:097][332]LogTemp: Warning: [Spawn] BP_AOPlayerController_Dungeon_C_2147482341 | Authority: 1 | ClassType: 3
-[2026.07.06-09.36.11:098][332]LogTemp: Warning: BP_AOPlayerController_Dungeon_C_2147482341 Spawned as BP_Ranger_C_2147482335
-[2026.07.06-09.36.11:994][332]LogWindows: Could not start crash report client using ../../../Engine/Binaries/Win64/CrashReportClient-Win64-Debug.exe
-[2026.07.06-09.36.11:995][332]LogMemory: Platform Memory Stats for WindowsServer
-[2026.07.06-09.36.11:996][332]LogMemory: Process Physical Memory: 366.92 MB used, 367.38 MB peak
-[2026.07.06-09.36.11:996][332]LogMemory: Process Virtual Memory: 257.41 MB used, 284.73 MB peak
-[2026.07.06-09.36.11:996][332]LogMemory: Physical Memory: 10182.60 MB used,  22077.46 MB free, 32260.06 MB total
-[2026.07.06-09.36.11:996][332]LogMemory: Virtual Memory: 18239.59 MB used,  20166.25 MB free, 38405.84 MB total
-[2026.07.06-09.36.11:996][332]LogWindows: Error: === Critical error: ===
-[2026.07.06-09.36.11:996][332]LogWindows: Error: 
-[2026.07.06-09.36.11:996][332]LogWindows: Error: Fatal error!
-[2026.07.06-09.36.11:996][332]LogWindows: Error: 
-[2026.07.06-09.36.11:996][332]LogWindows: Error: Unhandled Exception: EXCEPTION_STACK_OVERFLOW
-[2026.07.06-09.36.11:996][332]LogWindows: Error: 
-[2026.07.06-09.36.11:996][332]LogWindows: Error: [Callstack] 0x00007ff6b6fc7164 AION2Server.exe!UClass::FindFunctionByName() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\CoreUObject\Private\UObject\Class.cpp:6910]
-[2026.07.06-09.36.11:996][332]LogWindows: Error: [Callstack] 0x00007ff6b72fd311 AION2Server.exe!UObject::FindFunctionChecked() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\CoreUObject\Private\UObject\ScriptCore.cpp:1514]
-[2026.07.06-09.36.11:996][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3fef9 AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:718]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:997][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:998][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.11:999][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:000][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:001][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:002][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:003][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:003][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.cpp:729]
-[2026.07.06-09.36.12:003][332]LogWindows: Error: [Callstack] 0x00007ff6bcb3ff3b AION2Server.exe!AGameModeBase::InitStartSpot() [C:\AbyssOnly\AION2\Intermediate\Build\Win64\AION2Server\Inc\Engine\UHT\GameModeBase.gen.
-[2026.07.06-09.36.12:007][332]LogExit: Executing StaticShutdownAfterError
-[2026.07.06-09.36.12:008][332]LogWindows: FPlatformMisc::RequestExit(1, LaunchWindowsStartup.ExceptionHandler)
-[2026.07.06-09.36.12:008][332]LogWindows: FPlatformMisc::RequestExitWithStatus(1, 3, LaunchWindowsStartup.ExceptionHandler)
-[2026.07.06-09.36.12:008][332]LogCore: Engine exit requested (reason: Win RequestExit)
+[2026.07.09-06.33.08:370][326]LogWindows: Error: === Critical error: ===
+[2026.07.09-06.33.08:370][326]LogWindows: Error: 
+[2026.07.09-06.33.08:370][326]LogWindows: Error: Fatal error!
+[2026.07.09-06.33.08:370][326]LogWindows: Error: 
+[2026.07.09-06.33.08:370][326]LogWindows: Error: Unhandled Exception: EXCEPTION_ACCESS_VIOLATION writing address 0x0000000000000650
+[2026.07.09-06.33.08:371][326]LogWindows: Error: 
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e138d32d AION2Server.exe!FPacketHandler::Handle_S_DEDI_CREATE() [C:\AbyssOnly\AION2\Source\AION2\Manager\PacketHandlerManager.cpp:254]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e138c82f AION2Server.exe!`InitPacketHandler'::`2'::<lambda_1>::<lambda_invoker_cdecl>() [C:\AbyssOnly\AION2\Source\AION2\Manager\PacketHandlerManager.cpp:28]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e1384c00 AION2Server.exe!UAONetworkManager::ProcessQueuePackets() [C:\AbyssOnly\AION2\Source\AION2\Manager\AONetworkManager.cpp:92]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e00942a0 AION2Server.exe!FTickableGameObject::TickObjects() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Engine\Private\Tickable.cpp:197]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7df2b6ca2 AION2Server.exe!UGameEngine::Tick() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Engine\Private\GameEngine.cpp:1946]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e07d7483 AION2Server.exe!FEngineLoop::Tick() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Launch\Private\LaunchEngineLoop.cpp:5625]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e07e738c AION2Server.exe!GuardedMain() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Launch\Private\Launch.cpp:187]
+[2026.07.09-06.33.08:371][326]LogWindows: Error: [Callstack] 0x00007ff7e07e747a AION2Server.exe!GuardedMainWrapper() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Launch\Private\Windows\LaunchWindows.cpp:128]
+[2026.07.09-06.33.08:372][326]LogWindows: Error: [Callstack] 0x00007ff7e07e9eea AION2Server.exe!LaunchWindowsStartup() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Launch\Private\Windows\LaunchWindows.cpp:282]
+[2026.07.09-06.33.08:372][326]LogWindows: Error: [Callstack] 0x00007ff7e07f3c44 AION2Server.exe!WinMain() [C:\AbyssOnly\UnrealEngine\Engine\Source\Runtime\Launch\Private\Windows\LaunchWindows.cpp:340]
+[2026.07.09-06.33.08:372][326]LogWindows: Error: [Callstack] 0x00007ff7e523bc3a AION2Server.exe!__scrt_common_main_seh() [D:\a\_work\1\s\src\vctools\crt\vcstartup\src\startup\exe_common.inl:288]
+[2026.07.09-06.33.08:372][326]LogWindows: Error: [Callstack] 0x00007ff9ebc1e957 KERNEL32.DLL!UnknownFunction []
+[2026.07.09-06.33.08:372][326]LogWindows: Error: 
+[2026.07.09-06.33.08:389][326]LogExit: Executing StaticShutdownAfterError
+[2026.07.09-06.33.08:390][326]LogWindows: FPlatformMisc::RequestExit(1, LaunchWindowsStartup.ExceptionHandler)
+[2026.07.09-06.33.08:391][326]LogWindows: FPlatformMisc::RequestExitWithStatus(1, 3, LaunchWindowsStartup.ExceptionHandler)
+[2026.07.09-06.33.08:391][326]LogCore: Engine exit requested (reason: Win RequestExit)
+
+[2026.07.09-06.53.49:735][  0]LogTemp: Warning: BeginPlay - AMyGameMode
+[2026.07.09-06.53.49:736][  0]LogTemp: Warning: [ElectricZone] Add Tag Success: State.Monster.LT.ElectricZone / HasTag=1
+[2026.07.09-06.53.49:737][  0]LogGameState: Match State Changed from EnteringMap to WaitingToStart
+[2026.07.09-06.53.49:738][  0]LogLoad: Took 0.258289 seconds to LoadMap(/Game/Map/Arkanis_Total)
+[2026.07.09-06.53.49:738][  0]LogGlobalStatus: UEngine::LoadMap Load map complete /Game/Map/Arkanis_Total
+[2026.07.09-06.53.49:738][  0]LogPakFile: AllPaks IndexSizes: DirectoryHashSize=32, PathHashSize=16, EntriesSize=32752, DirTreeIndexSize=177272, TotalSize=210072
+[2026.07.09-06.53.49:761][  0]LogInit: Display: Engine is initialized. Leaving FEngineLoop::Init()
+[2026.07.09-06.53.49:762][  0]LogLoad: (Engine Initialization) Total time: 1.82 seconds
+[2026.07.09-06.53.49:783][  0]LogTrace: Display: Control listening on port 1985
+[2026.07.09-06.56.33:682][833]LogTemp: PacketHandler - Handle_S_CREATE /LeaderName: 김선환
+[2026.07.09-06.56.35:910][967]LogTemp: Error: HandleDungeonSetPlayerInfo failed: GameMode is null or not AAODungeonGameMode.

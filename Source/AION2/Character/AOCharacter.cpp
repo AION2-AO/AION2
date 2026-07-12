@@ -6,6 +6,8 @@
 #include "GAS/AttributeSet/AOAttributeSet.h"
 #include "Actor/AOProjectile.h"
 #include "Character/Monster/AOMonsterBase.h"
+#include "Character/Daeva/Daeva.h"
+
 
 #include "AbilitySystemComponent.h"
 #include "AbilitySystemBlueprintLibrary.h"
@@ -185,6 +187,75 @@ void AAOCharacter::CheckAttackHitSector(const FAttackData& AttackData, const flo
 	}
 }
 
+void AAOCharacter::CheckIsInSafeZone(const FAttackData& AttackData, uint8 SafeColor)
+{
+	if (!HasAuthority())
+	{
+		return;
+	}
+
+	TArray<FHitResult> OutHitResults;
+
+	const float AttackRange = AttackData.TraceData.Range;
+	const float AttackRadius = AttackData.TraceData.Radius;
+
+	FCollisionQueryParams Params(SCENE_QUERY_STAT(AttackTrace), false, this);
+
+	FVector SweepStart = GetActorTransform().TransformPosition(AttackData.TraceData.StartOffset);
+	FVector SweepEnd = SweepStart + AttackData.TraceData.Direction.GetSafeNormal() * AttackRange;
+	FVector CapsuleCenter = SweepStart + (SweepEnd - SweepStart) * 0.5f;
+
+	bool bHitDetected = GetWorld()->SweepMultiByChannel(OutHitResults, SweepStart, SweepEnd, FQuat::Identity, CCHANNEL_ATTACK, FCollisionShape::MakeSphere(AttackRadius), Params);
+
+	if (CVarDrawAttackTrace.GetValueOnGameThread())
+	{
+		const float CapsuleHalfHeight = AttackRange * 0.5f;
+		FColor DrawColor = bHitDetected ? FColor::Green : FColor::Red;
+		Multicast_DrawDebugCapsuleCollider(CapsuleCenter, CapsuleHalfHeight, AttackRadius, DrawColor);
+	}
+
+	if (!bHitDetected)
+	{
+		return;
+	}
+
+	bool bDidShakeCamera = false;
+
+	for (const FHitResult& HitResult : OutHitResults)
+	{
+		ADaeva* HitActor = Cast<ADaeva>(HitResult.GetActor());
+		if (!IsValid(HitActor))
+		{
+			continue;
+		}
+
+		if (HitActor->IsDead())
+		{
+			continue;
+		}
+
+		if (!IsEnemy(HitActor))
+		{
+			continue;
+		}
+
+		uint8 CurrentColor = static_cast<uint8>(HitActor->Get_CurrentDaevaHasSheildColor());
+
+		if (CurrentColor == SafeColor)
+		{
+			continue;
+		}
+
+		OnAttackSucceeded(AttackData, HitActor, HitResult, bDidShakeCamera);
+	}
+
+}
+
+
+
+
+
+
 void AAOCharacter::OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera)
 {
 	AAOCharacter* Target = Cast<AAOCharacter>(HitActor);
@@ -227,12 +298,24 @@ void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, const FHitResult&
 	{
 		FGameplayEffectSpecHandle GroggySpecHandle = SourceASC->MakeOutgoingSpec(GroggyDamageEffect, 1.0f, Context);
 
-		if (GroggySpecHandle.IsValid())
+		FGameplayTagContainer OwnedTags;	
+		MonsterTarget->GetAbilitySystemComponent()->GetOwnedGameplayTags(OwnedTags);	
+
+		// 보스가 기믹상태일시에는 데미지 x 
+		if (GroggySpecHandle.IsValid() && OwnedTags.HasTagExact(GIMMICK_MONSTER) == false)
 		{
+			const FGameplayTag GroggyDamageTag = FGameplayTag::RequestGameplayTag(TEXT("Data.GroggyDamage"));
+			float GroggyDamageAmount = BaseGroggyDamage;
+			if (AttackData.bRestoreManaOnHit)
+			{
+				GroggyDamageAmount *= 0.5;
+			}
+
+			GroggySpecHandle.Data->SetSetByCallerMagnitude(GroggyDamageTag, -GroggyDamageAmount);
 			SourceASC->ApplyGameplayEffectSpecToTarget(*GroggySpecHandle.Data.Get(), TargetASC);
+			
 		}
 	}
-
 
 	//
 
@@ -242,24 +325,17 @@ void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, const FHitResult&
 		return;
 	}
 
-	SpecHandle.Data->SetSetByCallerMagnitude(
-		FGameplayTag::RequestGameplayTag(TEXT("Data.Damage")),
-		-FinalDamage
-	);
+	SpecHandle.Data->SetSetByCallerMagnitude(FGameplayTag::RequestGameplayTag(TEXT("Data.Damage")),	-FinalDamage);
 
-	const float OldHealth =
-		TargetASC->GetNumericAttribute(
-			UAOAttributeSet::GetHealthAttribute()
-		);
+	const float OldHealth =	TargetASC->GetNumericAttribute(UAOAttributeSet::GetHealthAttribute());
 
 	SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(), TargetASC);
 
-	const float NewHealth =
-		TargetASC->GetNumericAttribute(
-			UAOAttributeSet::GetHealthAttribute()
-		);
+	const float NewHealth =	TargetASC->GetNumericAttribute(UAOAttributeSet::GetHealthAttribute());
 
-	UE_LOG(LogTemp,Warning,TEXT("[Damage] %s -> %s | ATK: %.1f | DEF: %.1f | Mult: %.2f | Final: %.2f | HP: %.1f -> %.1f"),
+	const  float NewGroggy = TargetASC->GetNumericAttribute(UAOAttributeSet::GetGroggyAttribute());
+
+	UE_LOG(LogTemp, Warning, TEXT("[Damage] %s -> %s | ATK: %.1f | DEF: %.1f | Mult: %.2f | Final: %.2f | HP: %.1f -> %.1f | Groggy : %.1f"),
 		*GetNameSafe(DamageCauser),
 		*GetNameSafe(this),
 		AttackPower,
@@ -267,7 +343,8 @@ void AAOCharacter::TakeDamageAO(const FAttackData& AttackData, const FHitResult&
 		Multiplier,
 		FinalDamage,
 		OldHealth,
-		NewHealth
+		NewHealth,
+		NewGroggy
 	);
 
 	if (AttackData.HitGameplayCueTag.IsValid())
@@ -473,6 +550,10 @@ TArray<USkeletalMeshComponent*> AAOCharacter::GetAllMeshes()
 	Meshes.Add(GetMesh());
 
 	return Meshes;
+}
+
+void AAOCharacter::OnRep_IsDead()
+{
 }
 
 void AAOCharacter::SetupOwnedAttackColliders()

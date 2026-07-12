@@ -88,12 +88,14 @@ Config/DefaultEditorPerProjectUserSettings.ini
 [Rr]elease/
 x64/
 x86/
+*/DummyClient/*
 
 
 # Google Proto
 /ProtoBufCore/
 /Protobuf/
-/Common/
+/Common/*
+!/Common/*.proto
 */ProtoBufCore/
 
 # Visual Studio 캐시 및 빌드 결과물

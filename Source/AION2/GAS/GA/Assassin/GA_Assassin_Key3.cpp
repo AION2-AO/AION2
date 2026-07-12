@@ -20,8 +20,7 @@ void UGA_Assassin_Key3::ActivateAbility(const FGameplayAbilitySpecHandle Handle,
 		return;
 	}
 
-	static const FGameplayTag CooldownTag = FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Assassin.Key3"));
-	const int32 Count = ActorInfo->AbilitySystemComponent->GetTagCount(CooldownTag);
+	const int32 Count = ActorInfo->AbilitySystemComponent->GetTagCount(FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Assassin.Key3")));
 	if (Count >= 2)
 	{
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);

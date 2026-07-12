@@ -18,7 +18,9 @@ public:
 	int32 GetHp() { return _hp; }
 	int32 GetExp() { return _exp; }
 
+	void SetId(uint64 NetworkId) { _playerId = NetworkId; }
 	void SetName(std::string playerName) { _name = playerName; }
+
 	void SetPos(Protocol::Vector3 inPos) { _playerPos = inPos; }
 	void SetRot(Protocol::Rotator3 inRot) { _playerRot = inRot; }
 	void SetReady(bool ready) { _isReady = ready; }

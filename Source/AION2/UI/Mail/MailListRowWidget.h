@@ -20,17 +20,23 @@ class AION2_API UMailListRowWidget : public UUserWidget
 	GENERATED_BODY()
 	
 public:
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidgetOptional))
 	UButton* MailSelectButton;
 
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidgetOptional))
 	UTextBlock* SenderName;
 	
-	UPROPERTY(meta = (BindWidget))
+	UPROPERTY(meta = (BindWidgetOptional))
 	UTextBlock* Title;
 
-	UPROPERTY(meta = (BindWidget, Optional = true))
+	UPROPERTY(meta = (BindWidgetOptional))
 	UTextBlock* ExpiredDate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Mail UI")
+	FSlateColor UnreadColor = FSlateColor(FLinearColor(0.5f, 0.5f, 0.5f, 1.0f));
+
+	UPROPERTY(EditDefaultsOnly, Category = "Mail UI")
+	FSlateColor ReadColor = FSlateColor(FLinearColor(1.0f, 1.0f, 1.0f, 1.0f));
 
 private:
 	FMailData RowData;

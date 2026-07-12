@@ -27,7 +27,7 @@ namespace _pbi = _pb::internal;
 
 namespace Protocol {
 }  // namespace Protocol
-static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[3];
+static const ::_pb::EnumDescriptor* file_level_enum_descriptors_Enum_2eproto[4];
 static constexpr ::_pb::ServiceDescriptor const** file_level_service_descriptors_Enum_2eproto = nullptr;
 const uint32_t TableStruct_Enum_2eproto::offsets[1] = {};
 static constexpr ::_pbi::MigrationSchema* schemas = nullptr;
@@ -38,12 +38,14 @@ const char descriptor_table_protodef_Enum_2eproto[] PROTOBUF_SECTION_VARIABLE(pr
   "LASS_NONE\020\000\022\014\n\010ASSASSIN\020\001\022\n\n\006CLERIC\020\002\022\n\n"
   "\006RANGER\020\003\022\013\n\007TEMPLAR\020\004*-\n\nRoomStatus\022\016\n\n"
   "RECRUITING\020\000\022\017\n\013IN_PROGRESS\020\001*/\n\021Dungeon"
-  "FailReason\022\t\n\005Ready\020\000\022\017\n\013FullDungeon\020\001b\006"
-  "proto3"
+  "FailReason\022\t\n\005Ready\020\000\022\017\n\013FullDungeon\020\001*Q"
+  "\n\016MailFailReason\022\016\n\nNONE_ERROR\020\000\022\021\n\rNONE"
+  "_RECEIVER\020\001\022\r\n\tNONE_GOLD\020\002\022\r\n\tNONE_ITEM\020"
+  "\003b\006proto3"
   ;
 static ::_pbi::once_flag descriptor_table_Enum_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Enum_2eproto = {
-    false, false, 206, descriptor_table_protodef_Enum_2eproto,
+    false, false, 289, descriptor_table_protodef_Enum_2eproto,
     "Enum.proto",
     &descriptor_table_Enum_2eproto_once, nullptr, 0, 0,
     schemas, file_default_instances, TableStruct_Enum_2eproto::offsets,
@@ -96,6 +98,22 @@ bool DungeonFailReason_IsValid(int value) {
   switch (value) {
     case 0:
     case 1:
+      return true;
+    default:
+      return false;
+  }
+}
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MailFailReason_descriptor() {
+  ::PROTOBUF_NAMESPACE_ID::internal::AssignDescriptors(&descriptor_table_Enum_2eproto);
+  return file_level_enum_descriptors_Enum_2eproto[3];
+}
+bool MailFailReason_IsValid(int value) {
+  switch (value) {
+    case 0:
+    case 1:
+    case 2:
+    case 3:
       return true;
     default:
       return false;

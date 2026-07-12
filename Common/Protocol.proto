@@ -1,0 +1,312 @@
+syntax = "proto3";
+
+package Protocol;
+
+import "Enum.proto";
+import "Struct.proto";
+
+message C_SignUpPacket 
+{
+	string id = 1;
+	string password = 2;
+	ClassType classType = 3;
+}
+
+message S_SignUpResultPacket
+{
+	bool success = 1;     
+}
+
+message C_SetNicknamePacket
+{
+	string nickname = 1;
+}
+
+message S_SetNicknamePacket
+{
+	bool isSucceed = 1;
+}
+
+message C_LoginPacket 
+{
+	string id = 1;
+	string password = 2;
+}
+
+message S_LoginFailPacket
+{}
+
+message S_LoginSuccessPacket 
+{
+	PlayerInfo playerInfo = 1;
+	int32 gold = 2;
+	int32 exp =3;
+	int32 hp = 4;
+}
+
+message C_MapLoadCompletePacket
+{}
+
+message S_ItemDataPacket
+{
+	repeated ItemData  playerItems = 1;
+}
+
+message S_SpawnPacket
+{
+	repeated PlayerState playerStates = 1;
+}
+
+message C_MovePacket
+{
+	uint64 playerId = 1;
+	Vector3 PlayerLocation = 2;
+	Vector3 PlayerVelocity = 3;
+	Rotator3 PlayerRotation =4;
+}
+
+message S_MovePacket
+{
+	uint64 playerId = 1;
+	Vector3 PlayerLocation = 2;
+	Vector3 PlayerVelocity = 3;
+	Rotator3 PlayerRotation =4;
+}
+
+message C_DashPacket
+{
+	uint64 playerId = 1;
+	Vector3 PlayerLocation = 2;
+	Vector3 PlayerVelocity = 3;
+	Rotator3 PlayerRotation =4;
+
+}
+
+message S_DashPacket
+{
+	uint64 playerId = 1;
+	Vector3 PlayerLocation = 2;
+	Vector3 PlayerVelocity = 3;
+	Rotator3 PlayerRotation =4;
+}
+
+message C_DedicatedPacket
+{
+	string serverIP = 1;
+	int32 serverPort = 2;
+}
+
+message C_DungeonWaitingRoomEnterPacket
+{
+}
+
+message S_DungeonWaitingRoomEnterPacket
+{
+	repeated DungeonInfo dungeonInfos = 1;
+}
+
+message C_DungeonCreatePacket
+{
+}
+
+message S_DungeonCreatePacket
+{
+	DungeonInfo dungeonInfo= 1;
+}
+
+message C_DungeonEnterPacket
+{
+	uint64 playerId = 1;
+	int32 dungeonId = 2;
+}
+
+message C_DungeonRandomEnterPacket
+{
+	uint64 playerId = 1;
+}
+
+message S_DungeonEnterPacket
+{
+	int32 dungeonId = 1;
+	DungeonPlayerInfo enterPlayer = 2;
+	DungeonInfo dungeonInfo = 3;
+}
+
+message C_DungeonReadyPacket
+{
+	int32 dungeonId = 1;
+}
+
+message S_DungeonReadyPacket
+{
+	uint64 playerId = 1;
+	int32 dungeonId = 2;
+	bool isReady = 3;
+}
+
+message C_DungeonStartPacket
+{
+	int32 dungeonId = 1;
+}
+
+message S_DungeonStartDediPacket
+{
+	repeated DediDungeonInfo prePlayersInfos = 1;
+}
+
+message S_DungeonStartPacket
+{
+	int32 dungeonId = 1;
+	string clientToken = 2;
+	string dungeonIP = 3;
+	int32 port = 4;
+}
+
+message C_DungeonExitPacket
+{
+	int32 dungeonId = 1;
+	uint64 playerId = 2;
+}
+
+message S_DungeonExitPacket
+{
+	DungeonInfo dungeonInfo = 1;
+	uint64 playerId = 2;
+}
+
+message S_DungeonFailPacket
+{
+	int32 dungeonId = 1;
+	DungeonFailReason reason = 2;
+}
+
+message C_RequestDungeonCompletePacket
+{
+	int32 dungeonId = 1;
+	int32 Gold = 2;
+}
+
+message S_RequestDungeonCompletePacket
+{
+	int32 hp = 1;
+	int32 Gold = 2;
+	repeated ItemData  playerItems = 3;
+}
+
+message C_StorePurchasePacket
+{
+	int32 itemId = 1;
+	uint64 playerId = 2;
+}
+
+message S_StorePurchasePacket
+{
+	ItemData itemInfo = 1;
+	int32 gold = 2;
+}
+
+message C_ChangeHpPacket
+{
+	uint64 playerId = 1;
+	int32 hp = 2;
+}
+
+message C_ChatPacket
+{
+	uint64 playerId = 1;
+	string chat = 2;
+}
+
+message S_ChatPacket
+{ 
+	string playerId = 1;
+	string chat = 2;
+}
+
+message S_DisconnectPacket
+{
+	uint64 playerId =1;
+}
+
+message C_UseItemPacket
+{
+	uint64 playerId = 1;
+	int32 slotIndex = 2;
+}
+
+message S_UseItemPacket
+{
+	uint64 playerId = 1;      // 아이템을 사용한 플레이어 ID (주변 유저 연출용)
+	int32 slotIndex = 2;      // 아이템이 사용된 퀵슬롯 인덱스
+	int32 count = 3;          // 사용 후 남은 아이템 개수 (0이면 슬롯 비우기)
+	string effectType = 4;    // 효과 종류 (예: "HEAL_HP", "HEAL_MP")
+	int32 effectValue = 5;    // 효과 수치 (예: 50)
+}
+
+message C_DungeonMapLoadCompletePacket
+{
+	int32 dungeonId = 1;
+}
+
+message S_SetDungeonPlayerPacket
+{
+	repeated DPlayerInfo playerInfo = 1;
+}
+
+message C_SendMailPacket
+{
+	uint64 senderId = 1;
+	string senderName = 2;
+	string receiverName = 3;
+	string title = 4;
+	string content = 5;
+	int32 gold = 6;
+	int32 itemId = 7;
+	int32 itemCount = 8;
+}
+
+message S_MailSendPacket
+{
+	bool success = 1;
+	MailFailReason errorCode = 2;
+}
+
+// 접속 중일 때 보낼 메일 알림 패킷
+message S_NotifyMailPacket
+{
+
+}
+
+// 메일 창으로 들어가면 보낼 (제목, 보낸 사람, 만료일, 아이템 첨부 여부를 가져올 패킷)
+message C_MailListPacket
+{
+	uint64 playerId = 1;
+}
+
+message S_MailListPacket
+{
+	repeated MailListInfo MailLists  = 1;
+}
+
+// 특정 메일을 클리가 -> 컨텐츠, 아이템 등 전부 로드
+message C_MailContentPacket
+{
+	uint64 MailId = 1;
+}
+
+message S_MailContentPacket
+{
+	uint64 MailId = 1;
+	uint64 senderId = 2;
+	string senderName = 3;
+	string receiverName = 4;
+	string title = 5;
+	string content = 6;
+	int32 gold = 7;
+	int32 itemId = 8;
+	int32 itemCount = 9;
+	bool IsReceived = 10;
+	bool isRead = 11;
+	string sendDate = 12;
+	string ExpiredDate = 13;
+}

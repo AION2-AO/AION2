@@ -1,10 +1,10 @@
-#pragma once
+ï»¿#pragma once
 #include "JobQueue.h"
 #include "Protocol.pb.h"
 
 #include <map>
 
-// ·Îºñ
+// ï¿½Îºï¿½
 class Room : public JobQueue
 {
 public:
@@ -18,6 +18,7 @@ public:
 	bool HandleEnterPlayer(PlayerRef player);
 	bool HandleLeavePlayer(PlayerRef player);
 	void HandleMove(Protocol::C_MovePacket pkt, PlayerRef player);
+	void HandlePlayerDash(Protocol::C_DashPacket pkt, PlayerRef player);
 	void HandleSavePlayerHp();
 	void HandleChat(Protocol::S_ChatPacket pkt);
 

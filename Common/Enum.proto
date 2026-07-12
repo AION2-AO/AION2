@@ -1,0 +1,29 @@
+syntax = "proto3";
+package Protocol;
+
+enum ClassType {
+  CLASS_NONE = 0;
+  ASSASSIN = 1;
+  CLERIC = 2;
+  RANGER = 3;
+  TEMPLAR = 4;
+}
+
+enum RoomStatus {
+    RECRUITING = 0; 
+    IN_PROGRESS = 1; 
+}
+
+enum DungeonFailReason
+{
+    Ready = 0; // 모든 멤버가 레디를 안 했을 경우
+    FullDungeon = 1; // 4개가 다 찼을 경우
+}
+
+enum MailFailReason
+{
+    NONE_ERROR = 0;
+    NONE_RECEIVER = 1;
+    NONE_GOLD = 2;
+    NONE_ITEM = 3;
+}

@@ -6,19 +6,28 @@
 #include "Common/TcpSocketBuilder.h"
 #include "SocketSubsystem.h"
 #include "Manager/AONetworkManager.h"
+#include "Manager/AOUIManager.h"
 #include "Kismet/GameplayStatics.h"
 #include "TimerManager.h"
 #include "IPAddress.h"
 
+//#include "LoadingScreenFunctionLibrary.h"
+
+
 void UAOGameInstance::Init()
 {
 	Super::Init();
+	
+	if (!UIManager)
+	{
+		UIManager = NewObject<UAOUIManager>(this);
+	}
+
 
 #if UE_SERVER
-	TryAsyncConnect("172.16.30.107", 9999);
+	TryAsyncConnect("61.82.153.198", 9999);
 #else
-
-	TryAsyncConnect("172.16.30.107", 7777);
+	TryAsyncConnect("61.82.153.198", 7777);
 #endif
 }
 
@@ -221,12 +230,18 @@ void UAOGameInstance::SendLoginPacket(const FString& Id, const FString& Password
 void UAOGameInstance::SendMapLoadCompletePacket()
 {
 	Protocol::C_MapLoadCompletePacket Pkt;
-	SendPacket(Pkt, PKT_C_MAPLOADCOMPLETE);
+	SendPacket(Pkt, PKT_C_MAP_LOAD_COMPLETE);
 }
 
 void UAOGameInstance::OpenVillageLevel()
 {
 	FString VillagePath = TEXT("/Game/Map/Village");
+
+	//if (ULoadingScreenFunctionLibrary::OpenLevelWithLoadingScreen(this, *VillagePath))
+	//{
+	//	return;
+	//}
+
 	UGameplayStatics::OpenLevel(GetWorld(), *VillagePath, true);
 }
 

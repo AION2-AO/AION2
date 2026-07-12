@@ -25,7 +25,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 
-
+	void SetPlayerShieldColor();
+	EOrbColor Get_ShieldOrbColor() { return OrbColor; }
 	void Set_ShieldOrbColor(EOrbColor _OrbColor) { OrbColor = _OrbColor;  }
 
 	UFUNCTION()

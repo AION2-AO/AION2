@@ -11,8 +11,8 @@ public:
 	bool OnRead(int32 numOfBytes);
 	bool OnWrite(int32 numOfBytes);
 
-	BYTE* ReadPos() { return &_buffer[_readPos]; }
-	BYTE* WritePos() { return &_buffer[_writePos]; }
+	BYTE* ReadPos() { return _buffer.data() + _readPos; }
+	BYTE* WritePos() { return _buffer.data() + _writePos; }
 	// 읽어야 할 데이터의 크기
 	int32 DataSize() { return _writePos - _readPos; }
 	int32 FreeSize() { return _capacity - _writePos; }

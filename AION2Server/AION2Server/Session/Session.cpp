@@ -1,4 +1,4 @@
-﻿#include "pch.h"
+#include "pch.h"
 #include "Session.h"
 #include "SocketUtils.h"
 #include "Service.h"
@@ -18,7 +18,7 @@ void Session::Send(SendBufferRef sendBuffer)
 {
 	if (IsConnected() == false)
 	{
-		std::cout << "IsConnected failed\n";
+		//std::cout << "IsConnected failed\n";
 		return;
 	}
 
@@ -40,7 +40,31 @@ void Session::Send(SendBufferRef sendBuffer)
 
 bool Session::Connect()
 {
-	return false;
+	if (IsConnected())
+		return false;
+
+	_socket = SocketUtils::CreateSocket();
+	if (_socket == INVALID_SOCKET)
+		return false;
+
+	// Bind to ANY address first for ConnectEx
+	NetAddress anyAddress(L"0.0.0.0", 0);
+	if (SocketUtils::Bind(_socket, anyAddress) == false)
+	{
+		::closesocket(_socket);
+		_socket = INVALID_SOCKET;
+		return false;
+	}
+
+	// Register socket to IOCP Core
+	if (GetService()->GetIocpCore()->Register(shared_from_this()) == false)
+	{
+		::closesocket(_socket);
+		_socket = INVALID_SOCKET;
+		return false;
+	}
+
+	return RegisterConnect();
 }
 
 void Session::Disconnect(const WCHAR* cause)
@@ -48,7 +72,6 @@ void Session::Disconnect(const WCHAR* cause)
 	if (_connected.exchange(false) == false)
 		return;
 
-	// TODO: Logout logic
 	std::wcout << "Disconnected: " << cause << "\n";
 	OnDisconnected();;
 	RegisterDisConnect();
@@ -80,7 +103,34 @@ void Session::Dispatch(IocpEvent* iocpEvent, int32 numBytes)
 
 bool Session::RegisterConnect()
 {
-	return false;
+	_connectEvent.Init();
+	_connectEvent.owner = shared_from_this();
+	_connectEvent._type = EventType::Connect;
+
+	DWORD bytesSent = 0;
+	SOCKADDR_IN addr = GetAddress().GetSockAddr();
+
+	bool pending = SocketUtils::ConnectEx(
+		_socket,
+		reinterpret_cast<const SOCKADDR*>(&addr),
+		sizeof(addr),
+		nullptr,
+		0,
+		&bytesSent,
+		&_connectEvent
+	);
+
+	if (pending == false)
+	{
+		int32 errorCode = ::WSAGetLastError();
+		if (errorCode != WSA_IO_PENDING)
+		{
+			_connectEvent.owner = nullptr; // Reset ownership
+			return false;
+		}
+	}
+
+	return true;
 }
 
 void Session::RegisterDisConnect()
@@ -182,16 +232,17 @@ void Session::ProcessConnect()
 
 	GetService()->AddSession(GetSessionRef());
 	if (GetService()->GetServiceType() == ServiceType::MMOServer)
-		// 접속한 클라이언트의 IP와 Port 출력하도록 수정
 	{
 		std::wcout << L"Client Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
-			<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
+			<< L", Port: " << GetService()->GetNetAddress().GetPort() 
+			<< L" | Active Sessions: " << GetService()->GetCurrentSessionCount() << std::endl;
 	}
 
 	else
 	{
 		std::wcout << L"Dedi Connected! IP: " << GetService()->GetNetAddress().GetIpAddress()
-			<< L", Port: " << GetService()->GetNetAddress().GetPort() << std::endl;
+			<< L", Port: " << GetService()->GetNetAddress().GetPort() 
+			<< L" | Active Sessions: " << GetService()->GetCurrentSessionCount() << std::endl;
 	}
 
 	OnConnected();
@@ -201,9 +252,8 @@ void Session::ProcessConnect()
 void Session::ProcessDisconnect()
 {
 	GetService()->ReleaseSession(GetSessionRef());
-	// TODO: OnDisconnected override logic
 
-	std::cout << "Client Disconnected!" << std::endl;
+	std::cout << "Client Disconnected! Active Sessions: " << GetService()->GetCurrentSessionCount() << std::endl;
 }
 
 void Session::ProcessRecv(int32 numBytes)

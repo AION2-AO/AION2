@@ -104,3 +104,19 @@ void UAONetworkManager::ProcessQueuePackets()
 		}
 	}
 }
+
+void UAONetworkManager::Tick(float DeltaTime)
+{
+	ProcessQueuePackets();
+}
+
+bool UAONetworkManager::IsTickable() const
+{
+	return !IsTemplate();
+}
+
+TStatId UAONetworkManager::GetStatId() const
+{
+	RETURN_QUICK_DECLARE_CYCLE_STAT(UAONetworkManager, STATGROUP_Tickables);
+}
+

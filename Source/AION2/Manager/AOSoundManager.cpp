@@ -6,7 +6,7 @@
 
 UAOSoundManager::UAOSoundManager()
 {
-	static ConstructorHelpers::FObjectFinder<UDataTable> DT_Sound(TEXT("/Game/Project404/Utils/DT_SoundTable"));
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_Sound(TEXT("/Game/Utils/DT_SoundTable"));
 	if (DT_Sound.Succeeded())
 	{
 		SoundDataTable = DT_Sound.Object;

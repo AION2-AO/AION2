@@ -7,58 +7,67 @@ extern PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
 enum : uint16
 {
-	// »∏ø¯∞°¿‘ π◊ ∑Œ±◊¿Œ
+	// ÌöåÏõêÍ∞ÄÏûÖ Î∞è Î°úÍ∑∏Ïù∏
 	PKT_C_SIGNUP = 1000,
 	PKT_S_SIGNUP = 1001,
+	PKT_C_SET_NICNNAME = 1046,
+	PKT_S_SET_NICNNAME = 1047,
+
 	PKT_C_LOGIN = 1002,
-	PKT_S_SLOGIN = 1003,
-	PKT_S_FLOGIN = 1004,
+	PKT_S_LOGIN_SUCCEED = 1003,
+	PKT_S_LOGIN_FAIL = 1004,
 
-	// æ∆¿Ã≈€ π◊ ªÛ¡°
+	// ÏïÑÏù¥ÌÖú Î∞è ÏÉÅÏ†ê
 	PKT_S_ITEM = 1005,
-	PKT_C_USEITEM = 1006,
-	PKT_S_USEITEM = 1007,
-	PKT_C_STOREPURCHASE = 1008,
-	PKT_S_STOREPURCHASE = 1009,
+	PKT_C_USE_ITEM = 1006,
+	PKT_S_USE_ITEM = 1007,
+	PKT_C_STORE_PURCHASE = 1008,
+	PKT_S_STORE_PURCHASE = 1009,
 
-	// ∏  ¿Ãµø π◊ Ω∫∆˘
-	PKT_C_MAPLOADCOMPLETE = 1010,
+	// Îßµ Ïù¥Îèô Î∞è Ïä§Ìè∞
+	PKT_C_MAP_LOAD_COMPLETE = 1010,
 	PKT_S_SPAWN = 1011,
 	PKT_C_MOVE = 1012,
 	PKT_S_MOVE = 1013,
+	PKT_C_DASH = 1044,
+	PKT_S_DASH = 1045,
 
-	// ¥¯¿¸
-	PKT_C_DUNGEONWAITINTROOM = 1014,
-	PKT_S_DUNGEONWAITINTROOM = 1015,
-	PKT_C_DUNGEONCREATE = 1016,
-	PKT_S_DUNGEONCREATE = 1017,
-	PKT_C_DUNGEONENTER = 1018,
-	PKT_S_DUNGEONENTER = 1019,
-	PKT_C_DUNGEONEXIT = 1032,
-	PKT_S_DUNGEONEXIT = 1033,
-	PKT_C_DUNGEONREADY = 1020,
-	PKT_S_DUNGEONREADY = 1021,
-	PKT_C_DUNGEONSTART = 1022,
-	PKT_S_DUNGEONSTART = 1023,
-	PKT_S_DUNGEONFAIL = 1028,
-	PKT_C_DUNGEOMMAPCOMPLETE = 1029,
-	PKT_S_DUNGEONSETPLAYER = 1030,
-	PKT_S_DUNGEONDEDISTART = 1031,
+	// ÎçòÏ†Ñ
+	PKT_C_DUNGEON_ENTER_WAITING_ROOM = 1014,
+	PKT_S_DUNGEON_ENTER_WAITING_ROOM = 1015,
+	PKT_C_DUNGEON_CREATE = 1016,
+	PKT_S_DUNGEON_CREATE = 1017,
+	PKT_C_DUNGEON_ENTER = 1018,
+	PKT_S_DUNGEON_ENTER = 1019,
+	PKT_C_DUNGEON_EXIT = 1032,
+	PKT_S_DUNGEON_EXIT = 1033,
+	PKT_C_DUNGEON_READY = 1020,
+	PKT_S_DUNGEON_READY = 1021,
+	PKT_C_DUNGEON_START = 1022,
+	PKT_S_DUNGEON_START = 1023,
+	PKT_S_DUNGEON_FAIL = 1028,
+	PKT_C_DUNGEON_MAP_COMPLETE = 1029,
+	PKT_S_DUNGEON_SET_PLAYER = 1030,
+	PKT_S_DUNGEON_DEDI_START = 1031,
 
-	// ƒ≥∏Ø≈Õ ªÛ≈¬ π◊ ªÛ»£¿€øÎ
-	PKT_C_CHANGEHP = 1024,
+	// ÎçòÏ†Ñ Ï¢ÖÎ£å
+	PKT_C_DUNGEON_COMPLETE_REQUEST = 1040,
+	PKT_S_DUNGEON_COMPLETE_REQUEST = 1041,
+
+	// Ï∫êÎ¶≠ÌÑ∞ ÏÉÅÌÉú Î∞è ÏÉÅÌò∏ÏûëÏö©
+	PKT_C_CHANGE_HP = 1024,
 	PKT_C_CHAT = 1025,
 	PKT_S_CHAT = 1026,
 
-	// ∏ﬁ¿œ
-	PKT_C_MAILLIST = 1034,
-	PKT_S_MAILLIST = 1035,
-	PKT_C_MAILCONTENT = 1036,
-	PKT_S_MAILCONTENT = 1037,
-	PKT_C_MAILSEND = 1038,
-	PKT_S_MAILSEND = 1039,
+	// Î©îÏùº
+	PKT_C_MAIL_LIST = 1034,
+	PKT_S_MAIL_LIST = 1035,
+	PKT_C_MAIL_CONTENT = 1036,
+	PKT_S_MAIL_CONTENT = 1037,
+	PKT_C_MAIL_SEND = 1038,
+	PKT_S_MAIL_SEND = 1039,
 
-	// ø¨∞· ¡æ∑·
+	// Ïó∞Í≤∞ Ï¢ÖÎ£å
 	PKT_S_DISCONNECT = 1027,
 
 	PKT_DS_DEDICATED = 1100,
@@ -74,43 +83,49 @@ public:
 		for (int32 i = 1000; i < UINT16_MAX; i++)
 			GPacketHandler[i] = Handle_INVALID;
 
-		// »∏ø¯∞°¿‘ π◊ ∑Œ±◊¿Œ
+		// ÌöåÏõêÍ∞ÄÏûÖ Î∞è Î°úÍ∑∏Ïù∏
 		GPacketHandler[PKT_C_SIGNUP] = [](PacketSessionRef& session, BYTE* buffer, int len) { return HandlePacket<Protocol::C_SignUpPacket>(HandleSignUp, session, buffer, len); };
+		GPacketHandler[PKT_C_SET_NICNNAME] = [](PacketSessionRef& session, BYTE* buffer, int len) { return HandlePacket<Protocol::C_SetNicknamePacket>(HandleSetNickname, session, buffer, len); };
 		GPacketHandler[PKT_C_LOGIN] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_LoginPacket>(HandleLogin, session, buffer, len); };
 
-		// æ∆¿Ã≈€ π◊ ªÛ¡°
-		GPacketHandler[PKT_C_STOREPURCHASE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_StorePurchasePacket>(HandleStorePurchase, session, buffer, len); };
-		GPacketHandler[PKT_C_USEITEM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_UseItemPacket>(HandleUseItem, session, buffer, len); };
+		// ÏïÑÏù¥ÌÖú Î∞è ÏÉÅÏ†ê
+		GPacketHandler[PKT_C_STORE_PURCHASE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_StorePurchasePacket>(HandleStorePurchase, session, buffer, len); };
+		GPacketHandler[PKT_C_USE_ITEM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_UseItemPacket>(HandleUseItem, session, buffer, len); };
 
-		// ∏  ¿Ãµø π◊ Ω∫∆˘
-		GPacketHandler[PKT_C_MAPLOADCOMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
+		// Îßµ Ïù¥Îèô Î∞è Ïä§Ìè∞
+		GPacketHandler[PKT_C_MAP_LOAD_COMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MovePacket>(HandleMove, session, buffer, len); };
+		GPacketHandler[PKT_C_DASH] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DashPacket>(HandleDash, session, buffer, len); };
 
-		// ¥¯¿¸
-		GPacketHandler[PKT_C_DUNGEONWAITINTROOM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonWaitingRoomEnterPacket>(HandleDungeonWaitingRoom, session, buffer, len); };
-		GPacketHandler[PKT_C_DUNGEONCREATE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonCreatePacket>(HandleDungeonCreate, session, buffer, len); };
-		GPacketHandler[PKT_C_DUNGEONENTER] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonEnterPacket>(HandleDungeonEnter, session, buffer, len); };
-		GPacketHandler[PKT_C_DUNGEONREADY] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonReadyPacket>(HandleDungeonReady, session, buffer, len); };
-		GPacketHandler[PKT_C_DUNGEONSTART] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonStartPacket>(HandleDungeonStart, session, buffer, len); };
-		GPacketHandler[PKT_C_DUNGEONEXIT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonExitPacket>(HandleDungeonExit, session, buffer, len); };
+		// ÎçòÏ†Ñ
+		GPacketHandler[PKT_C_DUNGEON_ENTER_WAITING_ROOM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonWaitingRoomEnterPacket>(HandleDungeonWaitingRoom, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_CREATE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonCreatePacket>(HandleDungeonCreate, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_ENTER] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonEnterPacket>(HandleDungeonEnter, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_READY] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonReadyPacket>(HandleDungeonReady, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_START] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonStartPacket>(HandleDungeonStart, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_EXIT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonExitPacket>(HandleDungeonExit, session, buffer, len); };
+		GPacketHandler[PKT_C_DUNGEON_COMPLETE_REQUEST] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_RequestDungeonCompletePacket>(HandleDungeonEnd, session, buffer, len); };
 
-		// ƒ≥∏Ø≈Õ ªÛ≈¬ π◊ ªÛ»£¿€øÎ
-		GPacketHandler[PKT_C_CHANGEHP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHpPacket>(HandleChangeHp, session, buffer, len); };
+		// Ï∫êÎ¶≠ÌÑ∞ ÏÉÅÌÉú Î∞è ÏÉÅÌò∏ÏûëÏö©
+		GPacketHandler[PKT_C_CHANGE_HP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHpPacket>(HandleChangeHp, session, buffer, len); };
 		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChatPacket>(HandleChat, session, buffer, len); };
 
-		// ∏ﬁ¿œ
-		GPacketHandler[PKT_C_MAILLIST] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailListPacket>(HandleMailList, session, buffer, len); };
-		GPacketHandler[PKT_C_MAILCONTENT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailContentPacket>(HandleMailContent, session, buffer, len); };
+		// Î©îÏùº
+		GPacketHandler[PKT_C_MAIL_SEND] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_SendMailPacket>(HandleMailSend, session, buffer, len); };
+		GPacketHandler[PKT_C_MAIL_LIST] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailListPacket>(HandleMailList, session, buffer, len); };
+		GPacketHandler[PKT_C_MAIL_CONTENT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MailContentPacket>(HandleMailContent, session, buffer, len); };
 
 
-		// ±‚≈∏ (µ•µƒ…¿Ã∆Æ º≠πˆ)
+		// Í∏∞ÌÉÄ (Îç∞ÎîîÏºÄÏù¥Ìä∏ ÏÑúÎ≤Ñ)
 		GPacketHandler[PKT_DS_DEDICATED] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DedicatedPacket>(HandleDedicated, session, buffer, len); };
 	}
 
 	static bool HandleSignUp(PacketSessionRef& session, Protocol::C_SignUpPacket& pkt);
+	static bool HandleSetNickname(PacketSessionRef& session, Protocol::C_SetNicknamePacket& pkt);
 	static bool HandleLogin(PacketSessionRef& session, Protocol::C_LoginPacket& pkt);
 	static bool HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt);
 	static bool HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt);
+	static bool HandleDash(PacketSessionRef& session, Protocol::C_DashPacket& pkt);
 	static bool HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHpPacket& pkt);
 
 	static bool HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt);
@@ -120,13 +135,16 @@ public:
 	static bool HandleDungeonExit(PacketSessionRef& session, Protocol::C_DungeonExitPacket& pkt);
 	static bool HandleDungeonReady(PacketSessionRef& session, Protocol::C_DungeonReadyPacket& pkt);
 	static bool HandleDungeonStart(PacketSessionRef& session, Protocol::C_DungeonStartPacket& pkt);
+	static bool HandleDungeonEnd(PacketSessionRef& session, Protocol::C_RequestDungeonCompletePacket& pkt);
+
 
 	static bool HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchasePacket& pkt);
 	static bool HandleUseItem(PacketSessionRef& session, Protocol::C_UseItemPacket& pkt);
 	static bool HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket& pkt);
 
 
-	// ∏ﬁ¿œ
+	// Î©îÏùº
+	static bool HandleMailSend(PacketSessionRef& session, Protocol::C_SendMailPacket& pkt);
 	static bool HandleMailList(PacketSessionRef& session, Protocol::C_MailListPacket& pkt);
 	static bool HandleMailContent(PacketSessionRef& session, Protocol::C_MailContentPacket& pkt);
 
@@ -149,30 +167,35 @@ public:
 	//}
 
 	static SendBufferRef MakeSendBuffer(Protocol::S_SignUpResultPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SIGNUP); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_LoginSuccessPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SLOGIN); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_LoginFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_FLOGIN); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_SetNicknamePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SET_NICNNAME); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_LoginSuccessPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_LOGIN_SUCCEED); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_LoginFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_LOGIN_FAIL); };
+
 	static SendBufferRef MakeSendBuffer(Protocol::S_ItemDataPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_ITEM); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_SpawnPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SPAWN); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_MovePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MOVE); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DashPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DASH); };
 
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonWaitingRoomEnterPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONWAITINTROOM); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonCreatePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONCREATE); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonEnterPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONENTER); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONSTART); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonExitPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONEXIT); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonReadyPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONREADY); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONFAIL); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_SetDungeonPlayerPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONSETPLAYER); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartDediPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEONDEDISTART); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonWaitingRoomEnterPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_ENTER_WAITING_ROOM); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonCreatePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_CREATE); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonEnterPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_ENTER); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_START); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonExitPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_EXIT); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonReadyPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_READY); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonFailPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_FAIL); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_SetDungeonPlayerPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_SET_PLAYER); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonStartDediPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_DEDI_START); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_RequestDungeonCompletePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_COMPLETE_REQUEST); };
 
-	static SendBufferRef MakeSendBuffer(Protocol::S_StorePurchasePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_STOREPURCHASE); };
-	static SendBufferRef MakeSendBuffer(Protocol::S_UseItemPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_USEITEM); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_StorePurchasePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_STORE_PURCHASE); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_UseItemPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_USE_ITEM); };
 
 	static SendBufferRef MakeSendBuffer(Protocol::S_ChatPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_CHAT); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DisconnectPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DISCONNECT); };
 
-	static SendBufferRef MakeSendBuffer(Protocol::S_MailListPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAILLIST); }
-	static SendBufferRef MakeSendBuffer(Protocol::S_MailContentPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAILCONTENT); }
+	static SendBufferRef MakeSendBuffer(Protocol::S_MailListPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAIL_LIST); }
+	static SendBufferRef MakeSendBuffer(Protocol::S_MailContentPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAIL_CONTENT); }
+	static SendBufferRef MakeSendBuffer(Protocol::S_MailSendPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MAIL_SEND); }
 
 private:
 	template<typename PacketType, typename ProcessFunc>

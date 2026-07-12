@@ -4,10 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "UI/AOUserWidgetBase.h"
+#include "Player/AOPlayerState.h"
+
 #include "AOClassSwitcherWidget.generated.h"
 
 class UImage;
 class UTextBlock;
+
 /**
  * 
  */
@@ -18,9 +21,11 @@ class AION2_API UAOClassSwitcherWidget : public UAOUserWidgetBase
 	
 public:
 	void SetClassWidget(uint8 ClassType);
+	void SetClassWidget(EDaevaClassType ClassType);
+
 	void SetReadyState(bool InReadyState);
 
-	// Leader인 ClassSwitcher에 보이는 아이콘을 보이도록 설정
+	// Leader??ClassSwitcher??보이???�이콘을 보이?�록 ?�정
 	void SetLeaderState(bool InLeaderState);
 
 	void SetPlayerName(FText InName);
@@ -56,7 +61,7 @@ protected:
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UTextBlock> TB_PlayerName;
 
-	// 준비되면 보일 것
+	// 준비되�?보일 �?
 	UPROPERTY(meta = (BindWidgetOptional))
 	TObjectPtr<UImage> ReadyImage;
 

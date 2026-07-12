@@ -28,6 +28,8 @@ public:
 	bool IsFull() const;
 	int32 GetFreeIndex() const;
 
+	void ResetDungeon();
+
 	void Broadcast(SendBufferRef sendBuffer);
 	
 	Protocol::DungeonInfo ToProto();
@@ -56,9 +58,11 @@ public:
 	void HandleEnterDungeon(PlayerRef player, int32 inDungeonId);
 	void HandleDungeonStart(PlayerRef player, int32 dungeonId);
 	void HandleDungeonExit(int32 dungeonId);
+	void HandleDungeonExitByDedi(int32 dungeonId);
 	void HandleReadyPacket(PlayerRef player, int32 dungeonId);
 	void HandleExitPacket(PlayerRef player, int32 dungeonId);
 	void HandleFailDungeon(PlayerRef player, Protocol::DungeonFailReason reason);
+	void HandleDungeonEnd(int32 dungeonId, int32 gold);
 
 	bool CheckMembersReady(DungeonRef dungeon);
 	bool CheckAlreadyIn(uint64 playerId, DungeonRef dungeon);
@@ -76,6 +80,7 @@ private:
 	std::map<int32, DungeonRef> _dungeons;
 	std::set<int32> _freeDungeonIds;
 	uint32_t _nextDungeonId = 1;
+	
 };
 
 extern DungeonWaitingRoomRef GDungeonWaitingRoom;

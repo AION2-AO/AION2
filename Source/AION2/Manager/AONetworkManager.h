@@ -6,13 +6,20 @@
 #include "Subsystems/GameInstanceSubsystem.h"
 #include <Sockets.h>
 #include "Network/AONetworkReceiverWorker.h"
+#include "Tickable.h"
 #include "AONetworkManager.generated.h"
 
 
 UCLASS()
-class AION2_API UAONetworkManager : public UGameInstanceSubsystem
+class AION2_API UAONetworkManager : public UGameInstanceSubsystem, public FTickableGameObject
 {
 	GENERATED_BODY()
+
+public:
+	// FTickableGameObject overrides
+	virtual void Tick(float DeltaTime) override;
+	virtual bool IsTickable() const override;
+	virtual TStatId GetStatId() const override;
 
 public:
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
@@ -29,11 +36,12 @@ public:
 public:
 	class UAOGameInstance* GameInstance; 
 	class UAOPlayerManager* PlayerMng;
+	int32 PendingDungeonId = 0;
 
 private:
 	FSocket* ClientSocket;
 
-	// ¸®½Ã¹ö ¿öÄ¿ ½º·¹µå¸¦ ¼ÒÀ¯ÇÒ °íÀ¯ Æ÷ÀÎÅÍ ¼±¾ğÇÔ
+	// ë¦¬ì‹œë²„ ì›Œì»¤ ìŠ¤ë ˆë“œë¥¼ ì†Œìœ í•  ê³ ìœ  í¬ì¸í„° ì„ ì–¸í•¨
 	TUniquePtr<AONetworkReceiverWorker> ReceiverWorker;
 
 	const int32 MAX_PACKET_SIZE = 65535;	

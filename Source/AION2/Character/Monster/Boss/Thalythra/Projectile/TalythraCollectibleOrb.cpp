@@ -12,14 +12,14 @@
 // Sets default values
 ATalythraCollectibleOrb::ATalythraCollectibleOrb()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("ProjectileMovement"));
 
-	RootComponent = Collision;	
+	RootComponent = Collision;
 
 
 	// 네트워크 보간 설정
@@ -37,7 +37,7 @@ ATalythraCollectibleOrb::ATalythraCollectibleOrb()
 	SetMinNetUpdateFrequency(60.f);     // 변화가 없거나 우선순위가 낮아도 초당 최소 30번은 체크 보장해라. 
 
 
-	
+
 
 }
 
@@ -45,7 +45,7 @@ ATalythraCollectibleOrb::ATalythraCollectibleOrb()
 void ATalythraCollectibleOrb::BeginPlay()
 {
 	Super::BeginPlay();
-	
+
 
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ATalythraCollectibleOrb::OnProjectileOverlapEvent);
 }
@@ -61,49 +61,38 @@ void ATalythraCollectibleOrb::Tick(float DeltaTime)
 void ATalythraCollectibleOrb::OnProjectileOverlapEvent(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
 {
 	if (HasAuthority() == false)
-		return; 
+		return;
 
-
-	// 같은 발사자가 쏜 다른 투사체 무시
-	if (ATalythraCollectibleOrb* OtherProj = Cast<ATalythraCollectibleOrb>(OtherActor))
-	{
-		return; // 투사체끼리는 무조건 무시 (또는 GetInstigator 비교)
-	}
+	if (Cast<ATalythraCollectibleOrb>(OtherActor))
+		return;  // 투사체끼리 무시
 
 	AAOCharacter* HitCharacter = Cast<AAOCharacter>(OtherActor);
+	if (HitCharacter == nullptr)
+		return;  // 캐릭터 아니면 무시 (Destroy 안 함)
 
-	// 여기서 분기 보스면 공격력 증가, 보스가 아니면 오브 획득 
-	
 	// 보스
-	if(HitCharacter == GetInstigator())
+	if (HitCharacter == GetInstigator())
 	{
-		ATalythra* pTalythra = Cast<ATalythra>(HitCharacter);
-		if (pTalythra == nullptr)
-			return; 
-
-		float AttackPower = pTalythra->GetAttributeSet()->GetAttackPower(); 
-		AttackPower += 2.f;
-
-		// 구슬을 먹을수록 보스의 공격력은 증가 
-		pTalythra->GetAttributeSet()->SetAttackPower(AttackPower);
+		if (ATalythra* pTalythra = Cast<ATalythra>(HitCharacter))
+		{
+			float AttackPower = pTalythra->GetAttributeSet()->GetAttackPower() + 2.f;
+			pTalythra->GetAttributeSet()->SetAttackPower(AttackPower);
+		}
 	}
-
-	ADaeva* pPlayer = Cast<ADaeva>(HitCharacter);
-
-	
 	// 플레이어
-	if (HitCharacter->IsDead() == false && pPlayer != nullptr)
+	else if (ADaeva* pPlayer = Cast<ADaeva>(HitCharacter))
 	{
-		ATalythra* pTalythra = Cast<ATalythra>(GetInstigator());
-		pTalythra->Add_OrbHittedDaeva(pPlayer);
-		pPlayer->EatOrb(OrbColor);
-
-		// 여기서 만약 플레이어의 Orb 개수가 2이상이면, 
-		// 플레이어 위의 orb 를 렌더링 on 
+		if (!pPlayer->IsDead())
+		{
+			if (ATalythra* pTalythra = Cast<ATalythra>(GetInstigator()))
+			{
+				pTalythra->Add_OrbHittedDaeva(pPlayer);
+				pPlayer->EatOrb(OrbColor);
+			}
+		}
 	}
 
 	Destroy();
-
 }
 
 

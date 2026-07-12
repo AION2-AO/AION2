@@ -24,6 +24,7 @@ void AAOPlayerState::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
     DOREPLIFETIME(AAOPlayerState, MyId);
     DOREPLIFETIME(AAOPlayerState, MyClassType);
     DOREPLIFETIME(AAOPlayerState, MyName);
+    //DOREPLIFETIME(AAOPlayerState, MyItem);
 }
 
 UAbilitySystemComponent* AAOPlayerState::GetAbilitySystemComponent() const
@@ -40,26 +41,21 @@ void AAOPlayerState::GiveCommonAbilities()
 {
     if (bCommonAbilitiesGiven)
     {
-        UE_LOG(LogTemp, Warning, TEXT("Common abilities already given."));
         return;
     }
 
     if (!ASC)
     {
-        UE_LOG(LogTemp, Error, TEXT("ASC is null."));
         return;
     }
 
     if (!CommonAbilitySet)
     {
-        UE_LOG(LogTemp, Error, TEXT("CommonAbilitySet is null. Check BP_AOPlayerState setting."));
         return;
     }
 
     CommonAbilitySet->GiveToASC(ASC, CommonAbilityHandles);
     bCommonAbilitiesGiven = true;
-
-    UE_LOG(LogTemp, Warning, TEXT("Common abilities given. Count: %d"), CommonAbilityHandles.Num());
 }
 
 void AAOPlayerState::SetMyId(uint64 PlayerId)
@@ -77,8 +73,18 @@ void AAOPlayerState::SetMyName(FString InName)
     MyName = InName;
 }
 
+void AAOPlayerState::SetMyHealth(float InHealth)
+{
+}
 
-void AAOPlayerState::SetPlayerInfo(uint64 InPlayerId, const FString& InPlayerName, uint8 InClassType)
+
+void AAOPlayerState::SetMyItem(FString InItem)
+{
+    //MyItem = InItem;
+}
+
+
+void AAOPlayerState::SetPlayerInfo(uint64 InPlayerId, const FString& InPlayerName, uint8 InClassType,float InHP/*, FString InItem*/)
 {
     if (!HasAuthority())
     {
@@ -88,6 +94,8 @@ void AAOPlayerState::SetPlayerInfo(uint64 InPlayerId, const FString& InPlayerNam
     MyId = InPlayerId;
     MyName = InPlayerName;
     MyClassType = (EDaevaClassType)InClassType;
+    InitialHP = InHP;
 
-    UE_LOG(LogTemp, Warning,TEXT("[Dungeon] PlayerInfo Set | Id: %llu | Name: %s | ClassType: %d"), MyId,*MyName, static_cast<int32>(MyClassType));
+
+    UE_LOG(LogTemp, Warning,TEXT("[Dungeon] PlayerInfo Set | Id: %llu | Name: %s | ClassType: %d | HP: %.1f"), MyId,*MyName, static_cast<int32>(MyClassType), InitialHP);
 }

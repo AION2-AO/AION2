@@ -4,6 +4,7 @@
 #include "UI/Mail/MailListRowWidget.h"
 #include "Components/Button.h"
 #include "Components/TextBlock.h"
+#include "Styling/SlateColor.h"
 #include "Network/Struct.pb.h"
 #include  "MainMailWidget.h"
 
@@ -22,17 +23,22 @@ void UMailListRowWidget::InitRowData(const FMailData& InData, class UMainMailWid
 	RowData = InData;
 	MainMailWidget = InMainMailWidget;
 
+	FSlateColor TextColor = RowData.bIsRead ? ReadColor : UnreadColor;
+
 	if (Title)
 	{
 		Title->SetText(FText::FromString(RowData.Title));
+		Title->SetColorAndOpacity(TextColor);
 	}
 	if (SenderName)
 	{
 		SenderName->SetText(FText::FromString(RowData.SenderName));
+		SenderName->SetColorAndOpacity(TextColor);
 	}
 	if (ExpiredDate)
 	{
 		ExpiredDate->SetText(FText::FromString(RowData.ExpiredDate));
+		ExpiredDate->SetColorAndOpacity(TextColor);
 	}
 }
 

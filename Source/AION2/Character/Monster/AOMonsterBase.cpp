@@ -24,23 +24,26 @@
 #include "UI/AOUserWidgetBase.h"
 #include "UI/AOMonsterHUDWidget_Targetable.h"
 
+// Boss BGM 
+#include "Game/DungeonGameState.h"
+
 // Sets default values
 AAOMonsterBase::AAOMonsterBase(const FObjectInitializer& ObjectInitializer)
-    :Super(ObjectInitializer)
+	:Super(ObjectInitializer)
 {
-    // Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 
 
-    ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
-    ASC->SetIsReplicated(true);
-    ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
+	ASC = CreateDefaultSubobject<UAbilitySystemComponent>(TEXT("ASC"));
+	ASC->SetIsReplicated(true);
+	ASC->SetReplicationMode(EGameplayEffectReplicationMode::Mixed);
 
 
-    AttributeSet = CreateDefaultSubobject<UAOAttributeSet>(TEXT("AttributeSet"));
+	AttributeSet = CreateDefaultSubobject<UAOAttributeSet>(TEXT("AttributeSet"));
 
 
-    bReplicates = true;
-    SetReplicateMovement(true);
+	bReplicates = true;
+	SetReplicateMovement(true);
 
 
 	// TargetWidgetComponent
@@ -90,7 +93,7 @@ AAOMonsterBase::AAOMonsterBase(const FObjectInitializer& ObjectInitializer)
 // Called when the game starts or when spawned
 void AAOMonsterBase::BeginPlay()
 {
-    Super::BeginPlay();
+	Super::BeginPlay();
 
 	// 클라에서 호출
 	InitGAS();
@@ -106,10 +109,10 @@ void AAOMonsterBase::BeginPlay()
 
 void AAOMonsterBase::PossessedBy(AController* NewController)
 {
-    Super::PossessedBy(NewController);
+	Super::PossessedBy(NewController);
 
 	// 서버에서 호출
-    InitGAS();
+	InitGAS();
 
 
 	// 선환 추가 
@@ -119,23 +122,23 @@ void AAOMonsterBase::PossessedBy(AController* NewController)
 
 void AAOMonsterBase::InitGAS()
 {
-    // Owner Actor란? : ASC를 논리적으로 소유한 주체 ( 해당 주체가 죽어도 유지되며, 레벨 및 스텟 보존 )
-    // Avatar Actor란? : Character  (죽으면 바뀌는 물체, 실제로 데이터를 처리하지 않지만 비주얼만 수행해주는 엑터) 
-    ASC->InitAbilityActorInfo(this, this);
+	// Owner Actor란? : ASC를 논리적으로 소유한 주체 ( 해당 주체가 죽어도 유지되며, 레벨 및 스텟 보존 )
+	// Avatar Actor란? : Character  (죽으면 바뀌는 물체, 실제로 데이터를 처리하지 않지만 비주얼만 수행해주는 엑터) 
+	ASC->InitAbilityActorInfo(this, this);
 
-    if (!ASC->HasMatchingGameplayTag(TEAM_MONSTER))
-    {
-        ASC->AddLooseGameplayTag(TEAM_MONSTER);
-    }
+	if (!ASC->HasMatchingGameplayTag(TEAM_MONSTER))
+	{
+		ASC->AddLooseGameplayTag(TEAM_MONSTER);
+	}
 
 
-    if (HasAuthority() == false)
-        return;
+	if (HasAuthority() == false)
+		return;
 
-    // 서버 로직 
+	// 서버 로직 
 
-    // ASC에 능력 넣어주는 작업  ( AbilitySet data는 몬스터의 Blueprint에서 설정 ) 
-    AbilitySet->GiveToASC(ASC, AbilityHandles);
+	// ASC에 능력 넣어주는 작업  ( AbilitySet data는 몬스터의 Blueprint에서 설정 ) 
+	AbilitySet->GiveToASC(ASC, AbilityHandles);
 
 	// Delegate
 	if (!HealthChangedDelegateHandle.IsValid())
@@ -199,18 +202,18 @@ void AAOMonsterBase::GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLi
 // Called every frame
 void AAOMonsterBase::Tick(float DeltaTime)
 {
-    Super::Tick(DeltaTime);
+	Super::Tick(DeltaTime);
 
 }
 
 UAnimMontage* AAOMonsterBase::GetMontageByTag(const FGameplayTag& MontageTag) const
 {
-    if (const TObjectPtr<UAnimMontage>* FoundMontage = MontageMap.Find(MontageTag))
-    {
-        return *FoundMontage;
-    }
+	if (const TObjectPtr<UAnimMontage>* FoundMontage = MontageMap.Find(MontageTag))
+	{
+		return *FoundMontage;
+	}
 
-    return nullptr;
+	return nullptr;
 }
 
 void AAOMonsterBase::InitAttributeSet()
@@ -253,33 +256,6 @@ void AAOMonsterBase::HandleBossDeathMontageEnd()
 
 	UE_LOG(LogTemp, Warning, TEXT("[Monster Death] %s Died"), *GetName());
 
-	// 클라이언트/서버 공통: 더 이상 이동, 충돌, 피격이 일어나지 않도록 처리
-	GetCharacterMovement()->StopMovementImmediately();
-	GetCharacterMovement()->DisableMovement();
-
-	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-
-	if (ASC)
-	{
-		ASC->CancelAllAbilities();
-
-		const FGameplayTag DeadTag =
-			FGameplayTag::RequestGameplayTag(FName("State.Dead"));
-
-		ASC->AddLooseGameplayTag(DeadTag);
-	}
-
-	// AI 중지
-	if (AAIController* AIController = Cast<AAIController>(GetController()))
-	{
-		AIController->StopMovement();
-
-		if (UBrainComponent* Brain = AIController->GetBrainComponent())
-		{
-			Brain->StopLogic(TEXT("Monster Dead"));
-		}
-	}
-
 	// 던전 진행은 서버에서만 결정
 	if (!HasAuthority())
 	{
@@ -300,6 +276,13 @@ void AAOMonsterBase::HandleBossDeathMontageEnd()
 			DungeonGameMode->NotifyBossDefeated(this);
 		}
 	}
+
+	// 보스 브금 -> 배경 브금으로 교체 
+	// 보스 브금 재생 
+	if (auto* GS = GetWorld()->GetGameState<ADungeonGameState>())
+	{
+		GS->SetMusic(EDungeonMusic::Dungeon);
+	}
 }
 
 // 호영 작성 
@@ -318,6 +301,11 @@ void AAOMonsterBase::OnHealthChanged(const FOnAttributeChangeData& Data)
 	{
 		HandleBossDeath();
 	}
+}
+
+void AAOMonsterBase::TriggerGimmicks(float Ratio)
+{
+	// 기믹 작성 ( 오버라이드 하셔서 사용하시면 됩니다.) 
 }
 
 void AAOMonsterBase::SetTargetWidgetVisible(bool bVisible)
@@ -342,6 +330,10 @@ void AAOMonsterBase::OnGroggyChanged(const FOnAttributeChangeData& Data)
 {
 	UE_LOG(LogTemp, Warning, TEXT("Monster Groggy %s : %.1f -> %.1f"), *GetName(), Data.OldValue, Data.NewValue);
 
+	// 선환 추가 
+	FGameplayTagContainer OwnedTags;
+	ASC->GetOwnedGameplayTags(OwnedTags);
+
 	if (!HasAuthority())
 	{
 		return;
@@ -349,7 +341,8 @@ void AAOMonsterBase::OnGroggyChanged(const FOnAttributeChangeData& Data)
 
 	if (Data.NewValue <= 0.0f && !bIsGroggy && !bIsDead)
 	{
-		StartGroggy();
+		if (OwnedTags.HasTagExact(GIMMICK_MONSTER) == false)
+			StartGroggy();
 	}
 }
 
@@ -371,7 +364,7 @@ void AAOMonsterBase::StartGroggy()
 	}
 
 	pMonsterController->Set_Phase(PHASE_MONSTER_GROGGY);
-	
+
 	GetCharacterMovement()->StopMovementImmediately();
 }
 
@@ -473,27 +466,27 @@ void AAOMonsterBase::Die()
 
 bool AAOMonsterBase::CanMoveOnNavMesh(const FVector Direction, float Distance)
 {
-    const UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
+	const UNavigationSystemV1* NavSys = UNavigationSystemV1::GetCurrent(GetWorld());
 
-    if (!NavSys)
-        return false;
+	if (!NavSys)
+		return false;
 
-    FVector Dir2D = Direction;
-    Dir2D.Z = 0.f;
+	FVector Dir2D = Direction;
+	Dir2D.Z = 0.f;
 
-    if (!Dir2D.Normalize())
-        return false;
+	if (!Dir2D.Normalize())
+		return false;
 
-    // Start를 발바닥 높이로 수정  
-    const float HalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
-    FVector Start = GetActorLocation();
-    Start.Z -= HalfHeight;
+	// Start를 발바닥 높이로 수정  
+	const float HalfHeight = GetCapsuleComponent()->GetScaledCapsuleHalfHeight();
+	FVector Start = GetActorLocation();
+	Start.Z -= HalfHeight;
 
-    const FVector End = Start + Dir2D * Distance;
+	const FVector End = Start + Dir2D * Distance;
 
-    FVector HitLocation;
-    const bool bHit = NavSys->NavigationRaycast(GetWorld(), Start, End, HitLocation);
+	FVector HitLocation;
+	const bool bHit = NavSys->NavigationRaycast(GetWorld(), Start, End, HitLocation);
 
 
-    return !bHit;
+	return !bHit;
 }

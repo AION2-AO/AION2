@@ -28,7 +28,7 @@ protected:
 	void OnMontageTaskCancelled();
 
 	UFUNCTION()
-	void OnCheckAttackHitEvent(FGameplayEventData Payload);
+	virtual void OnCheckAttackHitEvent(FGameplayEventData Payload);
 
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))

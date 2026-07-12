@@ -38,6 +38,7 @@ public class AION2 : ModuleRules
             "NavigationSystem",
             "Navmesh",
             "HTTP",
+            "MotionWarping",
             "StateTreeModule",
             "GameplayStateTreeModule"
         });

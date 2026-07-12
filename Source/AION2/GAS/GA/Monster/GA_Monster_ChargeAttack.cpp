@@ -8,14 +8,14 @@
 #include "Components/CapsuleComponent.h"
 
 void UGA_Monster_ChargeAttack::ActivateAbility(
-	const FGameplayAbilitySpecHandle Handle, 
+	const FGameplayAbilitySpecHandle Handle,
 	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo, 
+	const FGameplayAbilityActivationInfo ActivationInfo,
 	const FGameplayEventData* TriggerEventData)
 {
 
 	// 몽타주 재생은 Action에서 처리
-	Super::ActivateAbility(Handle,ActorInfo, ActivationInfo, TriggerEventData); 
+	Super::ActivateAbility(Handle, ActorInfo, ActivationInfo, TriggerEventData);
 
 	UAbilityTask_WaitGameplayEvent* WaitChargeHitStartCheckTask = UAbilityTask_WaitGameplayEvent::WaitGameplayEvent(this, EVENT_CHECKATTACKHIT_BEGIN);
 
@@ -31,27 +31,22 @@ void UGA_Monster_ChargeAttack::ActivateAbility(
 
 void UGA_Monster_ChargeAttack::CancelAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateCancelAbility)
 {
-	UnBindCapsuleOverlap(); // 안전망 - 중간 캔슬 대비 
 	HitActors.Reset();
 	Super::CancelAbility(Handle, ActorInfo, ActivationInfo, bReplicateCancelAbility);
 }
 
 void UGA_Monster_ChargeAttack::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-
-	UnBindCapsuleOverlap(); // 안전망 - 중간 캔슬 대비 
 	HitActors.Reset();
 	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
 }
 
 void UGA_Monster_ChargeAttack::OnHitCheckBegin(FGameplayEventData Payload)
 {
 	if (HasAuthority(&CurrentActivationInfo) == false)
-		return; 
+		return;
 
 	HitActors.Reset();
-	BindCapsuleOverlap();
 }
 
 void UGA_Monster_ChargeAttack::OnHitCheckEnd(FGameplayEventData Payload)
@@ -59,33 +54,30 @@ void UGA_Monster_ChargeAttack::OnHitCheckEnd(FGameplayEventData Payload)
 	if (HasAuthority(&CurrentActivationInfo) == false)
 		return;
 
-
-	UnBindCapsuleOverlap();
 	HitActors.Reset();
-
 }
 
 void UGA_Monster_ChargeAttack::OnCapsuleBindOverlap(
 	UPrimitiveComponent* OverlappedComp,
 	AActor* OtherActor, UPrimitiveComponent* OtherComp,
-	int32 OtherBodyIndex, 
+	int32 OtherBodyIndex,
 	bool bFromSweep,
 	const FHitResult& SweepResult)
 {
 	// 서버에서만 로직 실행할 수 있게 설정 
 	if (HasAuthority(&CurrentActivationInfo) == false)
-		return; 
+		return;
 
 	// 해당 Actor이 충돌대상이 맞는지.
 	if (IsVaildTarget(OtherActor) == false)
-		return; 
+		return;
 
 
 	// 해당 Actor가 이미 충돌처리 된 것인지.
 	if (HitActors.Contains(OtherActor))
-		return; 
+		return;
 
-	
+
 	HitActors.Add(OtherActor);
 
 
@@ -93,9 +85,9 @@ void UGA_Monster_ChargeAttack::OnCapsuleBindOverlap(
 	{
 		AAOCharacter* Monster = CastChecked<AAOCharacter>(GetAvatarActorFromActorInfo());
 
-		bool bCameraShake = false; 
+		bool bCameraShake = false;
 		Monster->OnAttackSucceeded(AttackData, AOTarget, SweepResult, bCameraShake);
-		
+
 	}
 }
 
@@ -103,12 +95,12 @@ void UGA_Monster_ChargeAttack::OnCapsuleBindOverlap(
 void UGA_Monster_ChargeAttack::BindCapsuleOverlap()
 {
 	AAOMonsterBase* Monster = CastChecked<AAOMonsterBase>(GetAvatarActorFromActorInfo());
-	
-	if(UCapsuleComponent* Capsule = Monster->GetCapsuleComponent())
+
+	if (UCapsuleComponent* Capsule = Monster->GetCapsuleComponent())
 	{
 		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Overlap);
 		Capsule->OnComponentBeginOverlap.AddDynamic(this, &UGA_Monster_ChargeAttack::OnCapsuleBindOverlap);
-		bHitCheckActive = true; 
+		bHitCheckActive = true;
 	}
 
 
@@ -117,23 +109,23 @@ void UGA_Monster_ChargeAttack::BindCapsuleOverlap()
 void UGA_Monster_ChargeAttack::UnBindCapsuleOverlap()
 {
 	if (!bHitCheckActive)
-		return; 
+		return;
 
 	AAOMonsterBase* Monster = Cast<AAOMonsterBase>(GetAvatarActorFromActorInfo());
-	if(Monster == nullptr)
+	if (Monster == nullptr)
 	{
-		bHitCheckActive = false; 
-		return; 
+		bHitCheckActive = false;
+		return;
 	}
 
 
-	if(UCapsuleComponent* Capsule = Monster->GetCapsuleComponent())
+	if (UCapsuleComponent* Capsule = Monster->GetCapsuleComponent())
 	{
 		Capsule->SetCollisionResponseToChannel(ECC_Pawn, ECR_Block);
 		Capsule->OnComponentBeginOverlap.RemoveDynamic(this, &UGA_Monster_ChargeAttack::OnCapsuleBindOverlap);
 	}
 
-	bHitCheckActive = false; 
+	bHitCheckActive = false;
 
 }
 

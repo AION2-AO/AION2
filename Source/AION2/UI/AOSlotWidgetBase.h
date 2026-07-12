@@ -11,7 +11,10 @@
  */
 
 class UButton;
-class UImage;
+class UTexture2D;
+
+struct FButtonStyle;
+struct FSlateBrush;
 
 enum class ESlotType : uint8
 {
@@ -26,10 +29,8 @@ class AION2_API UAOSlotWidgetBase : public UAOUserWidgetBase
 {
 	GENERATED_BODY()
 	
+
 protected:
 	UPROPERTY(meta = (BindWidget), BlueprintReadOnly)
 	TObjectPtr<UButton> SlotButton;
-
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Slot")
-	TObjectPtr<UImage> SlotButtonImage;
 };

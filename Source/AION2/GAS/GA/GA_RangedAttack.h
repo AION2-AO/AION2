@@ -37,6 +37,22 @@ protected:
 	UFUNCTION()
 	void OnLaunchProjectileEvent(FGameplayEventData Payload);
 
+	//HY
+protected:
+	UPROPERTY(EditDefaultsOnly, Category = "Attack|Ragner")
+	bool bUseMoveAttackMontage = false;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack|Ranger")
+	TObjectPtr<UAnimMontage> RangerStandAttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack|Ranger")
+	TObjectPtr<UAnimMontage> RangerMoveAttackMontage;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Attack|Ranger")
+	float MoveAttackSpeedThreshold = 10.0f;
+
+	//
+
 protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Attack", meta = (AllowPrivateAccess = "true"))
 	FAttackData AttackData;

@@ -19,6 +19,8 @@
 #define STATE_GLIDING FGameplayTag::RequestGameplayTag(TEXT("State.Gliding"))
 #define STATE_SPRINT FGameplayTag::RequestGameplayTag(TEXT("State.Sprint"))
 
+#define COMBO_AVAILABLE_KEYE FGameplayTag::RequestGameplayTag(TEXT("Combo.Available.KeyE"))
+
 #define COMBO_AVAILABLE_LB2 FGameplayTag::RequestGameplayTag(TEXT("Combo.Available.LB2"))
 #define COMBO_AVAILABLE_LB3 FGameplayTag::RequestGameplayTag(TEXT("Combo.Available.LB3"))
 
@@ -63,7 +65,7 @@
 #define PHASE_MONSTER_COMBAT FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Combat"))
 #define PHASE_MONSTER_GROGGY FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Groggy"))
 #define PHASE_MONSTER_DEAD FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Dead"))
-
+#define PHASE_MONSTER_RESET FGameplayTag::RequestGameplayTag(TEXT("Phase.Monster.Reset"))
 
 // State - SH
 #define STATE_MONSTER_TH_IDLE FGameplayTag::RequestGameplayTag(TEXT("State.Monster.TH.Idle"))
@@ -96,6 +98,8 @@
 // Gimmick 
 // 기믹 실행 트리거 (붙었다가 기믹 끝나면 제거됨)
 //GIMMICK_MONSTER_TH_HP65_PENDING
+
+#define GIMMICK_MONSTER FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster"))
 #define GIMMICK_MONSTER_TH_HP70_DONE FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP70.Done"))
 
 // 실행 이력 (한 번 발동했으면 영구히 남아 재발동 차단)
@@ -106,3 +110,4 @@
 #define GIMMICK_MONSTER_TH_HP35_DONE FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP35.Done"))
 #define GIMMICK_MONSTER_TH_HP35_PENDING FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.HP35.Pending"))
 
+#define GIMMICK_MONSTER_TH_SHELTER FGameplayTag::RequestGameplayTag(TEXT("Gimmick.Monster.TH.Shelter"))

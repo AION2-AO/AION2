@@ -10,6 +10,24 @@
 #include "ObjectUtils.h"
 #include "RedisManager.h"
 
+std::wstring Utf8ToUtf16(const std::string& utf8Str)
+{
+	if (utf8Str.empty()) return L"";
+	int32 sizeNeeded = ::MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), static_cast<int32>(utf8Str.size()), NULL, 0);
+	std::wstring utf16Str(sizeNeeded, 0);
+	::MultiByteToWideChar(CP_UTF8, 0, utf8Str.c_str(), static_cast<int32>(utf8Str.size()), &utf16Str[0], sizeNeeded);
+	return utf16Str;
+}
+
+std::string Utf16ToUtf8(const WCHAR* utf16Str)
+{
+	if (utf16Str == nullptr || *utf16Str == L'\0') return "";
+	int32 sizeNeeded = ::WideCharToMultiByte(CP_UTF8, 0, utf16Str, -1, NULL, 0, NULL, NULL);
+	std::string utf8Str(sizeNeeded - 1, 0); // null 문자 제외
+	::WideCharToMultiByte(CP_UTF8, 0, utf16Str, -1, &utf8Str[0], sizeNeeded, NULL, NULL);
+	return utf8Str;
+}
+
 PacketHandlerFunc GPacketHandler[UINT16_MAX];
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len)
@@ -24,22 +42,22 @@ bool PacketHandler::HandleSignUp(PacketSessionRef& session, Protocol::C_SignUpPa
 	std::cout << "SignUp Request: ID(" << pkt.id() << ") PW(" << pkt.password() << ") Class(" << static_cast<int32>(pkt.classtype()) << ")" << std::endl;
 
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
-	DBBind<3, 1> dbBind(*dbConnect, L"{CALL sp_RegisterUser(?, ?, ?)}");
+	DBBind<3, 2> dbBind(*dbConnect, L"{CALL sp_RegisterUser(?, ?, ?)}");
 
-	WCHAR wId[51] = { 0, };
-	WCHAR wPassword[51] = { 0, };
+	std::wstring wId = Utf8ToUtf16(pkt.id());
+	std::wstring wPassword = Utf8ToUtf16(pkt.password());
 
-	::mbstowcs_s(nullptr, wId, 51, pkt.id().c_str(), _TRUNCATE);
-	::mbstowcs_s(nullptr, wPassword, 51, pkt.password().c_str(), _TRUNCATE);
-
-	dbBind.BindParam(0, wId);
-	dbBind.BindParam(1, wPassword);
+	dbBind.BindParam(0, wId.c_str());
+	dbBind.BindParam(1, wPassword.c_str());
 
 	int32 classTypeInt = static_cast<int32>(pkt.classtype());
 	dbBind.BindParam(2, classTypeInt);
 
 	int32 resultCode = 0;
+	int32 networkId = 0;
+
 	dbBind.BindCol(0, resultCode);
+	dbBind.BindCol(1, networkId);
 
 	if (dbBind.Execute())
 	{
@@ -48,32 +66,121 @@ bool PacketHandler::HandleSignUp(PacketSessionRef& session, Protocol::C_SignUpPa
 			std::cout << "ResultCode : " << resultCode << std::endl;
 		}
 	}
-
 	GDBConnectionPool->Push(dbConnect);
 
+	// -1이면 실패, 1이면 성공
 	Protocol::S_SignUpResultPacket resultPkt;
-	resultPkt.set_success(resultCode == 0);
+	resultPkt.set_success((resultCode == 1));
 
 	SendBufferRef sendBuffer = PacketHandler::MakeSendBuffer(resultPkt);
 	session->Send(sendBuffer);
 
+	if (resultCode != 1) return false;
+
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = ObjectUtils::CreatePlayer(gameSession);
+	player->SetPlayerInfo(networkId, pkt.classtype(), 0, 100, 100);
 	return true;
+}
+
+bool PacketHandler::HandleSetNickname(PacketSessionRef& session, Protocol::C_SetNicknamePacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	int32 playerId = player->GetId();
+
+	std::wstring playerNickname = Utf8ToUtf16(pkt.nickname());
+
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+	DBBind<2, 1> dbBind(*dbConnect, L"{CALL sp_SetNickname(?, ?)}");
+
+	dbBind.BindParam(0, playerId);
+	dbBind.BindParam(1, playerNickname.c_str());
+
+	int8 result = 0;
+	dbBind.BindCol(0, result);
+
+	if (dbBind.Execute())
+	{
+		if (dbBind.Fetch())
+		{
+			std::cout << "Nickname ResultCode : " << result << std::endl;
+
+		}
+	}
+
+	Protocol::S_SetNicknamePacket nicknamePacket;
+	nicknamePacket.set_issucceed(result);
+	SendBufferRef nickBuffer = PacketHandler::MakeSendBuffer(nicknamePacket);
+	session->Send(nickBuffer);
+
+	if (result != 0) return false;
+
+	std::string nickname = Utf16ToUtf8(playerNickname.c_str());
+	player->SetName(nickname);
+
+	Protocol::S_LoginSuccessPacket loginPkt;
+
+	Protocol::PlayerInfo* playerInfo = loginPkt.mutable_playerinfo();
+	playerInfo->set_playerclass(static_cast<Protocol::ClassType>(player->GetClass()));
+	playerInfo->set_playerid(player->_playerId);
+	playerInfo->set_playernickname(player->GetName());
+	loginPkt.set_gold(player->_gold);
+	loginPkt.set_exp(player->_exp);
+	loginPkt.set_hp(player->_hp);
+
+	SendBufferRef sendBuffer = PacketHandler::MakeSendBuffer(loginPkt);
+	session->Send(sendBuffer);
+
+	GRoom->DoAsync(&Room::AddPlayer, player);
 }
 
 bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPacket& pkt)
 {
 	std::cout << "Login Request: ID(" << pkt.id() << ") PW(" << pkt.password() << ")" << std::endl;
+
+	// 더미유저 우회 로직 (DB 타지 않고 즉석 가상 로그인 성공 처리)
+	if (pkt.id().rfind("dummy_user_", 0) == 0)
+	{
+		std::string szNickname = pkt.id();
+		uint64 playerId = 100000 + std::stoull(pkt.id().substr(11));
+
+		GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+		PlayerRef player = ObjectUtils::CreatePlayer(gameSession);
+		player->SetPlayerInfo(playerId, static_cast<Protocol::ClassType>(1), 100, 1000, 100);
+		player->SetName(szNickname);
+
+		Protocol::S_LoginSuccessPacket loginPkt;
+		Protocol::PlayerInfo* playerInfo = loginPkt.mutable_playerinfo();
+		playerInfo->set_playerclass(static_cast<Protocol::ClassType>(player->_class));
+		playerInfo->set_playerid(player->_playerId);
+		playerInfo->set_playernickname(player->GetName());
+		loginPkt.set_gold(player->_gold);
+		loginPkt.set_exp(player->_exp);
+		loginPkt.set_hp(player->_hp);
+
+		SendBufferRef sendBuffer = PacketHandler::MakeSendBuffer(loginPkt);
+		session->Send(sendBuffer);
+
+		// 빈 아이템 패킷 전송
+		Protocol::S_ItemDataPacket itemPkt;
+		SendBufferRef itemSendBuffer = PacketHandler::MakeSendBuffer(itemPkt);
+		session->Send(itemSendBuffer);
+
+		GRoom->DoAsync(&Room::AddPlayer, player);
+
+		std::cout << "Dummy Login Bypass Success! ID: " << szNickname << std::endl;
+		return true;
+	}
+
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
-	DBBind<2, 10> dbBind(*dbConnect, L"{CALL sp_LogIn(?, ?)}");
+	DBBind<2, 11> dbBind(*dbConnect, L"{CALL sp_LogIn(?, ?)}");
 
-	WCHAR wId[51] = { 0, };
-	WCHAR wPassword[51] = { 0, };
+	std::wstring wId = Utf8ToUtf16(pkt.id());
+	std::wstring wPassword = Utf8ToUtf16(pkt.password());
 
-	::mbstowcs_s(nullptr, wId, 51, pkt.id().c_str(), _TRUNCATE);
-	::mbstowcs_s(nullptr, wPassword, 51, pkt.password().c_str(), _TRUNCATE);
-
-	dbBind.BindParam(0, wId);
-	dbBind.BindParam(1, wPassword);
+	dbBind.BindParam(0, wId.c_str());
+	dbBind.BindParam(1, wPassword.c_str());
 
 	int64 playerId = -1;
 	int32 errorCode = -1;
@@ -85,18 +192,21 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 	int32 itemTemplateId = 0;
 	int32 slotIndex = 0;
 	int32 itemCount = 0;
+	WCHAR nickname[51] = { 0, };
 
 	std::wcout.imbue(std::locale("kor"));
+
 	dbBind.BindCol(0, errorCode);
 	dbBind.BindCol(1, playerId);
-	dbBind.BindCol(2, playerClass);
-	dbBind.BindCol(3, exp);
-	dbBind.BindCol(4, gold);
-	dbBind.BindCol(5, hp);
-	dbBind.BindCol(6, itemInstanceId);
-	dbBind.BindCol(7, itemTemplateId);
-	dbBind.BindCol(8, slotIndex);
-	dbBind.BindCol(9, itemCount);
+	dbBind.BindCol(2, nickname);
+	dbBind.BindCol(3, playerClass);
+	dbBind.BindCol(4, exp);
+	dbBind.BindCol(5, gold);
+	dbBind.BindCol(6, hp);
+	dbBind.BindCol(7, itemInstanceId);
+	dbBind.BindCol(8, itemTemplateId);
+	dbBind.BindCol(9, slotIndex);
+	dbBind.BindCol(10, itemCount);
 
 	Protocol::S_ItemDataPacket itemPkt;
 	bool isFirstRow = true;
@@ -133,6 +243,8 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 
 	GDBConnectionPool->Push(dbConnect);
 
+	std::string szNickname = Utf16ToUtf8(nickname);
+
 	Protocol::S_LoginSuccessPacket loginPkt;
 
 	if (loginSuccess)
@@ -141,11 +253,12 @@ bool PacketHandler::HandleLogin(PacketSessionRef& session, Protocol::C_LoginPack
 
 		GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 		PlayerRef player = gameSession->_player;
-		player->SetName(pkt.id());
+		player->SetName(szNickname);
 
 		Protocol::PlayerInfo* playerInfo = loginPkt.mutable_playerinfo();
 		playerInfo->set_playerclass(static_cast<Protocol::ClassType>(player->_class));
 		playerInfo->set_playerid(player->_playerId);
+		playerInfo->set_playernickname(player->GetName());
 		loginPkt.set_gold(player->_gold);
 		loginPkt.set_exp(player->_exp);
 		loginPkt.set_hp(player->_hp);
@@ -192,6 +305,18 @@ bool PacketHandler::HandleMove(PacketSessionRef& session, Protocol::C_MovePacket
 	GRoom->DoAsync(&Room::HandleMove, pkt, player);
 	return true;
 }
+
+bool PacketHandler::HandleDash(PacketSessionRef& session, Protocol::C_DashPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	if (player == nullptr)
+		return false;
+
+	GRoom->DoAsync(&Room::HandlePlayerDash, pkt, player);
+	return true;
+}
+
 
 bool PacketHandler::HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHpPacket& pkt)
 {
@@ -275,6 +400,40 @@ bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_Du
 	int32 dungeonId = pkt.dungeonid();
 	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonStart, player, dungeonId);
 	return true;
+}
+
+bool PacketHandler::HandleDungeonEnd(PacketSessionRef& session, Protocol::C_RequestDungeonCompletePacket& pkt)
+{
+	DedicatedSessionRef dediSession = static_pointer_cast<DedicatedSession>(session);
+
+	//GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleCreateDungeon, player);
+	int32 dungeonId = pkt.dungeonid();
+	int32 gold = pkt.gold();
+
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+	DBBind<2, 1> dbBind(*dbConnect, L"{CALL sp_SetDungeonReward(?, ?)");
+	
+	dbBind.BindCol(0, gold);
+	dbBind.BindCol(1, dungeonId);
+
+	int resultCode = 0;
+
+	dbBind.BindParam(0, resultCode);
+
+	if (!dbBind.Execute())
+	{
+		std::cout << "HandleDungeonEnd - Execute() Error" << std::endl;
+	}
+	if (!dbBind.Fetch())
+	{
+		std::cout << "HandleDungeonEnd - Fetch() Error" << std::endl;
+	}
+
+	if (!resultCode) return false;
+
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonEnd, dungeonId, gold);
+	dediSession->SetUsing(false);
+	return false;
 }
 
 bool PacketHandler::HandleStorePurchase(PacketSessionRef& session, Protocol::C_StorePurchasePacket& pkt)
@@ -380,10 +539,8 @@ bool PacketHandler::HandleUseItem(PacketSessionRef& session, Protocol::C_UseItem
 		return false;
 	}
 
-	char szEffectType[51] = { 0, };
+	std::string szEffectType = Utf16ToUtf8(effectType);
 	GDBConnectionPool->Push(dbConnect);
-
-	::wcstombs_s(nullptr, szEffectType, sizeof(szEffectType), effectType, _TRUNCATE);
 
 	Protocol::S_UseItemPacket useItemPacket;
 	useItemPacket.set_slotindex(slotIndex);
@@ -406,6 +563,64 @@ bool PacketHandler::HandleChat(PacketSessionRef& session, Protocol::C_ChatPacket
 	chatPacket.set_playerid(player->GetName());
 	chatPacket.set_chat(pkt.chat());
 	GRoom->DoAsync(&Room::HandleChat, chatPacket);
+	return true;
+}
+
+bool PacketHandler::HandleMailSend(PacketSessionRef& session, Protocol::C_SendMailPacket& pkt)
+{
+	DBConnection* dbConnect = GDBConnectionPool->Pop();
+
+	DBBind<8, 0> dbBind(*dbConnect, L"{? = CALL sp_SendMail(?, ?, ?, ?, ?, ?, ?)}");
+
+	int32 returnValue = 0;
+	int32 senderId = static_cast<int32>(pkt.senderid());
+	int32 gold = pkt.gold();
+	int32 itemId = pkt.itemid();
+	int32 itemCount = pkt.itemcount();
+
+	std::wstring wReceiverName = Utf8ToUtf16(pkt.receivername());
+	std::wstring wTitle = Utf8ToUtf16(pkt.title());
+	std::wstring wContent = Utf8ToUtf16(pkt.content());
+
+	dbBind.BindParam(0, returnValue, SQL_PARAM_OUTPUT);
+	dbBind.BindParam(1, senderId);
+	dbBind.BindParam(2, wReceiverName.c_str());
+	dbBind.BindParam(3, wTitle.c_str());
+	dbBind.BindParam(4, wContent.c_str());
+	dbBind.BindParam(5, gold);
+	dbBind.BindParam(6, itemId);
+	dbBind.BindParam(7, itemCount);
+
+	bool isSuccess = false;
+	Protocol::MailFailReason reason = Protocol::MailFailReason::NONE_ERROR;
+	if (dbBind.Execute())
+	{
+	}
+	else
+	{
+		isSuccess = (returnValue == 0);
+		if (!isSuccess)
+		{
+			if (returnValue == -2)
+			{
+				reason = Protocol::MailFailReason::NONE_RECEIVER;
+			}
+			else
+			{
+				reason = Protocol::MailFailReason::NONE_GOLD;
+			}
+		}
+	}
+
+	GDBConnectionPool->Push(dbConnect);
+
+	Protocol::S_MailSendPacket resultPkt;
+	resultPkt.set_success(isSuccess);
+	resultPkt.set_errorcode(reason);
+
+	SendBufferRef sendBuffer = PacketHandler::MakeSendBuffer(resultPkt);
+	session->Send(sendBuffer);
+
 	return true;
 }
 
@@ -442,14 +657,10 @@ bool PacketHandler::HandleMailList(PacketSessionRef& session, Protocol::C_MailLi
 		while (dbBind.Fetch())
 		{
 			Protocol::MailListInfo* mailInfos = listPacket.add_maillists();
-			
-			char szTitle[51] = { 0, };
-			char szSender[51] = { 0, };
-			char szExpire[51] = { 0, };
 
-			::wcstombs_s(nullptr, szTitle, sizeof(szTitle), title, _TRUNCATE);
-			::wcstombs_s(nullptr, szSender, sizeof(szSender), senderName, _TRUNCATE);
-			::wcstombs_s(nullptr, szExpire, sizeof(szExpire), expiredDate, _TRUNCATE);
+			std::string szTitle = Utf16ToUtf8(title);
+			std::string szSender = Utf16ToUtf8(senderName);
+			std::string szExpire = Utf16ToUtf8(expiredDate);
 
 			bool hasItem = (isReceived != 0);
 
@@ -511,17 +722,11 @@ bool PacketHandler::HandleMailContent(PacketSessionRef& session, Protocol::C_Mai
 	{
 		if (dbBind.Fetch())
 		{
-			char szTitle[51] = { 0, };
-			char szSender[51] = { 0, };
-			char szContent[501] = { 0, };
-			char szSendDate[51] = { 0, };
-			char szExpire[51] = { 0, };
-
-			::wcstombs_s(nullptr, szSender, sizeof(szSender), senderName, _TRUNCATE);
-			::wcstombs_s(nullptr, szTitle, sizeof(szTitle), title, _TRUNCATE);
-			::wcstombs_s(nullptr, szContent, sizeof(szContent), content, _TRUNCATE);
-			::wcstombs_s(nullptr, szSendDate, sizeof(szSendDate), sendDate, _TRUNCATE);
-			::wcstombs_s(nullptr, szExpire, sizeof(szExpire), expiredDate, _TRUNCATE);
+			std::string szSender = Utf16ToUtf8(senderName);
+			std::string szTitle = Utf16ToUtf8(title);
+			std::string szContent = Utf16ToUtf8(content);
+			std::string szSendDate = Utf16ToUtf8(sendDate);
+			std::string szExpire = Utf16ToUtf8(expiredDate);
 
 			contentPacket.set_mailid(mailId);
 			contentPacket.set_sendername(szSender);

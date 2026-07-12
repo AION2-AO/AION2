@@ -20,6 +20,9 @@ public:
 	const int32 GetPort(){ return _port; }
 
 	const bool IsUsing() { return _isUsing; }
+
+	DungeonRef _dungeon;
+
 private:
 	std::string _ip;
 	int32 _port;

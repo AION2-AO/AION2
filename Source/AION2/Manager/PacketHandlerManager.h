@@ -16,40 +16,44 @@ public:
 
 	// 회원가입 및 로그인
 	bool Handle_S_SIGNUP(Protocol::S_SignUpResultPacket& Pkt);
-	bool Handle_S_SLOGIN(Protocol::S_LoginSuccessPacket& Pkt);
-	bool Handle_S_FLOGIN(Protocol::S_LoginFailPacket& Pkt);
+	bool Handle_S_SET_NICKNAME(Protocol::S_SetNicknamePacket& Pkt);
+	bool Handle_S_LOGIN_SUCCEED(Protocol::S_LoginSuccessPacket& Pkt);
+	bool Handle_S_LOGIN_FAIL(Protocol::S_LoginFailPacket& Pkt);
 
 	// 아이템 및 상점
 	bool Handle_S_ITEM(Protocol::S_ItemDataPacket& Pkt);
 	bool Handle_S_STORE(Protocol::S_StorePurchasePacket& Pkt);
-	bool Handle_S_USEITEM (Protocol::S_UseItemPacket& Pkt);
+	bool Handle_S_USE_ITEM (Protocol::S_UseItemPacket& Pkt);
 
 	// 맵 이동 및 스폰
 	bool Handle_S_SPAWN(Protocol::S_SpawnPacket& Pkt);
 	bool Handle_S_MOVE(Protocol::S_MovePacket& Pkt);
+	bool Handle_S_DASH(Protocol::S_DashPacket& Pkt);
 
 	// 던전
-	bool Handle_S_ENTERWAITING(Protocol::S_DungeonWaitingRoomEnterPacket& Pkt);
+	bool Handle_S_ENTER_WAITING(Protocol::S_DungeonWaitingRoomEnterPacket& Pkt);
 	bool Handle_S_CREATE(Protocol::S_DungeonCreatePacket& Pkt);
-	bool Handle_S_DEDICREATE(Protocol::S_DungeonCreatePacket& Pkt); 
+	bool Handle_S_DEDI_CREATE(Protocol::S_DungeonCreatePacket& Pkt); 
 	bool Handle_S_ENTER(Protocol::S_DungeonEnterPacket& Pkt);
 	bool Handle_S_READY(Protocol::S_DungeonReadyPacket& Pkt);
 	bool Handle_S_START(Protocol::S_DungeonStartPacket& Pkt);
 	bool Handle_S_EXIT(Protocol::S_DungeonExitPacket& Pkt);
-	bool Handle_S_DUNGEONFAIL(Protocol::S_DungeonFailPacket& Pkt);
+	bool Handle_S_DUNGEON_END(Protocol::S_RequestDungeonCompletePacket& Pkt);
+	bool Handle_S_DUNGEON_FAIL(Protocol::S_DungeonFailPacket& Pkt);
 
 	// 캐릭터 상태 및 상호작용
 	bool Handle_S_CHAT(Protocol::S_ChatPacket& Pkt);
 
 	// 메일
-	bool Handle_S_MAILLIST(Protocol::S_MailListPacket& Pkt);
-	bool Handle_S_MAILCONTENT(Protocol::S_MailContentPacket& Pkt);
+	bool Handle_S_MAIL_SEND(Protocol::S_MailSendPacket& Pkt);
+	bool Handle_S_MAIL_LIST(Protocol::S_MailListPacket& Pkt);
+	bool Handle_S_MAIL_CONTENT(Protocol::S_MailContentPacket& Pkt);
 
 	// 연결 종료
 	bool Handle_S_DISCONNECT(Protocol::S_DisconnectPacket& Pkt);
 
 	// 데디케이트 서버
-	bool Handle_S_DUNGEONSETPLAYER(Protocol::S_DungeonStartDediPacket Pkt);
+	bool Handle_S_DUNGEON_SET_PLAYER(Protocol::S_DungeonStartDediPacket Pkt);
 
 private:
 	UAOLoginUserWidget* GetLoginWidget() const;

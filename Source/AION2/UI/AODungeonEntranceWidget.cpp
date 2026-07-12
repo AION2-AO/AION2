@@ -107,7 +107,7 @@ void UAODungeonEntranceWidget::OnEnterButtonClicked()
 		EnterPacket.set_dungeonid(0);
 	}
 
-	SEND_PACKET(EnterPacket, PKT_C_DUNGEONENTER);
+	SEND_PACKET(EnterPacket, PKT_C_DUNGEON_ENTER);
 }
 
 void UAODungeonEntranceWidget::OnCreateButtonClicked()
@@ -116,7 +116,7 @@ void UAODungeonEntranceWidget::OnCreateButtonClicked()
 
 	Protocol::C_DungeonCreatePacket CreatePacket;
 
-	SEND_PACKET(CreatePacket, PKT_C_DUNGEONCREATE);
+	SEND_PACKET(CreatePacket, PKT_C_DUNGEON_CREATE);
 
 }
 void UAODungeonEntranceWidget::OnStartButtonClicked()
@@ -138,7 +138,7 @@ void UAODungeonEntranceWidget::OnStartButtonClicked()
 
 	Protocol::C_DungeonStartPacket StartPacket;
 	StartPacket.set_dungeonid(State.DungeonId);
-	SEND_PACKET(StartPacket, PKT_C_DUNGEONSTART);
+	SEND_PACKET(StartPacket, PKT_C_DUNGEON_START);
 }
 
 void UAODungeonEntranceWidget::OnReadyButtonClicked()
@@ -157,7 +157,7 @@ void UAODungeonEntranceWidget::OnReadyButtonClicked()
 
 	Protocol::C_DungeonReadyPacket ReadyPacket;
 	ReadyPacket.set_dungeonid(State.DungeonId);
-	SEND_PACKET(ReadyPacket, PKT_C_DUNGEONREADY);
+	SEND_PACKET(ReadyPacket, PKT_C_DUNGEON_READY);
 }
 
 void UAODungeonEntranceWidget::OnExitButtonClicked()
@@ -170,7 +170,7 @@ void UAODungeonEntranceWidget::OnExitButtonClicked()
 	}
 
 	const FPlayerDungeonRoomState& State = PlayerManager->GetMyDungeonRoomState();
-	if (!State.IsMember() || State.DungeonId <= 0)
+	if (!State.IsJoined() || State.DungeonId <= 0)
 	{
 		return;
 	}
@@ -182,7 +182,7 @@ void UAODungeonEntranceWidget::OnExitButtonClicked()
 		{
 			exitPacket.set_playerid(GI->GetMyPlayerId());
 		}
-		SEND_PACKET(exitPacket, PKT_C_DUNGEONEXIT);
+		SEND_PACKET(exitPacket, PKT_C_DUNGEON_EXIT);
 	}
 }
 
@@ -229,7 +229,45 @@ void UAODungeonEntranceWidget::SetDungeonInfo(const Protocol::DungeonInfo& Dunge
 
 void UAODungeonEntranceWidget::SetDungeonCreated(const Protocol::DungeonInfo& DungeonInfo)
 {
-	SetDungeonInfo(DungeonInfo);
+	UAOPlayerManager* PlayerManager = GetPlayerManager();
+	if (PlayerManager && PlayerManager->GetMyDungeonRoomState().IsJoined() && PlayerManager->GetMyDungeonRoomState().DungeonId == DungeonInfo.dungeonid())
+	{
+		SetDungeonInfo(DungeonInfo);
+	}
+	else
+	{
+		UAODungeonRoomWidget* TargetWidget = nullptr;
+		// 1. Check if the room is already in the list
+		for (UAODungeonRoomWidget* RoomWidget : DungeonRoomWidgets)
+		{
+			if (RoomWidget && RoomWidget->GetDungeonId() == DungeonInfo.dungeonid())
+			{
+				TargetWidget = RoomWidget;
+				break;
+			}
+		}
+
+		// 2. If not found, find the first unused slot (dungeonid <= 0 or not visible)
+		if (!TargetWidget)
+		{
+			for (UAODungeonRoomWidget* RoomWidget : DungeonRoomWidgets)
+			{
+				if (RoomWidget && (RoomWidget->GetDungeonId() <= 0 || RoomWidget->GetVisibility() != ESlateVisibility::Visible))
+				{
+					TargetWidget = RoomWidget;
+					break;
+				}
+			}
+		}
+
+		if (TargetWidget)
+		{
+			TargetWidget->SetDungeonInfo(DungeonInfo);
+			TargetWidget->OnJoinRequested.RemoveAll(this);
+			TargetWidget->OnJoinRequested.AddDynamic(this, &UAODungeonEntranceWidget::RequestEnterDungeon);
+			TargetWidget->SetVisibility(ESlateVisibility::Visible);
+		}
+	}
 }
 
 void UAODungeonEntranceWidget::SetDungeonEntered(int32 DungeonId, const Protocol::DungeonPlayerInfo& EnterPlayer)
@@ -365,7 +403,7 @@ void UAODungeonEntranceWidget::RequestEnterDungeon(int32 DungeonId)
 
 	EnterPacket.set_dungeonid(DungeonId);
 
-	SEND_PACKET(EnterPacket, PKT_C_DUNGEONENTER);
+	SEND_PACKET(EnterPacket, PKT_C_DUNGEON_ENTER);
 }
 
 void UAODungeonEntranceWidget::ApplyEntranceState()
@@ -564,7 +602,7 @@ void UAODungeonEntranceWidget::ShowErrorMessage(Protocol::DungeonFailReason Reas
 	}
 	case Protocol::DungeonFailReason::FullDungeon:
 	{
-		ErrorMessage->SetText(FText::FromString(TEXT("모든 참가자가 준비 중이어야 합니다.")));
+		ErrorMessage->SetText(FText::FromString(TEXT("던전을 생성할 수 없습니다.")));
 		break;
 	}
 	default:

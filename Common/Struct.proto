@@ -1,0 +1,85 @@
+syntax = "proto3";
+package Protocol;
+import "Enum.proto";
+
+message ItemData
+{
+	int32 itemInstancedId = 1;
+	int32 itemTemplateId = 2;
+	int32 slotIndex = 3;
+	int32 count = 4;
+}
+
+message Vector3 {
+  float x = 1;
+  float y = 2;
+  float z = 3;
+}
+
+message Rotator3 
+{
+	float pitch = 1;
+	float roll = 2;
+	float yaw = 3;
+}
+
+message PlayerInfo
+{
+	uint64 playerId = 1;
+	ClassType playerClass = 2;
+	string playerNickname = 3;
+}
+
+message PlayerState 
+{
+	uint64 playerId = 1;
+	string playerName = 2;
+	ClassType playerClass = 3;
+	Vector3 playerLocation =4;
+	Rotator3 playerRotation = 5;
+}
+
+message DungeonPlayerInfo
+{
+	uint64 memberId = 1;
+	string memberName = 2;
+	ClassType memberClass = 3;
+	bool isReady = 4;
+	int32 index = 5;
+}
+
+message DungeonInfo
+{
+	int32 dungeonId = 1;
+	RoomStatus status = 2;
+	DungeonPlayerInfo leaderInfo = 3;   
+	repeated DungeonPlayerInfo members = 4;
+}
+
+message DediDungeonInfo
+{
+	string clientToken = 1;
+	uint64 clientId = 2;
+	string clientName = 3;
+	ClassType clientClass = 4;
+	int32 clientHp = 5;
+	repeated ItemData playerItems = 6;
+}
+
+message DPlayerInfo
+{
+	uint64 playerId = 1;
+	string playerName = 2;
+	ClassType playerClass = 3;
+	int32 playerHp = 4;
+	repeated ItemData playerItems = 6;
+}
+
+message MailListInfo
+{
+	uint64 mailId = 1;
+	string title = 2;
+	string senderName = 3;
+	string expiredDate = 4;
+	bool hasItem = 5;
+}

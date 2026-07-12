@@ -26,5 +26,5 @@ void UAOStoreWidget::OnHealPurchase()
 	uint64 PlayerId = GI->GetMyPlayerId();
 	PurchasePacket.set_itemid(1);
 	PurchasePacket.set_playerid(PlayerId);
-	GI->SendPacket(PurchasePacket, PKT_C_STOREPURCHASE);
+	GI->SendPacket(PurchasePacket, PKT_C_STORE_PURCHASE);
 }

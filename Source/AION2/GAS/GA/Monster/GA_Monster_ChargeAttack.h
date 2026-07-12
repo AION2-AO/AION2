@@ -39,10 +39,10 @@ public:
 	
 protected:
 	UFUNCTION()
-	void OnHitCheckBegin(FGameplayEventData Payload);
+	virtual void OnHitCheckBegin(FGameplayEventData Payload);
 
 	UFUNCTION()
-	void OnHitCheckEnd(FGameplayEventData Payload);
+	virtual void OnHitCheckEnd(FGameplayEventData Payload);
 
 
 	UFUNCTION()

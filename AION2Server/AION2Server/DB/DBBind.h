@@ -50,9 +50,30 @@ public:
 		_paramFlag |= (1LL << idx);
 	}
 
+	template<typename T>
+	void BindParam(int32 idx, T& value, SQLSMALLINT paramType)
+	{
+		_dbConnection.BindParam(idx + 1, &value, &_paramIndex[idx], paramType);
+		_paramFlag |= (1LL << idx);
+	}
+
 	void BindParam(int32 idx, const WCHAR* value)
 	{
 		_dbConnection.BindParam(idx + 1, value, &_paramIndex[idx]);
+		_paramFlag |= (1LL << idx);
+	}
+
+	template<int32 N>
+	void BindParam(int32 idx, WCHAR(&value)[N])
+	{
+		_dbConnection.BindParam(idx + 1, (const WCHAR*)value, &_paramIndex[idx]);
+		_paramFlag |= (1LL << idx);
+	}
+
+	template<int32 N>
+	void BindParam(int32 idx, const WCHAR(&value)[N])
+	{
+		_dbConnection.BindParam(idx + 1, (const WCHAR*)value, &_paramIndex[idx]);
 		_paramFlag |= (1LL << idx);
 	}
 

@@ -98,7 +98,7 @@ void UGA_Siliator_PT2::StartMoveToTarget()
 	MoveDir = MoveDir.GetSafeNormal();
 	AOCharacter->SetActorRotation(MoveDir.Rotation());
 
-	const float FrontDistance = -50.f;
+	const float FrontDistance = -100.f;
 	FVector Destination = TargetLocation + MoveDir * FrontDistance;
 	Destination.Z = StartLocation.Z;
 

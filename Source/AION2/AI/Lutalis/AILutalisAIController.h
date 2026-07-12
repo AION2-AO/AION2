@@ -26,7 +26,7 @@ public:
 	virtual void TargetPerceptionOn(AActor* Actor, FAIStimulus Stimlus) override;
 
 public:
-	//virtual void OnPossess(APawn* InPawn) override;
+	virtual void OnPossess(APawn* InPawn) override;
 
 protected:
 
@@ -39,4 +39,10 @@ private:
 	// AttributeSet
 	UPROPERTY(EditAnywhere, Category = "GAS", meta = (AllowPrivateAccess = "true"))
 	TObjectPtr<class UAOAttributeSet> ControlledMonsterAttributeSet;
+
+private:
+	int32 ElectricZoneTriggerStep = 0;
+
+	void TryRequestElectricZoneByHealth();
+	bool AddElectricZoneRequestTag();
 };

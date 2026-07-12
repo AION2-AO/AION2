@@ -743,9 +743,24 @@ class PlayerInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kPlayerNicknameFieldNumber = 3,
     kPlayerIdFieldNumber = 1,
     kPlayerClassFieldNumber = 2,
   };
+  // string playerNickname = 3;
+  void clear_playernickname();
+  const std::string& playernickname() const;
+  template <typename ArgT0 = const std::string&, typename... ArgT>
+  void set_playernickname(ArgT0&& arg0, ArgT... args);
+  std::string* mutable_playernickname();
+  PROTOBUF_NODISCARD std::string* release_playernickname();
+  void set_allocated_playernickname(std::string* playernickname);
+  private:
+  const std::string& _internal_playernickname() const;
+  inline PROTOBUF_ALWAYS_INLINE void _internal_set_playernickname(const std::string& value);
+  std::string* _internal_mutable_playernickname();
+  public:
+
   // uint64 playerId = 1;
   void clear_playerid();
   uint64_t playerid() const;
@@ -772,6 +787,7 @@ class PlayerInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr playernickname_;
     uint64_t playerid_;
     int playerclass_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
@@ -1513,11 +1529,31 @@ class DediDungeonInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kPlayerItemsFieldNumber = 6,
     kClientTokenFieldNumber = 1,
     kClientNameFieldNumber = 3,
     kClientIdFieldNumber = 2,
     kClientClassFieldNumber = 4,
+    kClientHpFieldNumber = 5,
   };
+  // repeated .Protocol.ItemData playerItems = 6;
+  int playeritems_size() const;
+  private:
+  int _internal_playeritems_size() const;
+  public:
+  void clear_playeritems();
+  ::Protocol::ItemData* mutable_playeritems(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >*
+      mutable_playeritems();
+  private:
+  const ::Protocol::ItemData& _internal_playeritems(int index) const;
+  ::Protocol::ItemData* _internal_add_playeritems();
+  public:
+  const ::Protocol::ItemData& playeritems(int index) const;
+  ::Protocol::ItemData* add_playeritems();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >&
+      playeritems() const;
+
   // string clientToken = 1;
   void clear_clienttoken();
   const std::string& clienttoken() const;
@@ -1564,6 +1600,15 @@ class DediDungeonInfo final :
   void _internal_set_clientclass(::Protocol::ClassType value);
   public:
 
+  // int32 clientHp = 5;
+  void clear_clienthp();
+  int32_t clienthp() const;
+  void set_clienthp(int32_t value);
+  private:
+  int32_t _internal_clienthp() const;
+  void _internal_set_clienthp(int32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.DediDungeonInfo)
  private:
   class _Internal;
@@ -1572,10 +1617,12 @@ class DediDungeonInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData > playeritems_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr clienttoken_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr clientname_;
     uint64_t clientid_;
     int clientclass_;
+    int32_t clienthp_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -1704,10 +1751,30 @@ class DPlayerInfo final :
   // accessors -------------------------------------------------------
 
   enum : int {
+    kPlayerItemsFieldNumber = 6,
     kPlayerNameFieldNumber = 2,
     kPlayerIdFieldNumber = 1,
     kPlayerClassFieldNumber = 3,
+    kPlayerHpFieldNumber = 4,
   };
+  // repeated .Protocol.ItemData playerItems = 6;
+  int playeritems_size() const;
+  private:
+  int _internal_playeritems_size() const;
+  public:
+  void clear_playeritems();
+  ::Protocol::ItemData* mutable_playeritems(int index);
+  ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >*
+      mutable_playeritems();
+  private:
+  const ::Protocol::ItemData& _internal_playeritems(int index) const;
+  ::Protocol::ItemData* _internal_add_playeritems();
+  public:
+  const ::Protocol::ItemData& playeritems(int index) const;
+  ::Protocol::ItemData* add_playeritems();
+  const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >&
+      playeritems() const;
+
   // string playerName = 2;
   void clear_playername();
   const std::string& playername() const;
@@ -1740,6 +1807,15 @@ class DPlayerInfo final :
   void _internal_set_playerclass(::Protocol::ClassType value);
   public:
 
+  // int32 playerHp = 4;
+  void clear_playerhp();
+  int32_t playerhp() const;
+  void set_playerhp(int32_t value);
+  private:
+  int32_t _internal_playerhp() const;
+  void _internal_set_playerhp(int32_t value);
+  public:
+
   // @@protoc_insertion_point(class_scope:Protocol.DPlayerInfo)
  private:
   class _Internal;
@@ -1748,9 +1824,11 @@ class DPlayerInfo final :
   typedef void InternalArenaConstructable_;
   typedef void DestructorSkippable_;
   struct Impl_ {
+    ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData > playeritems_;
     ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr playername_;
     uint64_t playerid_;
     int playerclass_;
+    int32_t playerhp_;
     mutable ::PROTOBUF_NAMESPACE_ID::internal::CachedSize _cached_size_;
   };
   union { Impl_ _impl_; };
@@ -2224,6 +2302,56 @@ inline void PlayerInfo::_internal_set_playerclass(::Protocol::ClassType value) {
 inline void PlayerInfo::set_playerclass(::Protocol::ClassType value) {
   _internal_set_playerclass(value);
   // @@protoc_insertion_point(field_set:Protocol.PlayerInfo.playerClass)
+}
+
+// string playerNickname = 3;
+inline void PlayerInfo::clear_playernickname() {
+  _impl_.playernickname_.ClearToEmpty();
+}
+inline const std::string& PlayerInfo::playernickname() const {
+  // @@protoc_insertion_point(field_get:Protocol.PlayerInfo.playerNickname)
+  return _internal_playernickname();
+}
+template <typename ArgT0, typename... ArgT>
+inline PROTOBUF_ALWAYS_INLINE
+void PlayerInfo::set_playernickname(ArgT0&& arg0, ArgT... args) {
+ 
+ _impl_.playernickname_.Set(static_cast<ArgT0 &&>(arg0), args..., GetArenaForAllocation());
+  // @@protoc_insertion_point(field_set:Protocol.PlayerInfo.playerNickname)
+}
+inline std::string* PlayerInfo::mutable_playernickname() {
+  std::string* _s = _internal_mutable_playernickname();
+  // @@protoc_insertion_point(field_mutable:Protocol.PlayerInfo.playerNickname)
+  return _s;
+}
+inline const std::string& PlayerInfo::_internal_playernickname() const {
+  return _impl_.playernickname_.Get();
+}
+inline void PlayerInfo::_internal_set_playernickname(const std::string& value) {
+  
+  _impl_.playernickname_.Set(value, GetArenaForAllocation());
+}
+inline std::string* PlayerInfo::_internal_mutable_playernickname() {
+  
+  return _impl_.playernickname_.Mutable(GetArenaForAllocation());
+}
+inline std::string* PlayerInfo::release_playernickname() {
+  // @@protoc_insertion_point(field_release:Protocol.PlayerInfo.playerNickname)
+  return _impl_.playernickname_.Release();
+}
+inline void PlayerInfo::set_allocated_playernickname(std::string* playernickname) {
+  if (playernickname != nullptr) {
+    
+  } else {
+    
+  }
+  _impl_.playernickname_.SetAllocated(playernickname, GetArenaForAllocation());
+#ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (_impl_.playernickname_.IsDefault()) {
+    _impl_.playernickname_.Set("", GetArenaForAllocation());
+  }
+#endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  // @@protoc_insertion_point(field_set_allocated:Protocol.PlayerInfo.playerNickname)
 }
 
 // -------------------------------------------------------------------
@@ -2952,6 +3080,66 @@ inline void DediDungeonInfo::set_clientclass(::Protocol::ClassType value) {
   // @@protoc_insertion_point(field_set:Protocol.DediDungeonInfo.clientClass)
 }
 
+// int32 clientHp = 5;
+inline void DediDungeonInfo::clear_clienthp() {
+  _impl_.clienthp_ = 0;
+}
+inline int32_t DediDungeonInfo::_internal_clienthp() const {
+  return _impl_.clienthp_;
+}
+inline int32_t DediDungeonInfo::clienthp() const {
+  // @@protoc_insertion_point(field_get:Protocol.DediDungeonInfo.clientHp)
+  return _internal_clienthp();
+}
+inline void DediDungeonInfo::_internal_set_clienthp(int32_t value) {
+  
+  _impl_.clienthp_ = value;
+}
+inline void DediDungeonInfo::set_clienthp(int32_t value) {
+  _internal_set_clienthp(value);
+  // @@protoc_insertion_point(field_set:Protocol.DediDungeonInfo.clientHp)
+}
+
+// repeated .Protocol.ItemData playerItems = 6;
+inline int DediDungeonInfo::_internal_playeritems_size() const {
+  return _impl_.playeritems_.size();
+}
+inline int DediDungeonInfo::playeritems_size() const {
+  return _internal_playeritems_size();
+}
+inline void DediDungeonInfo::clear_playeritems() {
+  _impl_.playeritems_.Clear();
+}
+inline ::Protocol::ItemData* DediDungeonInfo::mutable_playeritems(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.DediDungeonInfo.playerItems)
+  return _impl_.playeritems_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >*
+DediDungeonInfo::mutable_playeritems() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.DediDungeonInfo.playerItems)
+  return &_impl_.playeritems_;
+}
+inline const ::Protocol::ItemData& DediDungeonInfo::_internal_playeritems(int index) const {
+  return _impl_.playeritems_.Get(index);
+}
+inline const ::Protocol::ItemData& DediDungeonInfo::playeritems(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.DediDungeonInfo.playerItems)
+  return _internal_playeritems(index);
+}
+inline ::Protocol::ItemData* DediDungeonInfo::_internal_add_playeritems() {
+  return _impl_.playeritems_.Add();
+}
+inline ::Protocol::ItemData* DediDungeonInfo::add_playeritems() {
+  ::Protocol::ItemData* _add = _internal_add_playeritems();
+  // @@protoc_insertion_point(field_add:Protocol.DediDungeonInfo.playerItems)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >&
+DediDungeonInfo::playeritems() const {
+  // @@protoc_insertion_point(field_list:Protocol.DediDungeonInfo.playerItems)
+  return _impl_.playeritems_;
+}
+
 // -------------------------------------------------------------------
 
 // DPlayerInfo
@@ -3044,6 +3232,66 @@ inline void DPlayerInfo::_internal_set_playerclass(::Protocol::ClassType value) 
 inline void DPlayerInfo::set_playerclass(::Protocol::ClassType value) {
   _internal_set_playerclass(value);
   // @@protoc_insertion_point(field_set:Protocol.DPlayerInfo.playerClass)
+}
+
+// int32 playerHp = 4;
+inline void DPlayerInfo::clear_playerhp() {
+  _impl_.playerhp_ = 0;
+}
+inline int32_t DPlayerInfo::_internal_playerhp() const {
+  return _impl_.playerhp_;
+}
+inline int32_t DPlayerInfo::playerhp() const {
+  // @@protoc_insertion_point(field_get:Protocol.DPlayerInfo.playerHp)
+  return _internal_playerhp();
+}
+inline void DPlayerInfo::_internal_set_playerhp(int32_t value) {
+  
+  _impl_.playerhp_ = value;
+}
+inline void DPlayerInfo::set_playerhp(int32_t value) {
+  _internal_set_playerhp(value);
+  // @@protoc_insertion_point(field_set:Protocol.DPlayerInfo.playerHp)
+}
+
+// repeated .Protocol.ItemData playerItems = 6;
+inline int DPlayerInfo::_internal_playeritems_size() const {
+  return _impl_.playeritems_.size();
+}
+inline int DPlayerInfo::playeritems_size() const {
+  return _internal_playeritems_size();
+}
+inline void DPlayerInfo::clear_playeritems() {
+  _impl_.playeritems_.Clear();
+}
+inline ::Protocol::ItemData* DPlayerInfo::mutable_playeritems(int index) {
+  // @@protoc_insertion_point(field_mutable:Protocol.DPlayerInfo.playerItems)
+  return _impl_.playeritems_.Mutable(index);
+}
+inline ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >*
+DPlayerInfo::mutable_playeritems() {
+  // @@protoc_insertion_point(field_mutable_list:Protocol.DPlayerInfo.playerItems)
+  return &_impl_.playeritems_;
+}
+inline const ::Protocol::ItemData& DPlayerInfo::_internal_playeritems(int index) const {
+  return _impl_.playeritems_.Get(index);
+}
+inline const ::Protocol::ItemData& DPlayerInfo::playeritems(int index) const {
+  // @@protoc_insertion_point(field_get:Protocol.DPlayerInfo.playerItems)
+  return _internal_playeritems(index);
+}
+inline ::Protocol::ItemData* DPlayerInfo::_internal_add_playeritems() {
+  return _impl_.playeritems_.Add();
+}
+inline ::Protocol::ItemData* DPlayerInfo::add_playeritems() {
+  ::Protocol::ItemData* _add = _internal_add_playeritems();
+  // @@protoc_insertion_point(field_add:Protocol.DPlayerInfo.playerItems)
+  return _add;
+}
+inline const ::PROTOBUF_NAMESPACE_ID::RepeatedPtrField< ::Protocol::ItemData >&
+DPlayerInfo::playeritems() const {
+  // @@protoc_insertion_point(field_list:Protocol.DPlayerInfo.playerItems)
+  return _impl_.playeritems_;
 }
 
 // -------------------------------------------------------------------

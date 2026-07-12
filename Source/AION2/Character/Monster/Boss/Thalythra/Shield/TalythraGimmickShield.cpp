@@ -8,13 +8,13 @@
 // Sets default values
 ATalythraGimmickShield::ATalythraGimmickShield()
 {
- 	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
+	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
 
 	Collision = CreateDefaultSubobject<USphereComponent>(TEXT("Collision"));
 
-	RootComponent = Collision; 
+	RootComponent = Collision;
 
 	// Replication 설정 
 	bReplicates = true;					// 이 Actor를 클라이언트에도 만들어지도록 설정
@@ -25,16 +25,35 @@ ATalythraGimmickShield::ATalythraGimmickShield()
 void ATalythraGimmickShield::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	
+
+	// 그럼 충돌 중인 상태를 검사해야하네. 그러면 
+
 	Collision->OnComponentBeginOverlap.AddDynamic(this, &ATalythraGimmickShield::OnShieldBeginOverlapEvent);
 	Collision->OnComponentEndOverlap.AddDynamic(this, &ATalythraGimmickShield::OnShieldEndOverlapEvent);
+
 }
 
 // Called every frame
 void ATalythraGimmickShield::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+}
+
+void ATalythraGimmickShield::SetPlayerShieldColor()
+{
+	TArray<AActor*> OverlappingPlayers;
+	Collision->GetOverlappingActors(OverlappingPlayers, ADaeva::StaticClass());
+
+	for (AActor* Actor : OverlappingPlayers)
+	{
+		ADaeva* Player = Cast<ADaeva>(Actor);
+		if (!Player) continue;
+
+		// 여기서 각 플레이어에게 쉴드 색 적용
+		Player->Set_HasSheildColor(OrbColor);
+	}
+
 
 }
 
@@ -48,16 +67,17 @@ void ATalythraGimmickShield::OnShieldBeginOverlapEvent(UPrimitiveComponent* Over
 	// 플레이어가 소환한 다른 쉴드 충돌 무시
 	if (ATalythraGimmickShield* OtherProj = Cast<ATalythraGimmickShield>(OtherActor))
 	{
-		return; 
+		Destroy();
+		return;
 	}
 
 	AAOCharacter* HitCharacter = Cast<AAOCharacter>(OtherActor);
 	if (HitCharacter == nullptr)
-		return; 
+		return;
 
 	ADaeva* pPlayer = Cast<ADaeva>(HitCharacter);
 	if (pPlayer == nullptr)
-		return; 
+		return;
 
 
 	// 플레이어
@@ -67,7 +87,7 @@ void ATalythraGimmickShield::OnShieldBeginOverlapEvent(UPrimitiveComponent* Over
 
 	}
 
-	
+
 	// 반드시 패턴이 끝나고 삭제해 주어야함.
 	//Destroy();
 

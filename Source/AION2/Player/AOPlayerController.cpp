@@ -7,15 +7,17 @@
 #include "EnhancedInputSubsystems.h"
 #include "EnhancedInputComponent.h"
 #include "InputCoreTypes.h"
-
+#include "Game/AODungeonGameMode.h"
+#include "Game/AOGameInstance.h"
 #include "AbilitySystemComponent.h"
+#include "Game/AOGameInstance.h"
+#include "Blueprint/UserWidget.h"
 
 #include "UI/AOMainHUDWidget.h"
 
-#include "Player/AOPlayerState.h"
-#include "Character/Monster/AOMonsterBase.h"
 #include "Manager/AOUIManager.h"
 #include "UI/Mail/MainMailWidget.h"
+#include "UI/DungeonClearWidget.h"
 #include "Components/Widget.h"
 
 
@@ -241,6 +243,23 @@ void AAOPlayerController::HideTargetMonsterHUD()
 	MainHUD->HideTargetMonsterHUD();
 }
 
+void AAOPlayerController::PlaySkillPressedFeedback(int32 InputId)
+{
+	if (!IsLocalController() || !MainHUD)
+	{
+		return;
+	}
+
+	MainHUD->PlaySkillPressedFeedback(InputId);
+}
+
+// 07.09
+void AAOPlayerController::Client_RefreshPlayerHUD_Implementation()
+{
+	HandlePawnASCReady();
+}
+//
+
 void AAOPlayerController::ToggleMailWidget()
 {
 	if (!IsLocalController()) return;
@@ -274,3 +293,46 @@ void AAOPlayerController::ToggleMailWidget()
 	}
 }
 
+void AAOPlayerController::TestClearDungeon()
+{
+	//ServerTestClearDungeon();
+}
+
+void AAOPlayerController::ServerRequestDungeonComplete_Implementation()
+{
+	AAODungeonGameMode* DungeonGameMode = GetWorld()->GetAuthGameMode<AAODungeonGameMode>();
+
+	if (!DungeonGameMode)
+	{
+		return;
+	}
+
+	DungeonGameMode->SendDungeonCompleteRequest();
+}
+
+void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Gold)
+{
+	if (!IsLocalController())
+	{
+		return;
+	}
+
+	if (!DungeonClearWidgetClass)
+	{
+		return;
+	}
+
+	if (!DungeonClearWidget)
+	{
+		DungeonClearWidget = CreateWidget<UDungeonClearWidget>(this,DungeonClearWidgetClass);
+
+		if (!DungeonClearWidget)
+		{
+			return;
+		}
+
+		DungeonClearWidget->AddToViewport();
+	}
+
+	DungeonClearWidget->SetDungeonClearWidget(Gold);
+}

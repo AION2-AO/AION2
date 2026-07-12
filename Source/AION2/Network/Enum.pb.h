@@ -133,6 +133,33 @@ inline bool DungeonFailReason_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<DungeonFailReason>(
     DungeonFailReason_descriptor(), name, value);
 }
+enum MailFailReason : int {
+  NONE_ERROR = 0,
+  NONE_RECEIVER = 1,
+  NONE_GOLD = 2,
+  NONE_ITEM = 3,
+  MailFailReason_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  MailFailReason_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool MailFailReason_IsValid(int value);
+constexpr MailFailReason MailFailReason_MIN = NONE_ERROR;
+constexpr MailFailReason MailFailReason_MAX = NONE_ITEM;
+constexpr int MailFailReason_ARRAYSIZE = MailFailReason_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* MailFailReason_descriptor();
+template<typename T>
+inline const std::string& MailFailReason_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, MailFailReason>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function MailFailReason_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    MailFailReason_descriptor(), enum_t_value);
+}
+inline bool MailFailReason_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, MailFailReason* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<MailFailReason>(
+    MailFailReason_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -169,6 +196,11 @@ template <> struct is_proto_enum< ::Protocol::DungeonFailReason> : ::std::true_t
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::DungeonFailReason>() {
   return ::Protocol::DungeonFailReason_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::MailFailReason> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::MailFailReason>() {
+  return ::Protocol::MailFailReason_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

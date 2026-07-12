@@ -29,7 +29,7 @@ public:
 	bool			BindParam(int32 paramIndex, double* value, SQLLEN* index);
 	bool			BindParam(int32 paramIndex, int8* value, SQLLEN* index);
 	bool			BindParam(int32 paramIndex, int16* value, SQLLEN* index);
-	bool			BindParam(int32 paramIndex, int32* value, SQLLEN* index);
+	bool			BindParam(int32 paramIndex, int32* value, SQLLEN* index, SQLSMALLINT paramType = SQL_PARAM_INPUT);
 	bool			BindParam(int32 paramIndex, int64* value, SQLLEN* index);
 	bool			BindParam(int32 paramIndex, TIMESTAMP_STRUCT* value, SQLLEN* index);
 	bool			BindParam(int32 paramIndex, const WCHAR* str, SQLLEN* index);
@@ -47,7 +47,8 @@ public:
 	bool			BindCol(int32 columnIndex, BYTE* bin, int32 size, SQLLEN* index);
 
 private:
-	bool			BindParam(SQLUSMALLINT paramIndex, SQLSMALLINT cType, SQLSMALLINT sqlType, SQLULEN len, SQLPOINTER ptr, SQLLEN* index);
+	bool			BindParam(SQLUSMALLINT paramIndex, SQLSMALLINT cType, SQLSMALLINT sqlType, SQLULEN len, SQLPOINTER ptr, SQLLEN* index, SQLSMALLINT paramType = SQL_PARAM_INPUT);
+
 	bool			BindCol(SQLUSMALLINT columnIndex, SQLSMALLINT cType, SQLULEN len, SQLPOINTER value, SQLLEN* index);
 	void			HandleError(SQLRETURN ret);
 

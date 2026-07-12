@@ -43,11 +43,13 @@ void UGA_Monster_Dead::CancelAbility(const FGameplayAbilitySpecHandle Handle, co
 
 void UGA_Monster_Dead::EndAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, bool bReplicateEndAbility, bool bWasCancelled)
 {
-    Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
     AAOMonsterBase* pMonster = CastChecked<AAOMonsterBase>(ActorInfo->AvatarActor.Get());
 
     pMonster->OnDeadMontageEnd.Broadcast();
+    pMonster->OnDeadMontageEnd.RemoveDynamic(pMonster, &AAOMonsterBase::HandleBossDeathMontageEnd);
+
+    Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
 
 
 }

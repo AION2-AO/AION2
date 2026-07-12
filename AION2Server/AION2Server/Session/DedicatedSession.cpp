@@ -2,6 +2,7 @@
 #include "DedicatedSession.h"
 #include "DediSessionManager.h"
 #include "PacketHandler.h"
+#include "Dungeon.h"
 
 
 void DedicatedSession::OnConnected()
@@ -12,7 +13,12 @@ void DedicatedSession::OnConnected()
 void DedicatedSession::OnDisconnected()
 {
 	GDediSessionManager.Remove(static_pointer_cast<DedicatedSession>(shared_from_this()));
-
+	
+	if (_dungeon)
+	{
+		GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonExitByDedi, _dungeon->GetId());
+		_dungeon = nullptr;
+	}
 }
 
 void DedicatedSession::OnRecvPacket(BYTE* buffer, int32 len)

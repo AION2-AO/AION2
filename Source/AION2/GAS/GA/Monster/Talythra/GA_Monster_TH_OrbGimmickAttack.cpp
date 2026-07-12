@@ -5,9 +5,15 @@
 #include "Character/Monster/Boss/Thalythra/Talythra.h"
 #include "Character/Daeva/Daeva.h"
 #include "Components/CapsuleComponent.h"
+#include "Physics/Collision.h"
+#include "Character/Monster/Boss/Thalythra/Shield/TalythraGimmickShield.h"
+#include "GAS/AOGameplayTags.h"
 
 void UGA_Monster_TH_OrbGimmickAttack::OnCheckAttackHitEvent(FGameplayEventData Payload)
 {
+
+	// 그러면 여기서 쉴드에서 해당 플레이어가 해당 쉴드 안에 있는지 체크하면 되겟네. 
+
 	if (!HasAuthority(&CurrentActivationInfo))
 	{
 		return;
@@ -20,39 +26,42 @@ void UGA_Monster_TH_OrbGimmickAttack::OnCheckAttackHitEvent(FGameplayEventData P
 		return;
 	}
 
-	
-	
-	
-	TArray<class ADaeva*> ArrayDaeva = pTalythra->Get_ArrayOrbHittedDaeva();
 
+	TArray<ATalythraGimmickShield*> ArrayGimmickShields = pTalythra->Get_ArrayOrbShield();
 
-	// 여기서 현재 탈리스라의 공격 색가져오고
-	// 플레이어의 현재 matching color와 같은지 확인해서 
-	// 같다면 공격x 틀리다면 공격 허용  o
-	// 현재 그러면 color만 지정해주면됨 탈리스라에 
-
-
-	for (auto& iter : ArrayDaeva)
+	for (auto& iter : ArrayGimmickShields)
 	{
-		if (iter->Get_CurrentDaevaHasSheildColor() == pTalythra->Get_AttackOrbColor())
-		{
-			continue;
-		}
-
-		else
-		{
-			AAOCharacter* pCharacter = Cast<AAOCharacter>(iter);
-
-			FHitResult HitResult;
-
-			HitResult.ImpactPoint = pCharacter->GetCapsuleComponent()->GetComponentLocation();
-			HitResult.ImpactNormal = FVector(1.f, 1.f, 1.f);
-
-			pCharacter->TakeDamageAO(AttackData, HitResult, pTalythra);
-		}
-
+		iter->SetPlayerShieldColor();
 	}
 
+	uint8 SafeOrbColor = static_cast<uint8>(pTalythra->Get_AttackOrbColor());
 
-	//AOCharacter->CheckAttackHit(AttackData);
+	pTalythra->CheckIsInSafeZone(AttackData, SafeOrbColor);
 }
+
+void UGA_Monster_TH_OrbGimmickAttack::EndAbility(
+	const FGameplayAbilitySpecHandle Handle,
+	const FGameplayAbilityActorInfo* ActorInfo,
+	const FGameplayAbilityActivationInfo ActivationInfo,
+	bool bReplicateEndAbility,
+	bool bWasCancelled)
+{
+	if (HasAuthority(&CurrentActivationInfo))
+	{
+		if (PendingTag.IsValid())
+		{
+			UAbilitySystemComponent* ASC = ActorInfo->AbilitySystemComponent.Get();
+
+			if (ASC)
+			{
+				ASC->RemoveLooseGameplayTag(PendingTag);
+				ASC->RemoveLooseGameplayTag(GIMMICK_MONSTER);
+			}
+		}
+	}
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
+
+}
+
+

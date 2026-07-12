@@ -56,6 +56,12 @@ int32 Dungeon::GetFreeIndex() const
 	return static_cast<int32>(_members.size() + 1);
 }
 
+void Dungeon::ResetDungeon()
+{
+	_members.clear();
+	_leader = nullptr;
+}
+
 
 void Dungeon::Broadcast(SendBufferRef sendBuffer)
 {
@@ -142,6 +148,60 @@ void DungeonWaitingRoom::HandleLeaveWaitingRoom(PlayerRef player)
 {
 	if (player == nullptr) return;
 	_waitingPlayers.erase(player->GetId());
+
+	for (auto it = _dungeons.begin(); it != _dungeons.end(); )
+	{
+		DungeonRef dungeon = it->second;
+		if (dungeon == nullptr)
+		{
+			it = _dungeons.erase(it);
+			continue;
+		}
+
+		if (dungeon->GetStatus() == Protocol::RoomStatus::RECRUITING)
+		{
+			if (dungeon->GetLeader() == player)
+			{
+				DediSessionRef dedi = dungeon->GetDediSession();
+				if (dedi)
+				{
+					dedi->SetUsing(false);
+					dedi->_dungeon = nullptr;
+				}
+
+				for (auto member : dungeon->GetMembers())
+				{
+					if (member)
+					{
+						member->SetReady(false);
+					}
+				}
+
+				Protocol::S_DungeonExitPacket exitPkt;
+				exitPkt.set_playerid(player->GetId());
+				exitPkt.mutable_dungeoninfo()->CopyFrom(dungeon->ToProto());
+				SendBufferRef exitBuffer = PacketHandler::MakeSendBuffer(exitPkt);
+				WaitingRoomBroadcast(exitBuffer, -1);
+
+				int32 dungeonId = dungeon->GetId();
+				_freeDungeonIds.insert(dungeonId);
+				it = _dungeons.erase(it);
+				continue;
+			}
+			else
+			{
+				if (dungeon->RemoveMember(player))
+				{
+					Protocol::S_DungeonExitPacket exitPkt;
+					exitPkt.set_playerid(player->GetId());
+					exitPkt.mutable_dungeoninfo()->CopyFrom(dungeon->ToProto());
+					SendBufferRef exitBuffer = PacketHandler::MakeSendBuffer(exitPkt);
+					WaitingRoomBroadcast(exitBuffer, -1);
+				}
+			}
+		}
+		++it;
+	}
 }
 
 void DungeonWaitingRoom::HandleCreateDungeon(PlayerRef player)
@@ -160,6 +220,7 @@ void DungeonWaitingRoom::HandleCreateDungeon(PlayerRef player)
 	DungeonRef dungeon = std::make_shared<Dungeon>(dungeonId, player);
 	_dungeons[dungeonId] = dungeon;
 
+	dedi->_dungeon = dungeon;
 	dedi->SetUsing(true);
 	dungeon->SetDediSession(dedi);
 
@@ -167,6 +228,7 @@ void DungeonWaitingRoom::HandleCreateDungeon(PlayerRef player)
 	createPkt.mutable_dungeoninfo()->CopyFrom(dungeon->ToProto());
 
 	SendBufferRef createdungeonBuffer = PacketHandler::MakeSendBuffer(createPkt);
+	dedi->Send(createdungeonBuffer);
 	WaitingRoomBroadcast(createdungeonBuffer);
 }
 
@@ -213,13 +275,6 @@ void DungeonWaitingRoom::HandleEnterDungeon(PlayerRef player, int32 inDungeonId)
 		Protocol::S_DungeonEnterPacket enterPacket;
 		enterPacket.set_dungeonid(targetDungeon->GetId());
 		if (CheckAlreadyIn(player->GetId(), targetDungeon)) return;
-		//Protocol::DungeonPlayerInfo* enterPlayerProto = enterPacket.mutable_enterplayer();
-		/*enterPlayerProto->set_memberid(player->GetId());
-		enterPlayerProto->set_membername(player->GetName());
-		enterPlayerProto->set_memberclass(player->GetClass());
-		enterPlayerProto->set_isready(false);
-		enterPlayerProto->set_index(static_cast<int32>(targetDungeon->GetMembers().size()));*/
-
 		enterPacket.mutable_dungeoninfo()->CopyFrom(targetDungeon->ToProto());
 
 		SendBufferRef enterBuffer = PacketHandler::MakeSendBuffer(enterPacket);
@@ -229,7 +284,7 @@ void DungeonWaitingRoom::HandleEnterDungeon(PlayerRef player, int32 inDungeonId)
 
 void DungeonWaitingRoom::HandleReadyPacket(PlayerRef player, int32 dungeonId)
 {
-	if(player->GetReady())
+	if (player->GetReady())
 	{
 		player->SetReady(false);
 	}
@@ -259,7 +314,11 @@ void DungeonWaitingRoom::HandleExitPacket(PlayerRef player, int32 dungeonId)
 	if (player == dungeon->GetLeader())
 	{
 		DediSessionRef dedi = dungeon->GetDediSession();
-		dedi->SetUsing(false);
+		if (dedi)
+		{
+			dedi->SetUsing(false);
+			dedi->_dungeon = nullptr;
+		}
 		for (auto member : dungeon->GetMembers())
 		{
 			member->SetReady(false);
@@ -320,23 +379,96 @@ void DungeonWaitingRoom::HandleDungeonToken(DungeonRef dungeon)
 		dediInfo = pkt.add_preplayersinfos();
 		auto session = member->_ownerSession;
 		if (auto session = member->_ownerSession.lock())
-		{
+		{	
+			int32 memberId = member->GetId();
+
 			dediInfo->set_clienttoken(session->GetToken());
-			dediInfo->set_clientid(member->GetId());
+			dediInfo->set_clientid(memberId);
 			dediInfo->set_clientname(member->GetName());
 			dediInfo->set_clientclass(member->GetClass());
+			dediInfo->set_clienthp(member->GetHp());		
+
+			DBConnection* dbConnect = GDBConnectionPool->Pop();
+			DBBind<1, 4> dbBind(*dbConnect, L"{CALL sp_GetItems(?)}");
+			dbBind.BindParam(0, memberId);
+
+			int32 itemInstanceId = 0;
+			int32 itemTemplateId = 0;
+			int32 slotIndex = 0;
+			int32 itemCount = 0;
+
+			std::wcout.imbue(std::locale("kor"));
+
+			dbBind.BindCol(0, itemInstanceId);
+			dbBind.BindCol(1, itemTemplateId);
+			dbBind.BindCol(2, slotIndex);
+			dbBind.BindCol(3, itemCount);
+
+			if (dbBind.Execute())
+			{
+				if (dbBind.Fetch())
+				{
+					if (itemInstanceId != 0)
+					{
+						Protocol::ItemData* item = dediInfo->add_playeritems();
+
+						item->set_iteminstancedid(itemInstanceId);
+						item->set_itemtemplateid(itemTemplateId);
+						item->set_slotindex(slotIndex);
+						item->set_count(itemCount);
+					}
+				}
+			}
+			GDBConnectionPool->Push(dbConnect);
+
 		}
 	}
+
 	{
 		auto leader = dungeon->GetLeader();
 		auto leaderSession = leader->_ownerSession;
 		if (auto leaderSession = leader->_ownerSession.lock())
 		{
+			int32 leaderId = leader->GetId();
 			dediInfo = pkt.add_preplayersinfos();
 			dediInfo->set_clienttoken(leaderSession->GetToken());
-			dediInfo->set_clientid(leader->GetId());
+			dediInfo->set_clientid(leaderId);
 			dediInfo->set_clientname(leader->GetName());
 			dediInfo->set_clientclass(leader->GetClass());
+
+			DBConnection* dbConnect = GDBConnectionPool->Pop();
+			if (dbConnect == nullptr) return;
+			DBBind<1, 4> dbBind(*dbConnect, L"{CALL sp_GetItems(?)}");
+			dbBind.BindParam(0, leaderId);
+
+			int32 itemInstanceId = 0;
+			int32 itemTemplateId = 0;
+			int32 slotIndex = 0;
+			int32 itemCount = 0;
+
+			std::wcout.imbue(std::locale("kor"));
+
+			dbBind.BindCol(0, itemInstanceId);
+			dbBind.BindCol(1, itemTemplateId);
+			dbBind.BindCol(2, slotIndex);
+			dbBind.BindCol(3, itemCount);
+
+			if (dbBind.Execute())
+			{
+				if (dbBind.Fetch())
+				{
+					if (itemInstanceId != 0)
+					{
+						Protocol::ItemData* item = dediInfo->add_playeritems();
+
+						item->set_iteminstancedid(itemInstanceId);
+						item->set_itemtemplateid(itemTemplateId);
+						item->set_slotindex(slotIndex);
+						item->set_count(itemCount);
+					}
+				}
+			}
+			GDBConnectionPool->Push(dbConnect);
 		}
 	}
 	SendBufferRef buffer = PacketHandler::MakeSendBuffer(pkt);
@@ -350,11 +482,9 @@ void DungeonWaitingRoom::HandleDungeonStart(PlayerRef player, int32 dungeonId)
 	if (it == _dungeons.end()) return;
 
 	DungeonRef dungeon = it->second;
-	//if (dungeon->GetLeader() != player) return;
 
 	if (!CheckMembersReady(dungeon))
 	{
-		// Todo 거절하기
 		HandleFailDungeon(player, Protocol::DungeonFailReason::Ready);
 		return;
 	}
@@ -367,9 +497,6 @@ void DungeonWaitingRoom::HandleDungeonStart(PlayerRef player, int32 dungeonId)
 	{
 		HandleLeaveWaitingRoom(member);
 	}
-
-	_dungeons.erase(dungeonId);
-	_freeDungeonIds.insert(dungeonId);
 }
 
 void DungeonWaitingRoom::HandleDungeonExit(int32 dungeonId)
@@ -381,7 +508,11 @@ void DungeonWaitingRoom::HandleDungeonExit(int32 dungeonId)
 	if (!dungeon) return;
 
 	auto dedi = dungeon->GetDediSession();
-	dedi->SetUsing(false);
+	if (dedi)
+	{
+		dedi->SetUsing(false);
+		dedi->_dungeon = nullptr;
+	}
 	dungeon->SetStatus(Protocol::RoomStatus::RECRUITING);
 
 	for (auto member : dungeon->GetMembers())
@@ -391,18 +522,56 @@ void DungeonWaitingRoom::HandleDungeonExit(int32 dungeonId)
 	}
 }
 
+void DungeonWaitingRoom::HandleDungeonExitByDedi(int32 dungeonId)
+{
+	auto it = _dungeons.find(dungeonId);
+	if (it == _dungeons.end()) return;
+
+	DungeonRef dungeon = it->second;
+	if (!dungeon) return;
+
+	if (auto leader = dungeon->GetLeader())
+	{
+		leader->SetReady(false);
+	}
+	for (auto member : dungeon->GetMembers())
+	{
+		if (member)
+		{
+			member->SetReady(false);
+		}
+	}
+
+	Protocol::S_DungeonExitPacket exitPkt;
+	if (auto leader = dungeon->GetLeader())
+		exitPkt.set_playerid(leader->GetId());
+	exitPkt.mutable_dungeoninfo()->CopyFrom(dungeon->ToProto());
+	SendBufferRef exitBuffer = PacketHandler::MakeSendBuffer(exitPkt);
+
+	if (dungeon->GetStatus() == Protocol::RoomStatus::IN_PROGRESS)
+	{
+		dungeon->Broadcast(exitBuffer);
+	}
+
+	WaitingRoomBroadcast(exitBuffer, -1);
+
+	_dungeons.erase(it);
+	_freeDungeonIds.insert(dungeonId);
+}
+
 void DungeonWaitingRoom::StartDungeonPacket(DungeonRef dungeon)
 {
 	auto dedi = dungeon->GetDediSession();
 	dungeon->SetStatus(Protocol::RoomStatus::IN_PROGRESS);
 	if (!dedi) return;
-	std::string dediIp = dedi->GetIP();
+	std::string dediIp = "125.133.163.145";
+
 	int32 port = dedi->GetPort();
+	std::cout << port << std::endl;
 	int32 dungeonId = dungeon->GetId();
 	std::string token;
 	for (auto member : dungeon->GetMembers())
 	{
-		auto session = member->_ownerSession;
 		if (auto session = member->_ownerSession.lock())
 		{
 			Protocol::S_DungeonStartPacket startPkt;
@@ -415,9 +584,9 @@ void DungeonWaitingRoom::StartDungeonPacket(DungeonRef dungeon)
 			session->Send(startBuffer);
 		}
 	}
+
 	{
 		auto leader = dungeon->GetLeader();
-		auto leaderSession = leader->_ownerSession;
 		if (auto leaderSession = leader->_ownerSession.lock())
 		{
 			Protocol::S_DungeonStartPacket startPkt;
@@ -430,7 +599,46 @@ void DungeonWaitingRoom::StartDungeonPacket(DungeonRef dungeon)
 			leaderSession->Send(startBuffer);
 		}
 	}
+
 }
+
+
+void DungeonWaitingRoom::HandleDungeonEnd(int32 dungeonId, int32 gold)
+{
+	auto it = _dungeons.find(dungeonId);
+	if (it == _dungeons.end()) return;
+
+	DungeonRef dungeon = it->second;
+	if (!dungeon) return;
+	Protocol::S_RequestDungeonCompletePacket endPacket;
+	endPacket.set_gold(gold);
+	SendBufferRef endBuffer = PacketHandler::MakeSendBuffer(endPacket);
+
+	for (auto& member : dungeon->GetMembers())
+	{
+		if (auto session = member->_ownerSession.lock())
+		{
+			session->Send(endBuffer);
+		}
+	}
+
+	auto leader = dungeon->GetLeader();
+	if (auto leaderSession = leader->_ownerSession.lock())
+	{
+		leaderSession->Send(endBuffer);
+	}
+	
+	auto dedi = dungeon->GetDediSession();
+	if (dedi)
+	{
+		dedi->SetUsing(false);
+		dedi->_dungeon = nullptr;
+	}
+
+	_dungeons.erase(dungeonId);
+	_freeDungeonIds.insert(dungeonId);
+}
+
 
 void DungeonWaitingRoom::WaitingRoomBroadcast(SendBufferRef sendBuffer, uint64 exceptId)
 {

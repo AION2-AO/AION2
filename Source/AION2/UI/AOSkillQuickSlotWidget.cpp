@@ -2,17 +2,33 @@
 
 
 #include "UI/AOSkillQuickSlotWidget.h"
+
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
-#include "Data/DA_AbilitySet.h"
+#include "Components/Button.h"
 
-void UAOSkillQuickSlotWidget::InitSkillSlot(const FGAData& InAbilityData)
+#include "Data/AOSkillSlotViewData.h"
+
+void UAOSkillQuickSlotWidget::AddSkillSlotViewData(const FAOSkillSlotViewData& InViewData)
 {
-    CooldownTag = InAbilityData.CooldownTag;
-    EffectWidgetClass = InAbilityData.EffectWidgetClass;
+    ViewDataByComboIndex.Add(InViewData);
+}
 
-    SetSkillIcon(InAbilityData.Icon);
-    SetSkillLevel(InAbilityData.AbilityLevel);
+void UAOSkillQuickSlotWidget::ClearSkillSlotViewData()
+{
+    ViewDataByComboIndex.Empty();
+}
+
+void UAOSkillQuickSlotWidget::SetCurrentSkillIndex(int32 InNewIndex)
+{
+    if (!ViewDataByComboIndex.IsValidIndex(InNewIndex))
+    {
+        return;
+    }
+
+    CurrentSkillIndex = InNewIndex;
+
+    SetSkillIcon(ViewDataByComboIndex[CurrentSkillIndex].Icon);
 }
 
 void UAOSkillQuickSlotWidget::SetSkillIcon(UTexture2D* Icon)
@@ -33,33 +49,64 @@ void UAOSkillQuickSlotWidget::SetSkillIcon(UTexture2D* Icon)
     // SizeBox로 감싸둬도 괜찮다!
 }
 
-void UAOSkillQuickSlotWidget::SetSkillLevel(int32 InLevel)
+const FAOSkillSlotViewData* UAOSkillQuickSlotWidget::GetCurrentSkillSlotViewData() const
 {
-    if (TB_SkillLevel)
+    if (!ViewDataByComboIndex.IsValidIndex(CurrentSkillIndex))
     {
-        TB_SkillLevel->SetText(
-            FText::FromString(FString::Printf(TEXT("Lv%d"), InLevel)));
+        return nullptr;
     }
+    return &ViewDataByComboIndex[CurrentSkillIndex];
 }
 
-void UAOSkillQuickSlotWidget::PlayPressedFeedback()
+void UAOSkillQuickSlotWidget::PlaySkillPressedFeedback()
 {
-}
-
-void UAOSkillQuickSlotWidget::StartCooldown(float RemainingTime, float Duration)
-{
-}
-
-void UAOSkillQuickSlotWidget::StopCooldown()
-{
-}
-
-void UAOSkillQuickSlotWidget::ShowEffectWidget()
-{
-    if (!EffectWidgetClass)
+    if (!SlotButton)
     {
         return;
     }
 
-    // EffectWidgetClass로 위젯 생성/표시
+    BP_PlayPressedFeedback();
 }
+
+void UAOSkillQuickSlotWidget::HandleComboInput()
+{
+    if (CurrentSkillIndex + 1  < ViewDataByComboIndex.Num())
+    {
+        CurrentSkillIndex++;
+    }
+    else
+    {
+        CurrentSkillIndex = 0;
+    }
+
+
+    UE_LOG(LogTemp, Warning, TEXT("%d"), CurrentSkillIndex);
+    SetCurrentSkillIndex(CurrentSkillIndex);
+}
+
+void UAOSkillQuickSlotWidget::ResetComboInput()
+{
+    if (ViewDataByComboIndex.Num() > 0)
+    {
+        SetCurrentSkillIndex(0);
+    }
+}
+
+void UAOSkillQuickSlotWidget::StartCooldown(float RemainingTime, float Duration)
+{
+    if (RemainingTime <= 0.0f || Duration <= 0.0f)
+    {
+        return;
+    }
+
+    // 실제 쿨다운 판정은 GAS가 담당한다.
+    // 여기서는 ASC에서 조회한 남은 시간/전체 시간을 Blueprint UI에 넘겨 시각화만 한다.
+    BP_StartCooldown(RemainingTime, Duration);
+}
+
+void UAOSkillQuickSlotWidget::StopCooldown()
+{
+    // CooldownTag가 ASC에서 제거되었으므로 슬롯의 쿨다운 표시를 종료한다.
+    BP_StopCooldown();
+}
+

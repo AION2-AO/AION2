@@ -48,5 +48,4 @@ private:
 	UPROPERTY()
 	TMap<TSoftClassPtr<UUserWidget>, UUserWidget*> WidgetCache;
 
-
 };

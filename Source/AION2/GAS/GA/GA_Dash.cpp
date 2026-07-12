@@ -30,8 +30,6 @@ void UGA_Dash::ActivateAbility(
 	const UAOAttributeSet* AttributeSet = ASC->GetSet<UAOAttributeSet>();
 	if (!AttributeSet)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] AttributeSet is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -40,8 +38,6 @@ void UGA_Dash::ActivateAbility(
 	// 대시 시작 전에 스태미나를 먼저 검사한다.
 	if (AttributeSet->GetStamina() <= 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Dash] Not enough stamina"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -49,8 +45,6 @@ void UGA_Dash::ActivateAbility(
 	ACharacter* Character = Cast<ACharacter>(ActorInfo->AvatarActor.Get());
 	if (!Character)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] Character is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -58,8 +52,6 @@ void UGA_Dash::ActivateAbility(
 	UCharacterMovementComponent* MovementComp = Character->GetCharacterMovement();
 	if (!MovementComp)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] MovementComponent is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -79,8 +71,6 @@ void UGA_Dash::ActivateAbility(
 	// Cost / Cooldown GameplayEffect 적용
 	if (!CommitAbility(Handle, ActorInfo, ActivationInfo))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Dash] CommitAbility failed"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -109,25 +99,14 @@ void UGA_Dash::ActivateAbility(
 
 	if (!DashMontage)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] Dash montage is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
-	UAbilityTask_PlayMontageAndWait* MontageTask =
-		UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(
-			this,
-			NAME_None,
-			DashMontage,
-			MontagePlayRate,
-			Daeva->HasMoveInput() ? FName("Forward") : FName("Back")
-		);
+	UAbilityTask_PlayMontageAndWait* MontageTask =	UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(	this,NAME_None,	DashMontage,MontagePlayRate,Daeva->HasMoveInput() ? FName("Forward") : FName("Back"));
 
 	if (!MontageTask)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] Failed to create montage task"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -138,8 +117,6 @@ void UGA_Dash::ActivateAbility(
 	MontageTask->OnCancelled.AddDynamic(this, &UGA_Dash::OnDashCancelled);
 
 	MontageTask->ReadyForActivation();
-
-	UE_LOG(LogTemp,Log,TEXT("[Dash Start] Stamina: %.1f / %.1f"),AttributeSet->GetStamina(),AttributeSet->GetMaxStamina());
 }
 
 void UGA_Dash::OnDashFinished()
@@ -149,7 +126,5 @@ void UGA_Dash::OnDashFinished()
 
 void UGA_Dash::OnDashCancelled()
 {
-	UE_LOG(LogTemp, Warning, TEXT("[Dash Cancelled]"));
-
 	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,true);
 }

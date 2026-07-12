@@ -25,7 +25,7 @@ protected:
 
 public:
 	virtual void OnPossess(APawn* InPawn) override; 
-
+	virtual void TargetPerceptionOn(AActor* Actor, FAIStimulus  Stimlus) override;
 
 protected:
 

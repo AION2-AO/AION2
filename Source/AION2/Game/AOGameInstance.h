@@ -10,6 +10,10 @@
 /**
  *
  */
+
+class UAOUIManager;
+class UAONetworkManager;
+
 UCLASS()
 class AION2_API UAOGameInstance : public UGameInstance
 {
@@ -46,6 +50,7 @@ public:
 	void SendPacket(google::protobuf::Message& Pkt, uint16 PacketId);
 
 	class UAONetworkManager* GetNetworkManager() { return UNetworkManager; }
+	UAOUIManager* GetUIManager() const { return UIManager; }
 
 public:
 	void SetMyPlayerId(uint64 playerId) { MyPlayerId = playerId; }
@@ -69,4 +74,7 @@ private:
 	uint8 MyPlayerClass = 0;
 
 	FString MyPlayerName;
+
+	UPROPERTY()
+	TObjectPtr<UAOUIManager> UIManager;
 };

@@ -24,6 +24,10 @@ protected:
 	virtual void Tick(float DeltaSeconds) override;
 	virtual void OnPossess(APawn* InPawn) override;	
 
+	void RemoveTarget(AActor* Target);
+	bool RefreshOrReset();  // true면 타겟 재설정 성공, false면 전투 종료 리셋
+
+
 public:
 	FORCEINLINE void Set_Phase(FGameplayTag _PhaseTag) { PhaseTag = _PhaseTag; }
 	FORCEINLINE void Set_State(FGameplayTag _StateTag) { StateTag = _StateTag; }

@@ -121,9 +121,9 @@ bool DBConnection::BindParam(int32 paramIndex, int16* value, SQLLEN* index)
 	return BindParam(paramIndex, SQL_C_SHORT, SQL_SMALLINT, sizeof(int16), value, index);
 }
 
-bool DBConnection::BindParam(int32 paramIndex, int32* value, SQLLEN* index)
+bool DBConnection::BindParam(int32 paramIndex, int32* value, SQLLEN* index, SQLSMALLINT paramType)
 {
-	return BindParam(paramIndex, SQL_C_LONG, SQL_INTEGER, sizeof(int32), value, index);
+	return BindParam(paramIndex, SQL_C_LONG, SQL_INTEGER, sizeof(int32), value, index, paramType);
 }
 
 bool DBConnection::BindParam(int32 paramIndex, int64* value, SQLLEN* index)
@@ -213,9 +213,10 @@ bool DBConnection::BindCol(int32 columnIndex, BYTE* bin, int32 size, SQLLEN* ind
 	return BindCol(columnIndex, SQL_BINARY, size, bin, index);
 }
 
-bool DBConnection::BindParam(SQLUSMALLINT paramIndex, SQLSMALLINT cType, SQLSMALLINT sqlType, SQLULEN len, SQLPOINTER ptr, SQLLEN* index)
+
+bool DBConnection::BindParam(SQLUSMALLINT paramIndex, SQLSMALLINT cType, SQLSMALLINT sqlType, SQLULEN len, SQLPOINTER ptr, SQLLEN* index, SQLSMALLINT paramType)
 {
-	SQLRETURN ret = ::SQLBindParameter(_statement, paramIndex, SQL_PARAM_INPUT, cType, sqlType, len, 0, ptr, 0, index);
+	SQLRETURN ret = ::SQLBindParameter(_statement, paramIndex, paramType, cType, sqlType, len, 0, ptr, 0, index);
 	if (ret != SQL_SUCCESS && ret != SQL_SUCCESS_WITH_INFO)
 	{
 		HandleError(ret);

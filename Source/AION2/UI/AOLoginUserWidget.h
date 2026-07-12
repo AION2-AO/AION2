@@ -30,4 +30,21 @@ public:
 		ShowErrorMsg(FText::FromString(TEXT("아이디나 비밀번호를 확인해 주세요.")));
 	}
 
+	UFUNCTION(BlueprintCallable)
+	void SendNickname(); 
+
+	UFUNCTION()
+	void ReceiveNicknameResult(int8 ErrorCode);
+	
+protected:
+	virtual void NativeConstruct() override;
+
+
+public:
+	UPROPERTY(meta = (BindWidgetOptional))
+	class UButton* Btn_NicknameSet;
+
+	UPROPERTY(meta = (BindWidgetOptional))
+	class UEditableText* NicknameText;
+
 };

@@ -66,7 +66,8 @@ enum class EMontageID : uint8
 	KeyQ,
 	KeyE,
 	Die,
-	Rebirth
+	Rebirth,
+	Jump
 };
 
 UENUM(BlueprintType)
@@ -103,6 +104,12 @@ DECLARE_MULTICAST_DELEGATE_ThreeParams(
 	ADaeva*
 );
 
+// Combo처리를 UI가 구독할 수 있도록 추가.
+DECLARE_MULTICAST_DELEGATE_OneParam(
+	FOnComboInputCompleted,
+	int32
+);
+
 UCLASS()
 class AION2_API ADaeva : public AAOCharacter , public IGenericTeamAgentInterface
 {
@@ -121,6 +128,14 @@ protected:
 
 	virtual void GetLifetimeReplicatedProps(TArray<FLifetimeProperty>& OutLifetimeProps) const override;
 
+	/*
+	*  Suyeon: Local이 아닌 Player는 EndPlay가 제 때 호출되지 않을 수 있으므로, 
+	* UnPossessed에서 해주는 작업을 명시적으로 해줌
+	*/
+	virtual void EndPlay(const EEndPlayReason::Type EndPlayReason) override;
+
+
+
 private:
 	void Tick_Camera(float DeltaTime);
 
@@ -136,7 +151,6 @@ public:
 
 	UFUNCTION(Client, Unreliable)
 	void Client_PlayCameraShake();
-
 
 public:
 	bool HasMoveInput();
@@ -185,14 +199,25 @@ private:
 	void InputRBPressed();
 	void InputMoveReleased();
 
+	// Combo가 다시 돌아가는 것을 처리하기 위해 필요
+	void InputLBReleased();
+
+	// Combo가 다시 돌아가는 것을 처리하기 위해 필요
+	void InputRBReleased();
+
+
 	void InputXPressed();
 	void InputBPressed();
+
+public:
+	FOnComboInputCompleted OnComboInputCompleted;
 
 protected:
 	void OnCombatStateChanged(const FGameplayTag Tag, int32 NewCount);
 	void OnRebirthMontageEnded(UAnimMontage* Montage, bool bInterrupted);
 
 public:
+	virtual void OnRep_IsDead() override;
 	virtual void HandleDeath(EDeathReason DeathReason = EDeathReason::Normal);
 	virtual void OnHealthChanged(const FOnAttributeChangeData& Data);
 
@@ -204,6 +229,7 @@ public:
 
 protected:
 	FDelegateHandle HealthChangedDelegateHandle;
+
 
 protected:
 	void StartSprint();
@@ -271,6 +297,7 @@ private:
 	bool IsFrontOfCamera(AActor* Other);
 	float CalcDistanceSquaredToScreenCenter(AActor* Other);
 	void ChangeCurrentTargetInClient(AAOCharacter* NewTarget);
+	void CheckTargetGroggy();
 
 public:
 	/*
@@ -345,6 +372,7 @@ public:
 	void SendHp(float NewHp);
 	void SendItem(int32 SlotIndex);
 	void SetItemUse();
+
 private:
 	bool bPlayerUIReady = false;
 
@@ -521,4 +549,13 @@ private:
 	// 일단 넉넉하게 180 => 3초로 잡기. 잘 되면 점점 줄여서 60을 목표로.
 	int32 PawnASCBindMaxRetryCount = 180;
 
+
+protected:
+	// UI 입력이 여러 번 들어가는 것을 방지
+	int32 LastPressedFeedbackAbilityID = INDEX_NONE;
+
+protected:
+	FTimerHandle OverheadWidgetRefreshTimer;
+
+	void RefreshOverheadWidgetIfVisible();
 };

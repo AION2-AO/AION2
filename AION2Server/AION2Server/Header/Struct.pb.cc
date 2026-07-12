@@ -74,7 +74,8 @@ struct Rotator3DefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 Rotator3DefaultTypeInternal _Rotator3_default_instance_;
 PROTOBUF_CONSTEXPR PlayerInfo::PlayerInfo(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.playerid_)*/uint64_t{0u}
+    /*decltype(_impl_.playernickname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+  , /*decltype(_impl_.playerid_)*/uint64_t{0u}
   , /*decltype(_impl_.playerclass_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct PlayerInfoDefaultTypeInternal {
@@ -138,10 +139,12 @@ struct DungeonInfoDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DungeonInfoDefaultTypeInternal _DungeonInfo_default_instance_;
 PROTOBUF_CONSTEXPR DediDungeonInfo::DediDungeonInfo(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.clienttoken_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+    /*decltype(_impl_.playeritems_)*/{}
+  , /*decltype(_impl_.clienttoken_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.clientname_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.clientid_)*/uint64_t{0u}
   , /*decltype(_impl_.clientclass_)*/0
+  , /*decltype(_impl_.clienthp_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct DediDungeonInfoDefaultTypeInternal {
   PROTOBUF_CONSTEXPR DediDungeonInfoDefaultTypeInternal()
@@ -154,9 +157,11 @@ struct DediDungeonInfoDefaultTypeInternal {
 PROTOBUF_ATTRIBUTE_NO_DESTROY PROTOBUF_CONSTINIT PROTOBUF_ATTRIBUTE_INIT_PRIORITY1 DediDungeonInfoDefaultTypeInternal _DediDungeonInfo_default_instance_;
 PROTOBUF_CONSTEXPR DPlayerInfo::DPlayerInfo(
     ::_pbi::ConstantInitialized): _impl_{
-    /*decltype(_impl_.playername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
+    /*decltype(_impl_.playeritems_)*/{}
+  , /*decltype(_impl_.playername_)*/{&::_pbi::fixed_address_empty_string, ::_pbi::ConstantInitialized{}}
   , /*decltype(_impl_.playerid_)*/uint64_t{0u}
   , /*decltype(_impl_.playerclass_)*/0
+  , /*decltype(_impl_.playerhp_)*/0
   , /*decltype(_impl_._cached_size_)*/{}} {}
 struct DPlayerInfoDefaultTypeInternal {
   PROTOBUF_CONSTEXPR DPlayerInfoDefaultTypeInternal()
@@ -226,6 +231,7 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   ~0u,  // no _inlined_string_donated_
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerInfo, _impl_.playerid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerInfo, _impl_.playerclass_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::PlayerInfo, _impl_.playernickname_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::PlayerState, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -268,6 +274,8 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::DediDungeonInfo, _impl_.clientid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DediDungeonInfo, _impl_.clientname_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DediDungeonInfo, _impl_.clientclass_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DediDungeonInfo, _impl_.clienthp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DediDungeonInfo, _impl_.playeritems_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -277,6 +285,8 @@ const uint32_t TableStruct_Struct_2eproto::offsets[] PROTOBUF_SECTION_VARIABLE(p
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playerid_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playername_),
   PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playerclass_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playerhp_),
+  PROTOBUF_FIELD_OFFSET(::Protocol::DPlayerInfo, _impl_.playeritems_),
   ~0u,  // no _has_bits_
   PROTOBUF_FIELD_OFFSET(::Protocol::MailListInfo, _internal_metadata_),
   ~0u,  // no _extensions_
@@ -294,12 +304,12 @@ static const ::_pbi::MigrationSchema schemas[] PROTOBUF_SECTION_VARIABLE(protode
   { 10, -1, -1, sizeof(::Protocol::Vector3)},
   { 19, -1, -1, sizeof(::Protocol::Rotator3)},
   { 28, -1, -1, sizeof(::Protocol::PlayerInfo)},
-  { 36, -1, -1, sizeof(::Protocol::PlayerState)},
-  { 47, -1, -1, sizeof(::Protocol::DungeonPlayerInfo)},
-  { 58, -1, -1, sizeof(::Protocol::DungeonInfo)},
-  { 68, -1, -1, sizeof(::Protocol::DediDungeonInfo)},
-  { 78, -1, -1, sizeof(::Protocol::DPlayerInfo)},
-  { 87, -1, -1, sizeof(::Protocol::MailListInfo)},
+  { 37, -1, -1, sizeof(::Protocol::PlayerState)},
+  { 48, -1, -1, sizeof(::Protocol::DungeonPlayerInfo)},
+  { 59, -1, -1, sizeof(::Protocol::DungeonInfo)},
+  { 69, -1, -1, sizeof(::Protocol::DediDungeonInfo)},
+  { 81, -1, -1, sizeof(::Protocol::DPlayerInfo)},
+  { 92, -1, -1, sizeof(::Protocol::MailListInfo)},
 };
 
 static const ::_pb::Message* const file_default_instances[] = {
@@ -321,36 +331,40 @@ const char descriptor_table_protodef_Struct_2eproto[] PROTOBUF_SECTION_VARIABLE(
   "mTemplateId\030\002 \001(\005\022\021\n\tslotIndex\030\003 \001(\005\022\r\n\005"
   "count\030\004 \001(\005\"*\n\007Vector3\022\t\n\001x\030\001 \001(\002\022\t\n\001y\030\002"
   " \001(\002\022\t\n\001z\030\003 \001(\002\"4\n\010Rotator3\022\r\n\005pitch\030\001 \001"
-  "(\002\022\014\n\004roll\030\002 \001(\002\022\013\n\003yaw\030\003 \001(\002\"H\n\nPlayerI"
+  "(\002\022\014\n\004roll\030\002 \001(\002\022\013\n\003yaw\030\003 \001(\002\"`\n\nPlayerI"
   "nfo\022\020\n\010playerId\030\001 \001(\004\022(\n\013playerClass\030\002 \001"
-  "(\0162\023.Protocol.ClassType\"\264\001\n\013PlayerState\022"
-  "\020\n\010playerId\030\001 \001(\004\022\022\n\nplayerName\030\002 \001(\t\022(\n"
-  "\013playerClass\030\003 \001(\0162\023.Protocol.ClassType\022"
-  ")\n\016playerLocation\030\004 \001(\0132\021.Protocol.Vecto"
-  "r3\022*\n\016playerRotation\030\005 \001(\0132\022.Protocol.Ro"
-  "tator3\"\203\001\n\021DungeonPlayerInfo\022\020\n\010memberId"
-  "\030\001 \001(\004\022\022\n\nmemberName\030\002 \001(\t\022(\n\013memberClas"
-  "s\030\003 \001(\0162\023.Protocol.ClassType\022\017\n\007isReady\030"
-  "\004 \001(\010\022\r\n\005index\030\005 \001(\005\"\245\001\n\013DungeonInfo\022\021\n\t"
-  "dungeonId\030\001 \001(\005\022$\n\006status\030\002 \001(\0162\024.Protoc"
-  "ol.RoomStatus\022/\n\nleaderInfo\030\003 \001(\0132\033.Prot"
-  "ocol.DungeonPlayerInfo\022,\n\007members\030\004 \003(\0132"
-  "\033.Protocol.DungeonPlayerInfo\"v\n\017DediDung"
-  "eonInfo\022\023\n\013clientToken\030\001 \001(\t\022\020\n\010clientId"
-  "\030\002 \001(\004\022\022\n\nclientName\030\003 \001(\t\022(\n\013clientClas"
-  "s\030\004 \001(\0162\023.Protocol.ClassType\"]\n\013DPlayerI"
-  "nfo\022\020\n\010playerId\030\001 \001(\004\022\022\n\nplayerName\030\002 \001("
-  "\t\022(\n\013playerClass\030\003 \001(\0162\023.Protocol.ClassT"
-  "ype\"g\n\014MailListInfo\022\016\n\006mailId\030\001 \001(\004\022\r\n\005t"
-  "itle\030\002 \001(\t\022\022\n\nsenderName\030\003 \001(\t\022\023\n\013expire"
-  "dDate\030\004 \001(\t\022\017\n\007hasItem\030\005 \001(\010b\006proto3"
+  "(\0162\023.Protocol.ClassType\022\026\n\016playerNicknam"
+  "e\030\003 \001(\t\"\264\001\n\013PlayerState\022\020\n\010playerId\030\001 \001("
+  "\004\022\022\n\nplayerName\030\002 \001(\t\022(\n\013playerClass\030\003 \001"
+  "(\0162\023.Protocol.ClassType\022)\n\016playerLocatio"
+  "n\030\004 \001(\0132\021.Protocol.Vector3\022*\n\016playerRota"
+  "tion\030\005 \001(\0132\022.Protocol.Rotator3\"\203\001\n\021Dunge"
+  "onPlayerInfo\022\020\n\010memberId\030\001 \001(\004\022\022\n\nmember"
+  "Name\030\002 \001(\t\022(\n\013memberClass\030\003 \001(\0162\023.Protoc"
+  "ol.ClassType\022\017\n\007isReady\030\004 \001(\010\022\r\n\005index\030\005"
+  " \001(\005\"\245\001\n\013DungeonInfo\022\021\n\tdungeonId\030\001 \001(\005\022"
+  "$\n\006status\030\002 \001(\0162\024.Protocol.RoomStatus\022/\n"
+  "\nleaderInfo\030\003 \001(\0132\033.Protocol.DungeonPlay"
+  "erInfo\022,\n\007members\030\004 \003(\0132\033.Protocol.Dunge"
+  "onPlayerInfo\"\261\001\n\017DediDungeonInfo\022\023\n\013clie"
+  "ntToken\030\001 \001(\t\022\020\n\010clientId\030\002 \001(\004\022\022\n\nclien"
+  "tName\030\003 \001(\t\022(\n\013clientClass\030\004 \001(\0162\023.Proto"
+  "col.ClassType\022\020\n\010clientHp\030\005 \001(\005\022\'\n\013playe"
+  "rItems\030\006 \003(\0132\022.Protocol.ItemData\"\230\001\n\013DPl"
+  "ayerInfo\022\020\n\010playerId\030\001 \001(\004\022\022\n\nplayerName"
+  "\030\002 \001(\t\022(\n\013playerClass\030\003 \001(\0162\023.Protocol.C"
+  "lassType\022\020\n\010playerHp\030\004 \001(\005\022\'\n\013playerItem"
+  "s\030\006 \003(\0132\022.Protocol.ItemData\"g\n\014MailListI"
+  "nfo\022\016\n\006mailId\030\001 \001(\004\022\r\n\005title\030\002 \001(\t\022\022\n\nse"
+  "nderName\030\003 \001(\t\022\023\n\013expiredDate\030\004 \001(\t\022\017\n\007h"
+  "asItem\030\005 \001(\010b\006proto3"
   ;
 static const ::_pbi::DescriptorTable* const descriptor_table_Struct_2eproto_deps[1] = {
   &::descriptor_table_Enum_2eproto,
 };
 static ::_pbi::once_flag descriptor_table_Struct_2eproto_once;
 const ::_pbi::DescriptorTable descriptor_table_Struct_2eproto = {
-    false, false, 1116, descriptor_table_protodef_Struct_2eproto,
+    false, false, 1260, descriptor_table_protodef_Struct_2eproto,
     "Struct.proto",
     &descriptor_table_Struct_2eproto_once, descriptor_table_Struct_2eproto_deps, 1, 10,
     schemas, file_default_instances, TableStruct_Struct_2eproto::offsets,
@@ -1182,11 +1196,20 @@ PlayerInfo::PlayerInfo(const PlayerInfo& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   PlayerInfo* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.playerid_){}
+      decltype(_impl_.playernickname_){}
+    , decltype(_impl_.playerid_){}
     , decltype(_impl_.playerclass_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
+  _impl_.playernickname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.playernickname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
+  if (!from._internal_playernickname().empty()) {
+    _this->_impl_.playernickname_.Set(from._internal_playernickname(), 
+      _this->GetArenaForAllocation());
+  }
   ::memcpy(&_impl_.playerid_, &from._impl_.playerid_,
     static_cast<size_t>(reinterpret_cast<char*>(&_impl_.playerclass_) -
     reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerclass_));
@@ -1198,10 +1221,15 @@ inline void PlayerInfo::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.playerid_){uint64_t{0u}}
+      decltype(_impl_.playernickname_){}
+    , decltype(_impl_.playerid_){uint64_t{0u}}
     , decltype(_impl_.playerclass_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
+  _impl_.playernickname_.InitDefault();
+  #ifdef PROTOBUF_FORCE_COPY_DEFAULT_STRING
+    _impl_.playernickname_.Set("", GetArenaForAllocation());
+  #endif // PROTOBUF_FORCE_COPY_DEFAULT_STRING
 }
 
 PlayerInfo::~PlayerInfo() {
@@ -1215,6 +1243,7 @@ PlayerInfo::~PlayerInfo() {
 
 inline void PlayerInfo::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.playernickname_.Destroy();
 }
 
 void PlayerInfo::SetCachedSize(int size) const {
@@ -1227,6 +1256,7 @@ void PlayerInfo::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.playernickname_.ClearToEmpty();
   ::memset(&_impl_.playerid_, 0, static_cast<size_t>(
       reinterpret_cast<char*>(&_impl_.playerclass_) -
       reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerclass_));
@@ -1253,6 +1283,16 @@ const char* PlayerInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* ct
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_playerclass(static_cast<::Protocol::ClassType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // string playerNickname = 3;
+      case 3:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 26)) {
+          auto str = _internal_mutable_playernickname();
+          ptr = ::_pbi::InlineGreedyStringParser(str, ptr, ctx);
+          CHK_(ptr);
+          CHK_(::_pbi::VerifyUTF8(str, "Protocol.PlayerInfo.playerNickname"));
         } else
           goto handle_unusual;
         continue;
@@ -1298,6 +1338,16 @@ uint8_t* PlayerInfo::_InternalSerialize(
       2, this->_internal_playerclass(), target);
   }
 
+  // string playerNickname = 3;
+  if (!this->_internal_playernickname().empty()) {
+    ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::VerifyUtf8String(
+      this->_internal_playernickname().data(), static_cast<int>(this->_internal_playernickname().length()),
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::SERIALIZE,
+      "Protocol.PlayerInfo.playerNickname");
+    target = stream->WriteStringMaybeAliased(
+        3, this->_internal_playernickname(), target);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -1313,6 +1363,13 @@ size_t PlayerInfo::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // string playerNickname = 3;
+  if (!this->_internal_playernickname().empty()) {
+    total_size += 1 +
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::StringSize(
+        this->_internal_playernickname());
+  }
 
   // uint64 playerId = 1;
   if (this->_internal_playerid() != 0) {
@@ -1343,6 +1400,9 @@ void PlayerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PRO
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  if (!from._internal_playernickname().empty()) {
+    _this->_internal_set_playernickname(from._internal_playernickname());
+  }
   if (from._internal_playerid() != 0) {
     _this->_internal_set_playerid(from._internal_playerid());
   }
@@ -1365,7 +1425,13 @@ bool PlayerInfo::IsInitialized() const {
 
 void PlayerInfo::InternalSwap(PlayerInfo* other) {
   using std::swap;
+  auto* lhs_arena = GetArenaForAllocation();
+  auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
+      &_impl_.playernickname_, lhs_arena,
+      &other->_impl_.playernickname_, rhs_arena
+  );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
       PROTOBUF_FIELD_OFFSET(PlayerInfo, _impl_.playerclass_)
       + sizeof(PlayerInfo::_impl_.playerclass_)
@@ -2347,10 +2413,12 @@ DediDungeonInfo::DediDungeonInfo(const DediDungeonInfo& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   DediDungeonInfo* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.clienttoken_){}
+      decltype(_impl_.playeritems_){from._impl_.playeritems_}
+    , decltype(_impl_.clienttoken_){}
     , decltype(_impl_.clientname_){}
     , decltype(_impl_.clientid_){}
     , decltype(_impl_.clientclass_){}
+    , decltype(_impl_.clienthp_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2371,8 +2439,8 @@ DediDungeonInfo::DediDungeonInfo(const DediDungeonInfo& from)
       _this->GetArenaForAllocation());
   }
   ::memcpy(&_impl_.clientid_, &from._impl_.clientid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.clientclass_) -
-    reinterpret_cast<char*>(&_impl_.clientid_)) + sizeof(_impl_.clientclass_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.clienthp_) -
+    reinterpret_cast<char*>(&_impl_.clientid_)) + sizeof(_impl_.clienthp_));
   // @@protoc_insertion_point(copy_constructor:Protocol.DediDungeonInfo)
 }
 
@@ -2381,10 +2449,12 @@ inline void DediDungeonInfo::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.clienttoken_){}
+      decltype(_impl_.playeritems_){arena}
+    , decltype(_impl_.clienttoken_){}
     , decltype(_impl_.clientname_){}
     , decltype(_impl_.clientid_){uint64_t{0u}}
     , decltype(_impl_.clientclass_){0}
+    , decltype(_impl_.clienthp_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.clienttoken_.InitDefault();
@@ -2408,6 +2478,7 @@ DediDungeonInfo::~DediDungeonInfo() {
 
 inline void DediDungeonInfo::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.playeritems_.~RepeatedPtrField();
   _impl_.clienttoken_.Destroy();
   _impl_.clientname_.Destroy();
 }
@@ -2422,11 +2493,12 @@ void DediDungeonInfo::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.playeritems_.Clear();
   _impl_.clienttoken_.ClearToEmpty();
   _impl_.clientname_.ClearToEmpty();
   ::memset(&_impl_.clientid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.clientclass_) -
-      reinterpret_cast<char*>(&_impl_.clientid_)) + sizeof(_impl_.clientclass_));
+      reinterpret_cast<char*>(&_impl_.clienthp_) -
+      reinterpret_cast<char*>(&_impl_.clientid_)) + sizeof(_impl_.clienthp_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -2470,6 +2542,27 @@ const char* DediDungeonInfo::_InternalParse(const char* ptr, ::_pbi::ParseContex
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_clientclass(static_cast<::Protocol::ClassType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 clientHp = 5;
+      case 5:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 40)) {
+          _impl_.clienthp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .Protocol.ItemData playerItems = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_playeritems(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
         } else
           goto handle_unusual;
         continue;
@@ -2535,6 +2628,20 @@ uint8_t* DediDungeonInfo::_InternalSerialize(
       4, this->_internal_clientclass(), target);
   }
 
+  // int32 clientHp = 5;
+  if (this->_internal_clienthp() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(5, this->_internal_clienthp(), target);
+  }
+
+  // repeated .Protocol.ItemData playerItems = 6;
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_playeritems_size()); i < n; i++) {
+    const auto& repfield = this->_internal_playeritems(i);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(6, repfield, repfield.GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2550,6 +2657,13 @@ size_t DediDungeonInfo::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated .Protocol.ItemData playerItems = 6;
+  total_size += 1UL * this->_internal_playeritems_size();
+  for (const auto& msg : this->_impl_.playeritems_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
 
   // string clientToken = 1;
   if (!this->_internal_clienttoken().empty()) {
@@ -2576,6 +2690,11 @@ size_t DediDungeonInfo::ByteSizeLong() const {
       ::_pbi::WireFormatLite::EnumSize(this->_internal_clientclass());
   }
 
+  // int32 clientHp = 5;
+  if (this->_internal_clienthp() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_clienthp());
+  }
+
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
 }
 
@@ -2594,6 +2713,7 @@ void DediDungeonInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  _this->_impl_.playeritems_.MergeFrom(from._impl_.playeritems_);
   if (!from._internal_clienttoken().empty()) {
     _this->_internal_set_clienttoken(from._internal_clienttoken());
   }
@@ -2605,6 +2725,9 @@ void DediDungeonInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const 
   }
   if (from._internal_clientclass() != 0) {
     _this->_internal_set_clientclass(from._internal_clientclass());
+  }
+  if (from._internal_clienthp() != 0) {
+    _this->_internal_set_clienthp(from._internal_clienthp());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -2625,6 +2748,7 @@ void DediDungeonInfo::InternalSwap(DediDungeonInfo* other) {
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.playeritems_.InternalSwap(&other->_impl_.playeritems_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.clienttoken_, lhs_arena,
       &other->_impl_.clienttoken_, rhs_arena
@@ -2634,8 +2758,8 @@ void DediDungeonInfo::InternalSwap(DediDungeonInfo* other) {
       &other->_impl_.clientname_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(DediDungeonInfo, _impl_.clientclass_)
-      + sizeof(DediDungeonInfo::_impl_.clientclass_)
+      PROTOBUF_FIELD_OFFSET(DediDungeonInfo, _impl_.clienthp_)
+      + sizeof(DediDungeonInfo::_impl_.clienthp_)
       - PROTOBUF_FIELD_OFFSET(DediDungeonInfo, _impl_.clientid_)>(
           reinterpret_cast<char*>(&_impl_.clientid_),
           reinterpret_cast<char*>(&other->_impl_.clientid_));
@@ -2663,9 +2787,11 @@ DPlayerInfo::DPlayerInfo(const DPlayerInfo& from)
   : ::PROTOBUF_NAMESPACE_ID::Message() {
   DPlayerInfo* const _this = this; (void)_this;
   new (&_impl_) Impl_{
-      decltype(_impl_.playername_){}
+      decltype(_impl_.playeritems_){from._impl_.playeritems_}
+    , decltype(_impl_.playername_){}
     , decltype(_impl_.playerid_){}
     , decltype(_impl_.playerclass_){}
+    , decltype(_impl_.playerhp_){}
     , /*decltype(_impl_._cached_size_)*/{}};
 
   _internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
@@ -2678,8 +2804,8 @@ DPlayerInfo::DPlayerInfo(const DPlayerInfo& from)
       _this->GetArenaForAllocation());
   }
   ::memcpy(&_impl_.playerid_, &from._impl_.playerid_,
-    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.playerclass_) -
-    reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerclass_));
+    static_cast<size_t>(reinterpret_cast<char*>(&_impl_.playerhp_) -
+    reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerhp_));
   // @@protoc_insertion_point(copy_constructor:Protocol.DPlayerInfo)
 }
 
@@ -2688,9 +2814,11 @@ inline void DPlayerInfo::SharedCtor(
   (void)arena;
   (void)is_message_owned;
   new (&_impl_) Impl_{
-      decltype(_impl_.playername_){}
+      decltype(_impl_.playeritems_){arena}
+    , decltype(_impl_.playername_){}
     , decltype(_impl_.playerid_){uint64_t{0u}}
     , decltype(_impl_.playerclass_){0}
+    , decltype(_impl_.playerhp_){0}
     , /*decltype(_impl_._cached_size_)*/{}
   };
   _impl_.playername_.InitDefault();
@@ -2710,6 +2838,7 @@ DPlayerInfo::~DPlayerInfo() {
 
 inline void DPlayerInfo::SharedDtor() {
   GOOGLE_DCHECK(GetArenaForAllocation() == nullptr);
+  _impl_.playeritems_.~RepeatedPtrField();
   _impl_.playername_.Destroy();
 }
 
@@ -2723,10 +2852,11 @@ void DPlayerInfo::Clear() {
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
 
+  _impl_.playeritems_.Clear();
   _impl_.playername_.ClearToEmpty();
   ::memset(&_impl_.playerid_, 0, static_cast<size_t>(
-      reinterpret_cast<char*>(&_impl_.playerclass_) -
-      reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerclass_));
+      reinterpret_cast<char*>(&_impl_.playerhp_) -
+      reinterpret_cast<char*>(&_impl_.playerid_)) + sizeof(_impl_.playerhp_));
   _internal_metadata_.Clear<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>();
 }
 
@@ -2760,6 +2890,27 @@ const char* DPlayerInfo::_InternalParse(const char* ptr, ::_pbi::ParseContext* c
           uint64_t val = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint64(&ptr);
           CHK_(ptr);
           _internal_set_playerclass(static_cast<::Protocol::ClassType>(val));
+        } else
+          goto handle_unusual;
+        continue;
+      // int32 playerHp = 4;
+      case 4:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 32)) {
+          _impl_.playerhp_ = ::PROTOBUF_NAMESPACE_ID::internal::ReadVarint32(&ptr);
+          CHK_(ptr);
+        } else
+          goto handle_unusual;
+        continue;
+      // repeated .Protocol.ItemData playerItems = 6;
+      case 6:
+        if (PROTOBUF_PREDICT_TRUE(static_cast<uint8_t>(tag) == 50)) {
+          ptr -= 1;
+          do {
+            ptr += 1;
+            ptr = ctx->ParseMessage(_internal_add_playeritems(), ptr);
+            CHK_(ptr);
+            if (!ctx->DataAvailable(ptr)) break;
+          } while (::PROTOBUF_NAMESPACE_ID::internal::ExpectTag<50>(ptr));
         } else
           goto handle_unusual;
         continue;
@@ -2815,6 +2966,20 @@ uint8_t* DPlayerInfo::_InternalSerialize(
       3, this->_internal_playerclass(), target);
   }
 
+  // int32 playerHp = 4;
+  if (this->_internal_playerhp() != 0) {
+    target = stream->EnsureSpace(target);
+    target = ::_pbi::WireFormatLite::WriteInt32ToArray(4, this->_internal_playerhp(), target);
+  }
+
+  // repeated .Protocol.ItemData playerItems = 6;
+  for (unsigned i = 0,
+      n = static_cast<unsigned>(this->_internal_playeritems_size()); i < n; i++) {
+    const auto& repfield = this->_internal_playeritems(i);
+    target = ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::
+        InternalWriteMessage(6, repfield, repfield.GetCachedSize(), target, stream);
+  }
+
   if (PROTOBUF_PREDICT_FALSE(_internal_metadata_.have_unknown_fields())) {
     target = ::_pbi::WireFormat::InternalSerializeUnknownFieldsToArray(
         _internal_metadata_.unknown_fields<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(::PROTOBUF_NAMESPACE_ID::UnknownFieldSet::default_instance), target, stream);
@@ -2830,6 +2995,13 @@ size_t DPlayerInfo::ByteSizeLong() const {
   uint32_t cached_has_bits = 0;
   // Prevent compiler warnings about cached_has_bits being unused
   (void) cached_has_bits;
+
+  // repeated .Protocol.ItemData playerItems = 6;
+  total_size += 1UL * this->_internal_playeritems_size();
+  for (const auto& msg : this->_impl_.playeritems_) {
+    total_size +=
+      ::PROTOBUF_NAMESPACE_ID::internal::WireFormatLite::MessageSize(msg);
+  }
 
   // string playerName = 2;
   if (!this->_internal_playername().empty()) {
@@ -2847,6 +3019,11 @@ size_t DPlayerInfo::ByteSizeLong() const {
   if (this->_internal_playerclass() != 0) {
     total_size += 1 +
       ::_pbi::WireFormatLite::EnumSize(this->_internal_playerclass());
+  }
+
+  // int32 playerHp = 4;
+  if (this->_internal_playerhp() != 0) {
+    total_size += ::_pbi::WireFormatLite::Int32SizePlusOne(this->_internal_playerhp());
   }
 
   return MaybeComputeUnknownFieldsSize(total_size, &_impl_._cached_size_);
@@ -2867,6 +3044,7 @@ void DPlayerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   uint32_t cached_has_bits = 0;
   (void) cached_has_bits;
 
+  _this->_impl_.playeritems_.MergeFrom(from._impl_.playeritems_);
   if (!from._internal_playername().empty()) {
     _this->_internal_set_playername(from._internal_playername());
   }
@@ -2875,6 +3053,9 @@ void DPlayerInfo::MergeImpl(::PROTOBUF_NAMESPACE_ID::Message& to_msg, const ::PR
   }
   if (from._internal_playerclass() != 0) {
     _this->_internal_set_playerclass(from._internal_playerclass());
+  }
+  if (from._internal_playerhp() != 0) {
+    _this->_internal_set_playerhp(from._internal_playerhp());
   }
   _this->_internal_metadata_.MergeFrom<::PROTOBUF_NAMESPACE_ID::UnknownFieldSet>(from._internal_metadata_);
 }
@@ -2895,13 +3076,14 @@ void DPlayerInfo::InternalSwap(DPlayerInfo* other) {
   auto* lhs_arena = GetArenaForAllocation();
   auto* rhs_arena = other->GetArenaForAllocation();
   _internal_metadata_.InternalSwap(&other->_internal_metadata_);
+  _impl_.playeritems_.InternalSwap(&other->_impl_.playeritems_);
   ::PROTOBUF_NAMESPACE_ID::internal::ArenaStringPtr::InternalSwap(
       &_impl_.playername_, lhs_arena,
       &other->_impl_.playername_, rhs_arena
   );
   ::PROTOBUF_NAMESPACE_ID::internal::memswap<
-      PROTOBUF_FIELD_OFFSET(DPlayerInfo, _impl_.playerclass_)
-      + sizeof(DPlayerInfo::_impl_.playerclass_)
+      PROTOBUF_FIELD_OFFSET(DPlayerInfo, _impl_.playerhp_)
+      + sizeof(DPlayerInfo::_impl_.playerhp_)
       - PROTOBUF_FIELD_OFFSET(DPlayerInfo, _impl_.playerid_)>(
           reinterpret_cast<char*>(&_impl_.playerid_),
           reinterpret_cast<char*>(&other->_impl_.playerid_));

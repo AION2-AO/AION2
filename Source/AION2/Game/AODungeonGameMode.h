@@ -9,6 +9,7 @@
 class AAOMonsterBase;
 class APlayerController;
 class APlayerStart;
+class Pawn;
 
 UENUM(BlueprintType)
 enum class EDungeonPhase : uint8
@@ -54,6 +55,8 @@ public:
 
 	// Player Health 0 or Died Call
 	void NotifyPlayerDied(APlayerController* DeadPlayerController, bool bIsFallDeath = false);
+	void NotifyPlayerRespawnImmediately(APlayerController* DeadPlayerController);
+
 	TMap<TObjectPtr<APlayerController>, int32> PendingRespawnBossIndices;
 
 protected:
@@ -90,11 +93,15 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Dungeon|Class")
 	TMap<EDaevaClassType, TSubclassOf<APawn>> JobClassMap;
 
+protected :
+	virtual APawn* SpawnDefaultPawnAtTransform_Implementation(AController* NewPlayer,const FTransform& SpawnTransform) override;
+
+private :
+	APawn* SpawnPawnByPlayerClass(AController* NewPlayer, const FTransform& SapwnTransform);
+
 protected:
-	// 일반 사망 : 죽은 자리에서 부활.
 	TMap<TObjectPtr<APlayerController>, FTransform> PendingRespawnTransforms;
 
-	// 팀 전멸 : 보스 근처 체크포인트에서 전체 부활
 	FTimerHandle WipeRespawnTimerHandle;
 
 	UPROPERTY(VisibleInstanceOnly, BlueprintReadOnly, Category = "Dungeon")
@@ -153,6 +160,8 @@ public:
 	void SetDungeonId(int32 DungeonId) { MyDungeonId = DungeonId; }
 	void SetPrePlayerInfo(const Protocol::S_DungeonStartDediPacket& PlayerInfo);
 
+	int32 GetDungeonId() { return MyDungeonId; }
+	
 public :
 	UFUNCTION(BlueprintCallable, Category = "Dungeon")
 	void RequestReturnToVillage();
@@ -161,12 +170,16 @@ public :
 	// 미리 스폰된 플레이어들
 	UPROPERTY()
 	TArray<class APawn*> SpawnedPlayers;
-private:
-	// H.Y
-	//void SendDungeonComplete();
-	void SendDungeonComplete(bool bIsClear);
-	//
 
+	// Test
+	UFUNCTION(Exec)
+	void ForceClearDungeon();
+
+	void SendDungeonCompleteRequest();
+
+	void CreateDungeonClearWidget();
+
+private:
 	int32 MyDungeonId = 0;
 	Protocol::DPlayerInfo* ValidateToken(FString Token);
 
@@ -178,4 +191,6 @@ private:
 
 private :
 	bool bDungeonResultSent = false;
+	int32 DungeonPrice = 1000;
+
 };

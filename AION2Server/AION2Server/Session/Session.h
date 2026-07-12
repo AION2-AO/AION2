@@ -12,7 +12,7 @@ class Session : public IocpObject
 
 	enum
 	{
-		BUFFER_SIZE = 0x1000, // 64KB
+		BUFFER_SIZE = 0x10000, // 64KB
 	};
 
 public:
@@ -80,7 +80,7 @@ private:
 struct PacketHeader
 {
 	uint16 size;
-	uint16 id; // ÇÁ·ÎÅäÄİID (ex. 1=·Î±×ÀÎ, 2=ÀÌµ¿¿äÃ»)
+	uint16 id; // í”„ë¡œí† ì½œID (ex. 1=ë¡œê·¸ì¸, 2=ì´ë™ìš”ì²­)
 };
 #pragma pack(pop)
 

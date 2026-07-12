@@ -89,6 +89,8 @@ void ATalythraProjectile::OnProjectileOverlapEvent(UPrimitiveComponent* Overlapp
 
 
 	AAOCharacter* HitCharacter = Cast<AAOCharacter>(OtherActor);
+	if (HitCharacter == nullptr)
+		return;
 
 	if (HitCharacter->IsDead())
 	{

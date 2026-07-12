@@ -3,6 +3,8 @@
 
 #include "GAS/GA/Monster/GA_Monster_Gimmick.h"
 #include "AbilitySystemComponent.h"
+#include "GAS/AOGameplayTags.h"
+
 
 void UGA_Monster_Gimmick::EndAbility(
 	const FGameplayAbilitySpecHandle Handle,
@@ -21,6 +23,7 @@ void UGA_Monster_Gimmick::EndAbility(
 			if(ASC)
 			{
 				ASC->RemoveLooseGameplayTag(PendingTag);
+				ASC->RemoveLooseGameplayTag(GIMMICK_MONSTER);
 				ASC->AddLooseGameplayTag(DoneTag);
 			}
 

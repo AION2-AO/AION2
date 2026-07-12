@@ -39,8 +39,29 @@ void UGA_RangedAttack::ActivateAbility(
 		return;
 	}
 
-	UAnimMontage* AttackMontage =
-		Daeva->GetMontageByID(MontageIDToPlay);
+	//UAnimMontage* AttackMontage = Daeva->GetMontageByID(MontageIDToPlay);
+
+	UAnimMontage* AttackMontage = nullptr;
+
+	const float Speed = Daeva->GetVelocity().Size2D();
+	const bool bIsMovingAttack = bUseMoveAttackMontage && Speed > MoveAttackSpeedThreshold;
+
+	if (bUseMoveAttackMontage)
+	{
+		if (bIsMovingAttack)
+		{
+			AttackMontage = RangerMoveAttackMontage;
+		}
+		else
+		{
+			AttackMontage = RangerStandAttackMontage;
+		}
+		UE_LOG(LogTemp, Warning, TEXT("Ranger Montage Select | Speed = %.2f | Threshold = %.2f | Selecteed = %s"), Speed, MoveAttackSpeedThreshold, AttackMontage ? *AttackMontage->GetName() : TEXT("None"));
+	}
+	else
+	{
+		AttackMontage = Daeva->GetMontageByID(MontageIDToPlay);
+	}
 
 	if (!AttackMontage)
 	{
@@ -174,10 +195,21 @@ void UGA_RangedAttack::ActivateAbility(
 
 	FVector Direction = Target->GetActorLocation() - Daeva->GetActorLocation();
 	Direction.Z = 0.f;
-	Daeva->SetActorRotation(Direction.Rotation());
+
+	if (!Direction.IsNearlyZero())
+	{
+		if (!bIsMovingAttack)
+		{
+			Daeva->SetActorRotation(Direction.Rotation());
+		}
+	}
 
 	UAT_RotateToTarget* RotateTask = UAT_RotateToTarget::RotateToTarget(this, AttackData.AvailableRange, 15.0f);
-	RotateTask->ReadyForActivation();
+
+	if (RotateTask)
+	{
+		RotateTask->ReadyForActivation();
+	}
 }
 
 void UGA_RangedAttack::OnMontageTaskFinished()
@@ -203,6 +235,5 @@ void UGA_RangedAttack::OnLaunchProjectileEvent(FGameplayEventData Payload)
 		return;
 	}
 
-	UE_LOG(LogTemp, Log, TEXT("Summon Shuriken"));
 	AOCharacter->SpawnAttackProjectile(AttackData, ProjectileClass, ProjectileSpawnSocket);
 }

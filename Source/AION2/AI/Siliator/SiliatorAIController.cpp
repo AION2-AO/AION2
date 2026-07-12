@@ -4,6 +4,7 @@
 #include "GAS/AOGameplayTags.h"
 
 #include "Perception/AIPerceptionTypes.h"
+#include "Game/DungeonGameState.h"
 
 void ASiliatorAIController::TargetPerceptionOn(AActor* Actor, FAIStimulus Stimlus)
 {
@@ -26,6 +27,12 @@ void ASiliatorAIController::TargetPerceptionOn(AActor* Actor, FAIStimulus Stimlu
 			ControlledMonster->Set_Phase(PHASE_MONSTER_COMBAT);
 			CurrentTargetPlayer = Actor;
 			HasDetectedTarget = true;
+
+			// 보스 브금 재생 
+			if (auto* GS = GetWorld()->GetGameState<ADungeonGameState>())
+			{
+				GS->SetMusic(EDungeonMusic::Boss);
+			}
 		}
 
 		// 해당 플레이어가 시야에 처음 인식되었을 때 

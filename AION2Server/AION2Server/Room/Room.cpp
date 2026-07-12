@@ -1,4 +1,4 @@
-#include "pch.h"
+﻿#include "pch.h"
 #include "Room.h"
 #include "Player.h"
 #include "Protocol.pb.h"
@@ -26,8 +26,6 @@ void Room::EnterRoom(PlayerRef player)
 {
 	// 새로 들어온 플레이어의 위치를 기존 플레이어들에게 전송
 	{
-		std::cout << "New Player: " << player->GetId() << "\n";
-
 		Protocol::S_SpawnPacket spawnPkt;
 		Protocol::PlayerState* playerState = spawnPkt.add_playerstates();
 
@@ -56,8 +54,6 @@ void Room::EnterRoom(PlayerRef player)
 		Protocol::S_SpawnPacket spawnPkt;
 		for (auto& userInfo : _players)
 		{
-			std::cout << "Ex Player: " << userInfo.first << "To New Player" << player->GetId() << "\n";
-
 			PlayerRef user = userInfo.second;
 			Protocol::PlayerState* playerState = spawnPkt.add_playerstates();
 			playerState->set_playerid(user->_playerId);
@@ -199,3 +195,37 @@ void Room::Broadcast(SendBufferRef sendBuffer, uint64 exceptId)
 		}
 	}
 }
+
+void Room::HandlePlayerDash(Protocol::C_DashPacket pkt, PlayerRef player)
+{
+	uint64 playerId = player->GetId();
+
+	Protocol::S_DashPacket dashPkt;
+	dashPkt.set_playerid(player->_playerId);
+	const Protocol::Vector3& targetPos = pkt.playerlocation();
+	const Protocol::Rotator3& targetRot = pkt.playerrotation();
+
+	player->SetPos(targetPos);
+	player->SetRot(targetRot);
+
+	dashPkt.set_playerid(playerId);
+
+	Protocol::Vector3* loc = dashPkt.mutable_playerlocation();
+	loc->set_x(targetPos.x());
+	loc->set_y(targetPos.y());
+	loc->set_z(targetPos.z());
+
+	Protocol::Vector3* vel = dashPkt.mutable_playervelocity();
+	vel->set_x(pkt.playervelocity().x());
+	vel->set_y(pkt.playervelocity().y());
+	vel->set_z(pkt.playervelocity().z());
+
+	Protocol::Rotator3* rot = dashPkt.mutable_playerrotation();
+	rot->set_pitch(targetRot.pitch());
+	rot->set_yaw(targetRot.yaw());
+	rot->set_roll(targetRot.roll());
+
+	SendBufferRef sendBuffer = PacketHandler::MakeSendBuffer(dashPkt);
+	Broadcast(sendBuffer, player->_playerId);
+}
+

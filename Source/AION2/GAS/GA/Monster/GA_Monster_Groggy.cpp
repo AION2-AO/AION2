@@ -54,11 +54,13 @@ void UGA_Monster_Groggy::EndAbility(
 	bool bWasCancelled)
 {
 
-	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
-
 	AAOMonsterBase* pMonster = CastChecked<AAOMonsterBase>(ActorInfo->AvatarActor.Get());
 
 	pMonster->OnGroggyMontageEnd.Broadcast();
+	pMonster->OnGroggyMontageEnd.RemoveDynamic(pMonster, &AAOMonsterBase::EndGroggy);
+
+
+	Super::EndAbility(Handle, ActorInfo, ActivationInfo, bReplicateEndAbility, bWasCancelled);
 
 }
 
