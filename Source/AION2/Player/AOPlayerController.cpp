@@ -298,6 +298,78 @@ void AAOPlayerController::TestClearDungeon()
 	//ServerTestClearDungeon();
 }
 
+void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Gold)
+{
+	UE_LOG(LogTemp, Warning,
+		TEXT("[DungeonClearUI] Client RPC received | PC=%s Local=%d NetMode=%d Gold=%d"),
+		*GetNameSafe(this),
+		IsLocalController(),
+		static_cast<int32>(GetNetMode()),
+		Gold);
+
+	if (!IsLocalController())
+	{
+		UE_LOG(LogTemp, Error,
+			TEXT("[DungeonClearUI] This controller is not local"));
+		return;
+	}
+
+	if (!DungeonClearWidgetClass)
+	{
+		UE_LOG(LogTemp, Error,
+			TEXT("[DungeonClearUI] DungeonClearWidgetClass is NULL"));
+		return;
+	}
+
+	if (!DungeonClearWidget)
+	{
+		DungeonClearWidget =
+			CreateWidget<UDungeonClearWidget>(
+				this,
+				DungeonClearWidgetClass
+			);
+
+		if (!DungeonClearWidget)
+		{
+			UE_LOG(LogTemp, Error,
+				TEXT("[DungeonClearUI] CreateWidget failed"));
+			return;
+		}
+
+		DungeonClearWidget->AddToViewport(100);
+
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonClearUI] Widget created and added: %s"),
+			*GetNameSafe(DungeonClearWidget));
+	}
+	else
+	{
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonClearUI] Existing widget found"));
+
+		if (!DungeonClearWidget->IsInViewport())
+		{
+			DungeonClearWidget->AddToViewport(100);
+		}
+
+		DungeonClearWidget->SetVisibility(ESlateVisibility::Visible);
+	}
+
+	DungeonClearWidget->SetDungeonClearWidget(Gold);
+
+	FInputModeUIOnly InputMode;
+	InputMode.SetWidgetToFocus(DungeonClearWidget->TakeWidget());
+	InputMode.SetLockMouseToViewportBehavior(
+		EMouseLockMode::DoNotLock
+	);
+
+	SetInputMode(InputMode);
+	bShowMouseCursor = true;
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[DungeonClearUI] Finished displaying widget"));
+}
+
 void AAOPlayerController::ServerRequestDungeonComplete_Implementation()
 {
 	AAODungeonGameMode* DungeonGameMode = GetWorld()->GetAuthGameMode<AAODungeonGameMode>();
@@ -308,31 +380,4 @@ void AAOPlayerController::ServerRequestDungeonComplete_Implementation()
 	}
 
 	DungeonGameMode->SendDungeonCompleteRequest();
-}
-
-void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Gold)
-{
-	if (!IsLocalController())
-	{
-		return;
-	}
-
-	if (!DungeonClearWidgetClass)
-	{
-		return;
-	}
-
-	if (!DungeonClearWidget)
-	{
-		DungeonClearWidget = CreateWidget<UDungeonClearWidget>(this,DungeonClearWidgetClass);
-
-		if (!DungeonClearWidget)
-		{
-			return;
-		}
-
-		DungeonClearWidget->AddToViewport();
-	}
-
-	DungeonClearWidget->SetDungeonClearWidget(Gold);
 }

@@ -9,6 +9,7 @@
 
 #include "Character/Monster/AOMonsterBase.h"
 #include "Player/AOPlayerController.h"
+#include "Game/DungeonGameState.h"
 
 #include "Engine/World.h"
 #include "Kismet/GameplayStatics.h"
@@ -309,7 +310,7 @@ void AAODungeonGameMode::ClearDungeon()
 
 	UE_LOG(LogTemp, Warning, TEXT("[Dungeon] Dungeon Clear"));
 	
-	GiveDungeonReward();
+	//GiveDungeonReward();
 	CreateDungeonClearWidget();
 	//SendDungeonCompleteRequest();
 }
@@ -737,6 +738,12 @@ void AAODungeonGameMode::RespawnAllDeadPlayersAtBossCheckpoint()
 		}
 	}
 
+	// 보스 브금 재생 
+	if (auto* GS = GetWorld()->GetGameState<ADungeonGameState>())
+	{
+		GS->SetMusic(EDungeonMusic::Boss);
+	}
+
 	DeadPlayerControllers.Empty();
 	PendingRespawnTransforms.Empty();
 	PendingRespawnBossIndices.Empty();
@@ -960,23 +967,53 @@ void AAODungeonGameMode::SendDungeonCompleteRequest()
 
 void AAODungeonGameMode::CreateDungeonClearWidget()
 {
-	// PlayerController -> Client RPC.
 	if (!HasAuthority())
 	{
+		UE_LOG(LogTemp, Error,
+			TEXT("[DungeonClear] CreateDungeonClearWidget called without authority"));
 		return;
 	}
 
-	for (FConstPlayerControllerIterator It = GetWorld()->GetPlayerControllerIterator(); It; ++It)
+	UE_LOG(LogTemp, Warning,
+		TEXT("[DungeonClear] Start broadcasting widget. Gold=%d"),
+		DungeonPrice);
+
+	int32 ControllerCount = 0;
+
+	for (FConstPlayerControllerIterator It =
+		GetWorld()->GetPlayerControllerIterator(); It; ++It)
 	{
-		AAOPlayerController* PlayerController = Cast<AAOPlayerController>(It->Get());
+		APlayerController* BaseController = It->Get();
+
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonClear] Found Controller=%s Class=%s"),
+			*GetNameSafe(BaseController),
+			BaseController
+			? *GetNameSafe(BaseController->GetClass())
+			: TEXT("NULL"));
+
+		AAOPlayerController* PlayerController =
+			Cast<AAOPlayerController>(BaseController);
 
 		if (!PlayerController)
 		{
+			UE_LOG(LogTemp, Error,
+				TEXT("[DungeonClear] Controller is not AAOPlayerController"));
 			continue;
 		}
 
+		++ControllerCount;
+
+		UE_LOG(LogTemp, Warning,
+			TEXT("[DungeonClear] Calling client RPC for %s"),
+			*GetNameSafe(PlayerController));
+
 		PlayerController->ClientCreateDungeonClearWidget(DungeonPrice);
 	}
+
+	UE_LOG(LogTemp, Warning,
+		TEXT("[DungeonClear] RPC target count=%d"),
+		ControllerCount);
 }
 
 Protocol::DPlayerInfo* AAODungeonGameMode::ValidateToken(FString Token)
