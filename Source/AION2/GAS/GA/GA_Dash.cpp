@@ -57,13 +57,8 @@ void UGA_Dash::ActivateAbility(
 	}
 
 	// 공중 / 비행 / 글라이드 중에는 순간 대시 불가
-	if (MovementComp->IsFalling() ||
-		MovementComp->IsFlying() ||
-		(MovementComp->MovementMode == MOVE_Custom &&
-			MovementComp->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide)))
+	if (MovementComp->IsFalling() || MovementComp->IsFlying() || (MovementComp->MovementMode == MOVE_Custom && MovementComp->CustomMovementMode == static_cast<uint8>(EAOMovementMode::Glide)))
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Dash] Dash unavailable in current movement mode"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -78,8 +73,6 @@ void UGA_Dash::ActivateAbility(
 	ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
 	if (!Daeva)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Dash] Daeva is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}

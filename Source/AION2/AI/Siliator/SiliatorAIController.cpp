@@ -43,3 +43,35 @@ void ASiliatorAIController::TargetPerceptionOn(AActor* Actor, FAIStimulus Stimlu
 		}
 	}
 }
+
+bool ASiliatorAIController::RefreshOrReset()
+{
+	// 배열에 살아있는 후보가 남아있으면 그 중 하나 선택
+	if (ArrayTargetPlayers.Num() == 0)
+	{
+		if (RefreshPerceivedTargets() == false)
+		{
+			// 보스 HP 및 Groggy 게이지 초기화. 
+			UAOAttributeSet* pAttributeSet = ControlledMonster->GetAttributeSet();
+			pAttributeSet->SetHealth(pAttributeSet->GetMaxHealth());
+			pAttributeSet->SetGroggy(pAttributeSet->GetMaxGroggy());
+
+			if (ControlledMonster->Get_GimmickArray() != nullptr)
+			{
+				TArray<AAOMonsterBase::FGimmickEntry>* ArrayGimmick = ControlledMonster->Get_GimmickArray();
+
+				for (auto& iter : *ArrayGimmick)
+				{
+					iter.bTriggered = false;
+				}
+			}
+
+			CurrentTargetPlayer = nullptr;
+			HasDetectedTarget = false;
+			return false;
+		}
+	}
+
+	CurrentTargetPlayer = ArrayTargetPlayers[0];
+	return true;
+}

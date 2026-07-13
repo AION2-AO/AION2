@@ -90,6 +90,13 @@ enum : uint16
 	PKT_S_DISCONNECT = 1027,
 
 	PKT_DS_DEDICATED = 1100,
+
+	// PVP 및 공격 관련 패킷
+	PKT_S_PVP_STATE = 1048,
+	PKT_C_ATTACK = 1049,
+	PKT_S_ATTACK_RESULT = 1050,
+	PKT_C_JUMP = 1051,
+	PKT_S_JUMP = 1052,
 };
 
 #include "PacketHeader.generated.h"

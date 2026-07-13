@@ -25,7 +25,7 @@ void AAOTrapProjectile::BeginPlay()
 	Super::BeginPlay();
 }
 
-void AAOTrapProjectile::SpawnTrapOnOverlap(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult& SweepResult)
+void AAOTrapProjectile::SpawnTrapOnOverlap(UPrimitiveComponent* OverlappedComp,AActor* OtherActor,UPrimitiveComponent* OtherComp,int32 OtherBodyIndex,bool bFromSweep,const FHitResult& SweepResult)
 {
 	if (!HasAuthority() || bTrapSpawned || !TrapZoneClass)
 	{
@@ -34,13 +34,47 @@ void AAOTrapProjectile::SpawnTrapOnOverlap(UPrimitiveComponent* OverlappedComp, 
 
 	AAOCharacter* HitCharacter = Cast<AAOCharacter>(OtherActor);
 
+	if (!HitCharacter)
+	{
+		return;
+	}
+
+	if (HitCharacter != Target)
+	{
+		return;
+	}
+
+	AAOCharacter* SourceCharacter = DamageCauser.Get();
+
+	if (!SourceCharacter)
+	{
+		return;
+	}
+
+	if (HitCharacter->IsDead())
+	{
+		return;
+	}
+
+	if (!SourceCharacter->IsEnemy(HitCharacter))
+	{
+		return;
+	}
+
 	bTrapSpawned = true;
 
 	FActorSpawnParameters SpawnParams;
-	SpawnParams.Owner = DamageCauser.Get();
-	SpawnParams.Instigator = DamageCauser.Get();
+	SpawnParams.Owner = SourceCharacter;
+	SpawnParams.Instigator = SourceCharacter;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	GetWorld()->SpawnActor<AAOTrapZone>(TrapZoneClass,GetActorLocation(),FRotator::ZeroRotator,SpawnParams);
-	UE_LOG(	LogTemp,Warning,TEXT("[Trap] Zone Spawned At : %s"),*GetActorLocation().ToString());
+	const FVector TrapLocation =
+		GetTrapSpawnLocation(HitCharacter, SweepResult);
+
+	AAOTrapZone* SpawnedTrap = GetWorld()->SpawnActor<AAOTrapZone>(TrapZoneClass,TrapLocation,FRotator::ZeroRotator,SpawnParams);
+}
+
+FVector AAOTrapProjectile::GetTrapSpawnLocation(AAOCharacter* HitCharacter, const FHitResult& SweepResult) const
+{
+	return GetActorLocation();
 }

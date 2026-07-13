@@ -3,12 +3,15 @@
 #include "CoreMinimal.h"
 #include "Abilities/GameplayAbility.h"
 #include "Character/Daeva/Daeva.h"
+#include "Interface/AOCooldownTagProvider.h"
 #include "GA_RangedAttack.generated.h"
 
 class UGameplayEffect;
 
 UCLASS()
-class AION2_API UGA_RangedAttack : public UGameplayAbility
+class AION2_API UGA_RangedAttack 
+	: public UGameplayAbility
+	, public IAOCooldownTagProvider
 {
 	GENERATED_BODY()
 
@@ -19,6 +22,10 @@ public:
 		const FGameplayAbilityActivationInfo ActivationInfo,
 		const FGameplayEventData* TriggerEventData
 	) override;
+
+public:
+	// UI용 Cooldown Tag를 제공하는 별도 함수를 갖도록 함
+	virtual bool GetUICooldownTag(FGameplayTag& OutCooldownTag) const override;
 
 protected :
 	UPROPERTY(EditDefaultsOnly, Category = "Mana")

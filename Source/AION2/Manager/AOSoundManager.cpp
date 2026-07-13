@@ -6,11 +6,20 @@
 
 UAOSoundManager::UAOSoundManager()
 {
-	static ConstructorHelpers::FObjectFinder<UDataTable> DT_Sound(TEXT("/Game/Utils/DT_SoundTable"));
+	static ConstructorHelpers::FObjectFinder<UDataTable> DT_Sound(TEXT("/Game/Sound/AOSoundAssetTable"));
 	if (DT_Sound.Succeeded())
 	{
 		SoundDataTable = DT_Sound.Object;
 	}
+}
+
+UAOSoundManager* UAOSoundManager::Get(const UObject* WorldContextObject)
+{
+	if (UGameInstance* GameInstance = UGameplayStatics::GetGameInstance(WorldContextObject))
+	{
+		return GameInstance->GetSubsystem<UAOSoundManager>();
+	}
+	return nullptr;
 }
 
 void UAOSoundManager::Initialize(FSubsystemCollectionBase& Collection)

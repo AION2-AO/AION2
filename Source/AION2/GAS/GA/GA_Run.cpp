@@ -23,16 +23,12 @@ void UGA_Run::ActivateAbility(
 	const UAOAttributeSet* AttributeSet = ASC->GetSet<UAOAttributeSet>();
 	if (!AttributeSet)
 	{
-		UE_LOG(LogTemp, Error, TEXT("[Run] AttributeSet is null"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
 
 	if (AttributeSet->GetStamina() <= 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("[Run] Not enough stamina"));
-
 		EndAbility(Handle, ActorInfo, ActivationInfo, true, true);
 		return;
 	}
@@ -49,8 +45,6 @@ void UGA_Run::ActivateAbility(
 		{
 			RunMoveSpeedEffectHandle =
 				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-
-			UE_LOG(LogTemp, Log, TEXT("[Run] MoveSpeed Effect Applied"));
 		}
 	}
 	else
@@ -68,10 +62,7 @@ void UGA_Run::ActivateAbility(
 
 		if (SpecHandle.IsValid())
 		{
-			RunStaminaDrainEffectHandle =
-				ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
-
-			UE_LOG(LogTemp, Log, TEXT("[Run] Stamina Drain Effect Applied"));
+			RunStaminaDrainEffectHandle = ASC->ApplyGameplayEffectSpecToSelf(*SpecHandle.Data.Get());
 		}
 	}
 	else
@@ -81,38 +72,15 @@ void UGA_Run::ActivateAbility(
 
 	if (!StaminaChangedDelegateHandle.IsValid())
 	{
-		StaminaChangedDelegateHandle =
-			ASC->GetGameplayAttributeValueChangeDelegate(
-				UAOAttributeSet::GetStaminaAttribute()
-			).AddUObject(this, &UGA_Run::OnStaminaChanged);
+		StaminaChangedDelegateHandle = ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetStaminaAttribute()).AddUObject(this, &UGA_Run::OnStaminaChanged);
 	}
-
-	UE_LOG(
-		LogTemp,
-		Warning,
-		TEXT("[Run Start] Stamina: %.1f / %.1f"),
-		AttributeSet->GetStamina(),
-		AttributeSet->GetMaxStamina()
-	);
 }
 
-void UGA_Run::InputReleased(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo
-)
+void UGA_Run::InputReleased(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo)
 {
 	Super::InputReleased(Handle, ActorInfo, ActivationInfo);
 
-	UE_LOG(LogTemp, Warning, TEXT("[Run End] Input Released"));
-
-	EndAbility(
-		Handle,
-		ActorInfo,
-		ActivationInfo,
-		true,
-		false
-	);
+	EndAbility(	Handle,	ActorInfo,	ActivationInfo,	true,false);
 }
 
 void UGA_Run::OnStaminaChanged(const FOnAttributeChangeData& Data)
@@ -122,29 +90,13 @@ void UGA_Run::OnStaminaChanged(const FOnAttributeChangeData& Data)
 		return;
 	}
 
-	UE_LOG(LogTemp, Warning, TEXT("[Run End] Stamina Empty"));
 
-	EndAbility(
-		CurrentSpecHandle,
-		CurrentActorInfo,
-		CurrentActivationInfo,
-		true,
-		false
-	);
+	EndAbility(CurrentSpecHandle, CurrentActorInfo, CurrentActivationInfo, true, false);
 }
 
-void UGA_Run::EndAbility(
-	const FGameplayAbilitySpecHandle Handle,
-	const FGameplayAbilityActorInfo* ActorInfo,
-	const FGameplayAbilityActivationInfo ActivationInfo,
-	bool bReplicateEndAbility,
-	bool bWasCancelled
-)
+void UGA_Run::EndAbility(const FGameplayAbilitySpecHandle Handle,const FGameplayAbilityActorInfo* ActorInfo,const FGameplayAbilityActivationInfo ActivationInfo,bool bReplicateEndAbility,bool bWasCancelled)
 {
-	UAbilitySystemComponent* ASC =
-		ActorInfo && ActorInfo->AbilitySystemComponent.IsValid()
-		? ActorInfo->AbilitySystemComponent.Get()
-		: nullptr;
+	UAbilitySystemComponent* ASC =	ActorInfo && ActorInfo->AbilitySystemComponent.IsValid() ? ActorInfo->AbilitySystemComponent.Get()	: nullptr;
 
 	if (ASC)
 	{
@@ -152,35 +104,21 @@ void UGA_Run::EndAbility(
 		{
 			ASC->RemoveActiveGameplayEffect(RunMoveSpeedEffectHandle);
 			RunMoveSpeedEffectHandle.Invalidate();
-
-			UE_LOG(LogTemp, Log, TEXT("[Run End] MoveSpeed Effect Removed"));
 		}
 
 		if (RunStaminaDrainEffectHandle.IsValid())
 		{
 			ASC->RemoveActiveGameplayEffect(RunStaminaDrainEffectHandle);
 			RunStaminaDrainEffectHandle.Invalidate();
-
-			UE_LOG(LogTemp, Log, TEXT("[Run End] Stamina Drain Effect Removed"));
 		}
 
 		if (StaminaChangedDelegateHandle.IsValid())
 		{
-			ASC->GetGameplayAttributeValueChangeDelegate(
-				UAOAttributeSet::GetStaminaAttribute()
-			).Remove(StaminaChangedDelegateHandle);
+			ASC->GetGameplayAttributeValueChangeDelegate(UAOAttributeSet::GetStaminaAttribute()).Remove(StaminaChangedDelegateHandle);
 
 			StaminaChangedDelegateHandle.Reset();
 		}
 	}
-
-	UE_LOG(LogTemp, Warning, TEXT("[Run End] Ability Ended"));
-
-	Super::EndAbility(
-		Handle,
-		ActorInfo,
-		ActivationInfo,
-		bReplicateEndAbility,
-		bWasCancelled
-	);
+	
+	Super::EndAbility(Handle,ActorInfo,ActivationInfo,bReplicateEndAbility,bWasCancelled);
 }

@@ -15,6 +15,9 @@ public:
 	std::unordered_map<std::string, int32>GetPendingHpUpdate();
 	void ClearPendingHpUpdate(const std::vector<std::string>& ids);
 
+	void SetDeathPenalty(const std::string& name, int32 seconds);
+	int32 GetDeathPenaltyTtl(const std::string& name);
+
 private:
 	RedisConnectionPool* _pool;
 };

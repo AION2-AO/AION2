@@ -170,6 +170,44 @@ void UGA_Attack::ActivateAbility(
     RotateTask->ReadyForActivation();
 }
 
+bool UGA_Attack::GetUICooldownTag(FGameplayTag& OutCooldownTag) const
+{
+	OutCooldownTag = FGameplayTag();
+
+	const FGameplayTag CooldownRoot =
+		FGameplayTag::RequestGameplayTag(TEXT("Cooldown"));
+
+	for (const TSubclassOf<UGameplayEffect>& EffectClass : GameplayEffectsToApply)
+	{
+		if (!EffectClass)
+		{
+			continue;
+		}
+
+		const UGameplayEffect* EffectCDO =
+			EffectClass->GetDefaultObject<UGameplayEffect>();
+
+		if (!EffectCDO)
+		{
+			continue;
+		}
+
+		const TArray<FGameplayTag>& GrantedTags =
+			EffectCDO->GetGrantedTags().GetGameplayTagArray();
+
+		for (const FGameplayTag& Tag : GrantedTags)
+		{
+			if (Tag.MatchesTag(CooldownRoot))
+			{
+				OutCooldownTag = Tag;
+				return true;
+			}
+		}
+	}
+
+	return false;
+}
+
 void UGA_Attack::OnMontageTaskFinished()
 {
 	EndAbility(CurrentSpecHandle,CurrentActorInfo,CurrentActivationInfo,true,false);

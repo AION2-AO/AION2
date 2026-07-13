@@ -102,9 +102,6 @@ void AAOTrapZone::ApplyTrapDamage()
 		}
 
 		SpecHandle.Data->SetSetByCallerMagnitude(DamageSetByCallerTag,DamageAmount);
-
 		SourceASC->ApplyGameplayEffectSpecToTarget(*SpecHandle.Data.Get(),TargetASC);
-
-		UE_LOG(	LogTemp,Warning,TEXT("[Trap DOT] %s -> %s"),*GetNameSafe(DamageCauser),	*GetNameSafe(TargetCharacter));
 	}
 }

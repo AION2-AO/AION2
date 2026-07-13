@@ -61,3 +61,31 @@ void RedisManager::ClearPendingHpUpdate(const std::vector<std::string>& ids)
 
 	_pool->Push(conn);
 }
+
+void RedisManager::SetDeathPenalty(const std::string& name, int32 seconds)
+{
+	RedisConnection* conn = _pool->Pop();
+	if (conn == nullptr) return;
+
+	redisReply* reply = conn->Command("SET player:penalty:%s 1 EX %d", name.c_str(), seconds);
+	if (reply) freeReplyObject(reply);
+
+	_pool->Push(conn);
+}
+
+int32 RedisManager::GetDeathPenaltyTtl(const std::string& name)
+{
+	RedisConnection* conn = _pool->Pop();
+	if (conn == nullptr) return -1;
+
+	redisReply* reply = conn->Command("TTL player:penalty:%s", name.c_str());
+	int32 ttl = -1;
+	if (reply && reply->type == REDIS_REPLY_INTEGER)
+	{
+		ttl = static_cast<int32>(reply->integer);
+	}
+	if (reply) freeReplyObject(reply);
+	_pool->Push(conn);
+
+	return ttl;
+}

@@ -13,6 +13,7 @@
 #include "UI/Mail/MailListRowWidget.h"
 #include "UI/Mail/MainMailWidget.h"
 #include "UI/Mail/MailData.h"
+#include "UI/PvpWidget.h"
 #include "Player/AOPlayerController.h"
 
 PacketHandlerFunc GAOPacketHandler[UINT16_MAX];
@@ -41,6 +42,9 @@ void InitPacketHandler()
 	GAOPacketHandler[PKT_S_SPAWN] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_SpawnPacket>(&FPacketHandler::Handle_S_SPAWN, Mng, Buf, Len); };
 	GAOPacketHandler[PKT_S_MOVE] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_MovePacket>(&FPacketHandler::Handle_S_MOVE, Mng, Buf, Len); };
 	GAOPacketHandler[PKT_S_DASH] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_DashPacket>(&FPacketHandler::Handle_S_DASH, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_PVP_STATE] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_PvpStatePacket>(&FPacketHandler::Handle_S_PVP_STATE, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_ATTACK_RESULT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_AttackResultPacket>(&FPacketHandler::Handle_S_ATTACK_RESULT, Mng, Buf, Len); };
+	GAOPacketHandler[PKT_S_JUMP] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_JumpPacket>(&FPacketHandler::Handle_S_JUMP, Mng, Buf, Len); };
 
 	GAOPacketHandler[PKT_S_CHAT] = [](UAONetworkManager* Mng, uint8* Buf, int32 Len) { return HandlePacketPolicy<Protocol::S_ChatPacket>(&FPacketHandler::Handle_S_CHAT, Mng, Buf, Len); };
 
@@ -225,6 +229,44 @@ bool FPacketHandler::Handle_S_DASH(Protocol::S_DashPacket& Pkt)
 
 	PlayerMng->HandleDash(Pkt.playerid(), TargetLoc, TargetRot, TargetVel);
 	return true;
+}
+
+bool FPacketHandler::Handle_S_PVP_STATE(Protocol::S_PvpStatePacket& Pkt)
+{
+	uint8 State = Pkt.state();
+	int32 Time = Pkt.remainingseconds();
+	UAOUIManager* UIManager = GetUIManager();
+	if (UIManager && GameInstance)
+	{
+		UPvpWidget* PvpWidget = UIManager->GetWidget<UPvpWidget>();
+		if (!PvpWidget)
+		{
+			AAOPlayerController* PC = Cast<AAOPlayerController>(GameInstance->GetWorld()->GetFirstPlayerController());
+			if (PC && !PC->PvpWidgetClass.IsNull())
+			{
+				PvpWidget = Cast<UPvpWidget>(UIManager->ShowWidget(PC->PvpWidgetClass, EUILayer::Default));
+			}
+		}
+
+		if (PvpWidget)
+		{
+			PvpWidget->UpdatePvpWidget(State, Time);
+		}
+	}
+	PlayerMng->HandleSetPvpState(Pkt.state());
+	return false;
+}
+
+bool FPacketHandler::Handle_S_ATTACK_RESULT(Protocol::S_AttackResultPacket& Pkt)
+{
+	PlayerMng->HandleAttack(Pkt);
+	return false;
+}
+
+bool FPacketHandler::Handle_S_JUMP(Protocol::S_JumpPacket& Pkt)
+{
+	PlayerMng->HandleJump(Pkt.playerid(), Pkt.isgliding());
+	return false;
 }
 
 

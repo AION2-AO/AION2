@@ -7,56 +7,43 @@
 #include "Components/Image.h"
 #include "Components/TextBlock.h"
 
-// ³ªÁß¿¡ Áö¿ö¾ß ÇÔ!!!
+// ë‚˜ì¤‘ì— ì§€ì›Œì•¼ í•¨!!!
 #include "Player/AOPlayerController.h"
-// ³ªÁß¿¡ Áö¿ö¾ß ÇÔ!!
+// ë‚˜ì¤‘ì— ì§€ì›Œì•¼ í•¨!!
 #include "Character/Daeva/Assassin.h"
 #include "Character/Daeva/Cleric.h"
 #include "Character/Daeva/Ranger.h"
 #include "Character/Daeva/Templar.h"
+#include "Game/AOGameInstance.h"
+#include "Manager/AOPlayerManager.h"
 
 void UAOClassSwitcherWidget::SetClassWidget(uint8 ClassType)
 {
-	UWidget* TargetWidget = nullptr;
-
-	// TODO(SuYeon): Data ±â¹İÀ¸·Î ¸¸µé±â.
-	switch (ClassType)
-	{
-	case 1:
-		TargetWidget = AssassinClassWidget;
-		break;
-	case 2:
-		TargetWidget = ClericClassWidget;
-		break;
-	case 3:
-		TargetWidget = RangerClassWidget;
-		break;
-	case 4:
-		TargetWidget = TemplarClassWidget;
-		break;
-	default:
-		TargetWidget = None_Class;
-		break;
-	}
-
-
-	if (TargetWidget)
-	{
-		WidgetSwitcher_Class->SetActiveWidget(TargetWidget);
-	}
+	SetClassWidget(static_cast<EDaevaClassType>(ClassType));
 }
 
 void UAOClassSwitcherWidget::SetClassWidget(EDaevaClassType ClassType)
 {
 	UWidget* TargetWidget = nullptr;
 
-	// TODO(SuYeon): Data ±â¹İÀ¸·Î ¸¸µé±â.
+	if (ClassType == EDaevaClassType::None && CachedPlayerId != 0)
+	{
+		if (const UGameInstance* GI = GetGameInstance())
+		{
+			if (const UAOPlayerManager* PlayerManager = GI->GetSubsystem<UAOPlayerManager>())
+			{
+				ClassType = static_cast<EDaevaClassType>(PlayerManager->GetPlayerClassType(CachedPlayerId));
+			}
+		}
+	}
+
+	// TODO(SuYeon): Data ê¸°ë°˜ìœ¼ë¡œ ë§Œë“¤ê¸°.
 
 	/* 
-	* ¼­¹ö¿¡¼­ °ªÀ» ¾È ³Ö¾îÁá´Ù¸é Daeva¸¦ »ó¼Ó¹ŞÀº class¸¦ ±â¹İÀ¸·Î 1¹ø force input.
-	* !! ¼­¹ö¿¡¼­ Á¤»óÀûÀ¸·Î °ªÀ» ³Ö¾îÁÖµµ·Ï ÇØ¾ß ÇÔ !!
-	* !! Editor¿ë ÄÚµå !!
-	* ÀÌ°Å±îÁö ¾ÈµÇ¸é ÁøÂ¥ ¹®Á¦ ÀÖ´Â °ÅÀÓ.
+	* ì„œë²„ì—ì„œ ê°’ì„ ì•ˆ ë„£ì–´ì¤¬ë‹¤ë©´ Daevaë¥¼ ìƒì†ë°›ì€ classë¥¼ ê¸°ë°˜ìœ¼ë¡œ 1ë²ˆ force input.
+	* !! ì„œë²„ì—ì„œ ì •ìƒì ìœ¼ë¡œ ê°’ì„ ë„£ì–´ì£¼ë„ë¡ í•´ì•¼ í•¨ !!
+	* !! Editorìš© ì½”ë“œ !!
+	* ì´ê±°ê¹Œì§€ ì•ˆë˜ë©´ ì§„ì§œ ë¬¸ì œ ìˆëŠ” ê±°ì„.
 	*/
 	if (ClassType== EDaevaClassType::None)
 	{

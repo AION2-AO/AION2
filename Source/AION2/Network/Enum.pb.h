@@ -160,6 +160,33 @@ inline bool MailFailReason_Parse(
   return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<MailFailReason>(
     MailFailReason_descriptor(), name, value);
 }
+enum EPvpState : int {
+  PVP_STATE_INACTIVE = 0,
+  PVP_STATE_WARN_START = 1,
+  PVP_STATE_ACTIVE = 2,
+  PVP_STATE_WARN_END = 3,
+  EPvpState_INT_MIN_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::min(),
+  EPvpState_INT_MAX_SENTINEL_DO_NOT_USE_ = std::numeric_limits<int32_t>::max()
+};
+bool EPvpState_IsValid(int value);
+constexpr EPvpState EPvpState_MIN = PVP_STATE_INACTIVE;
+constexpr EPvpState EPvpState_MAX = PVP_STATE_WARN_END;
+constexpr int EPvpState_ARRAYSIZE = EPvpState_MAX + 1;
+
+const ::PROTOBUF_NAMESPACE_ID::EnumDescriptor* EPvpState_descriptor();
+template<typename T>
+inline const std::string& EPvpState_Name(T enum_t_value) {
+  static_assert(::std::is_same<T, EPvpState>::value ||
+    ::std::is_integral<T>::value,
+    "Incorrect type passed to function EPvpState_Name.");
+  return ::PROTOBUF_NAMESPACE_ID::internal::NameOfEnum(
+    EPvpState_descriptor(), enum_t_value);
+}
+inline bool EPvpState_Parse(
+    ::PROTOBUF_NAMESPACE_ID::ConstStringParam name, EPvpState* value) {
+  return ::PROTOBUF_NAMESPACE_ID::internal::ParseNamedEnum<EPvpState>(
+    EPvpState_descriptor(), name, value);
+}
 // ===================================================================
 
 
@@ -201,6 +228,11 @@ template <> struct is_proto_enum< ::Protocol::MailFailReason> : ::std::true_type
 template <>
 inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::MailFailReason>() {
   return ::Protocol::MailFailReason_descriptor();
+}
+template <> struct is_proto_enum< ::Protocol::EPvpState> : ::std::true_type {};
+template <>
+inline const EnumDescriptor* GetEnumDescriptor< ::Protocol::EPvpState>() {
+  return ::Protocol::EPvpState_descriptor();
 }
 
 PROTOBUF_NAMESPACE_CLOSE

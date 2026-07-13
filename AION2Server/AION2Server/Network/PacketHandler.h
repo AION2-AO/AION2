@@ -71,6 +71,13 @@ enum : uint16
 	PKT_S_DISCONNECT = 1027,
 
 	PKT_DS_DEDICATED = 1100,
+
+	// PVP 및 공격 관련 패킷
+	PKT_S_PVP_STATE = 1048,
+	PKT_C_ATTACK = 1049,
+	PKT_S_ATTACK_RESULT = 1050,
+	PKT_C_JUMP = 1051,
+	PKT_S_JUMP = 1052,
 };
 
 bool Handle_INVALID(PacketSessionRef& session, BYTE* buffer, int32 len);
@@ -96,6 +103,7 @@ public:
 		GPacketHandler[PKT_C_MAP_LOAD_COMPLETE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MapLoadCompletePacket>(HandleMapComplete, session, buffer, len); };
 		GPacketHandler[PKT_C_MOVE] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_MovePacket>(HandleMove, session, buffer, len); };
 		GPacketHandler[PKT_C_DASH] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DashPacket>(HandleDash, session, buffer, len); };
+		GPacketHandler[PKT_C_JUMP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_JumpPacket>(HandleJump, session, buffer, len); };
 
 		// 던전
 		GPacketHandler[PKT_C_DUNGEON_ENTER_WAITING_ROOM] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_DungeonWaitingRoomEnterPacket>(HandleDungeonWaitingRoom, session, buffer, len); };
@@ -109,6 +117,7 @@ public:
 		// 캐릭터 상태 및 상호작용
 		GPacketHandler[PKT_C_CHANGE_HP] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChangeHpPacket>(HandleChangeHp, session, buffer, len); };
 		GPacketHandler[PKT_C_CHAT] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_ChatPacket>(HandleChat, session, buffer, len); };
+		GPacketHandler[PKT_C_ATTACK] = [](PacketSessionRef& session, BYTE* buffer, int len) { return HandlePacket<Protocol::C_AttackPacket>(HandleAttack, session, buffer, len); };
 
 		// 메일
 		GPacketHandler[PKT_C_MAIL_SEND] = [](PacketSessionRef& session, BYTE* buffer, int len) {return HandlePacket<Protocol::C_SendMailPacket>(HandleMailSend, session, buffer, len); };
@@ -126,6 +135,9 @@ public:
 	static bool HandleMapComplete(PacketSessionRef& session, Protocol::C_MapLoadCompletePacket& pkt);
 	static bool HandleMove(PacketSessionRef& session, Protocol::C_MovePacket& pkt);
 	static bool HandleDash(PacketSessionRef& session, Protocol::C_DashPacket& pkt);
+	static bool HandleJump(PacketSessionRef& session, Protocol::C_JumpPacket& pkt);
+	static bool HandleAttack(PacketSessionRef& session, Protocol::C_AttackPacket& pkt);
+
 	static bool HandleChangeHp(PacketSessionRef& session, Protocol::C_ChangeHpPacket& pkt);
 
 	static bool HandleDedicated(PacketSessionRef& session, Protocol::C_DedicatedPacket& pkt);
@@ -175,6 +187,9 @@ public:
 	static SendBufferRef MakeSendBuffer(Protocol::S_SpawnPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_SPAWN); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_MovePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_MOVE); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DashPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DASH); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_JumpPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_JUMP); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_AttackResultPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_ATTACK_RESULT); };
+	static SendBufferRef MakeSendBuffer(Protocol::S_PvpStatePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_PVP_STATE); };
 
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonWaitingRoomEnterPacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_ENTER_WAITING_ROOM); };
 	static SendBufferRef MakeSendBuffer(Protocol::S_DungeonCreatePacket& pkt) { return MakeSendBuffer(pkt, PKT_S_DUNGEON_CREATE); };

@@ -19,7 +19,9 @@ protected :
 	virtual void BeginPlay() override;
 
 	UFUNCTION()
-	void SpawnTrapOnOverlap(UPrimitiveComponent* OverlappedComp,AActor* OtherActor,	UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex,bool bFromSweep,const FHitResult& SweepResult);
+	virtual void SpawnTrapOnOverlap(UPrimitiveComponent* OverlappedComp,AActor* OtherActor,	UPrimitiveComponent* OtherComp,	int32 OtherBodyIndex,bool bFromSweep,const FHitResult& SweepResult);
+
+	virtual FVector GetTrapSpawnLocation(AAOCharacter* HitCharacter, const FHitResult& SweepResult) const;
 
 public :
 	UPROPERTY(EditDefaultsOnly, blueprintReadOnly, Category = "Trap")

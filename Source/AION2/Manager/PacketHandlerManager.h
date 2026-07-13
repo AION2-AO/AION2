@@ -29,6 +29,9 @@ public:
 	bool Handle_S_SPAWN(Protocol::S_SpawnPacket& Pkt);
 	bool Handle_S_MOVE(Protocol::S_MovePacket& Pkt);
 	bool Handle_S_DASH(Protocol::S_DashPacket& Pkt);
+	bool Handle_S_PVP_STATE(Protocol::S_PvpStatePacket& Pkt);
+	bool Handle_S_ATTACK_RESULT(Protocol::S_AttackResultPacket& Pkt);
+	bool Handle_S_JUMP(Protocol::S_JumpPacket& Pkt);
 
 	// 던전
 	bool Handle_S_ENTER_WAITING(Protocol::S_DungeonWaitingRoomEnterPacket& Pkt);

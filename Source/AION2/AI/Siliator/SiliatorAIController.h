@@ -11,4 +11,7 @@ class AION2_API ASiliatorAIController : public AAIMonsterControllerBase
 	
 public:
 	virtual void TargetPerceptionOn(AActor* Actor, FAIStimulus  Stimlus) override;
+
+protected:
+	virtual bool RefreshOrReset() override;
 };

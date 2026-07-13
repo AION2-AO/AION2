@@ -3,6 +3,63 @@
 #include "Character/AOCharacterMovementComponent.h"
 
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "UObject/UnrealType.h"
+
+static bool IsBodyMontageConfigured(const ADaeva* Daeva, EMontageID MontageID)
+{
+	if (!Daeva) return false;
+
+	FMapProperty* MapProp = CastField<FMapProperty>(ADaeva::StaticClass()->FindPropertyByName(TEXT("Montages")));
+	if (MapProp)
+	{
+		FScriptMapHelper MapHelper(MapProp, MapProp->ContainerPtrToValuePtr<void>(Daeva));
+		for (int32 i = 0; i < MapHelper.Num(); ++i)
+		{
+			if (MapHelper.IsValidIndex(i))
+			{
+				const uint8* KeyPtr = MapHelper.GetKeyPtr(i);
+				if (KeyPtr && *KeyPtr == static_cast<uint8>(MontageID))
+				{
+					const uint8* ValuePtr = MapHelper.GetValuePtr(i);
+					if (ValuePtr)
+					{
+						UAnimMontage* Montage = *reinterpret_cast<UAnimMontage* const*>(ValuePtr);
+						return Montage != nullptr;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+static bool IsWingMontageConfigured(const ADaeva* Daeva, EMontageID MontageID)
+{
+	if (!Daeva) return false;
+
+	FMapProperty* MapProp = CastField<FMapProperty>(ADaeva::StaticClass()->FindPropertyByName(TEXT("WingMontages")));
+	if (MapProp)
+	{
+		FScriptMapHelper MapHelper(MapProp, MapProp->ContainerPtrToValuePtr<void>(Daeva));
+		for (int32 i = 0; i < MapHelper.Num(); ++i)
+		{
+			if (MapHelper.IsValidIndex(i))
+			{
+				const uint8* KeyPtr = MapHelper.GetKeyPtr(i);
+				if (KeyPtr && *KeyPtr == static_cast<uint8>(MontageID))
+				{
+					const uint8* ValuePtr = MapHelper.GetValuePtr(i);
+					if (ValuePtr)
+					{
+						UAnimMontage* Montage = *reinterpret_cast<UAnimMontage* const*>(ValuePtr);
+						return Montage != nullptr;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
 
 void UGA_GlideDash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -33,10 +90,14 @@ void UGA_GlideDash::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
 
     MoveComp->StartGlideDash();
 
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::GlideDash), 1.0f);
+    UAnimMontage* BodyMontage = IsBodyMontageConfigured(Daeva, EMontageID::GlideDash) ? Daeva->GetMontageByID(EMontageID::GlideDash) : nullptr;
+    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, BodyMontage, 1.0f);
     if (Daeva->HasAuthority())
     {
-        Daeva->Multicast_PlayWingMontage(EMontageID::GlideDash, 1.0f);
+        if (IsWingMontageConfigured(Daeva, EMontageID::GlideDash))
+        {
+            Daeva->Multicast_PlayWingMontage(EMontageID::GlideDash, 1.0f);
+        }
     }
 
     MontageTask->OnCompleted.AddDynamic(this, &ThisClass::OnMontageTaskFinished);

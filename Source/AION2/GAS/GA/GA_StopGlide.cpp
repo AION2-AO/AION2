@@ -5,6 +5,63 @@
 
 #include "GameFramework/Character.h"
 #include "Abilities/Tasks/AbilityTask_PlayMontageAndWait.h"
+#include "UObject/UnrealType.h"
+
+static bool IsBodyMontageConfigured(const ADaeva* Daeva, EMontageID MontageID)
+{
+	if (!Daeva) return false;
+
+	FMapProperty* MapProp = CastField<FMapProperty>(ADaeva::StaticClass()->FindPropertyByName(TEXT("Montages")));
+	if (MapProp)
+	{
+		FScriptMapHelper MapHelper(MapProp, MapProp->ContainerPtrToValuePtr<void>(Daeva));
+		for (int32 i = 0; i < MapHelper.Num(); ++i)
+		{
+			if (MapHelper.IsValidIndex(i))
+			{
+				const uint8* KeyPtr = MapHelper.GetKeyPtr(i);
+				if (KeyPtr && *KeyPtr == static_cast<uint8>(MontageID))
+				{
+					const uint8* ValuePtr = MapHelper.GetValuePtr(i);
+					if (ValuePtr)
+					{
+						UAnimMontage* Montage = *reinterpret_cast<UAnimMontage* const*>(ValuePtr);
+						return Montage != nullptr;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
+
+static bool IsWingMontageConfigured(const ADaeva* Daeva, EMontageID MontageID)
+{
+	if (!Daeva) return false;
+
+	FMapProperty* MapProp = CastField<FMapProperty>(ADaeva::StaticClass()->FindPropertyByName(TEXT("WingMontages")));
+	if (MapProp)
+	{
+		FScriptMapHelper MapHelper(MapProp, MapProp->ContainerPtrToValuePtr<void>(Daeva));
+		for (int32 i = 0; i < MapHelper.Num(); ++i)
+		{
+			if (MapHelper.IsValidIndex(i))
+			{
+				const uint8* KeyPtr = MapHelper.GetKeyPtr(i);
+				if (KeyPtr && *KeyPtr == static_cast<uint8>(MontageID))
+				{
+					const uint8* ValuePtr = MapHelper.GetValuePtr(i);
+					if (ValuePtr)
+					{
+						UAnimMontage* Montage = *reinterpret_cast<UAnimMontage* const*>(ValuePtr);
+						return Montage != nullptr;
+					}
+				}
+			}
+		}
+	}
+	return false;
+}
 
 void UGA_StopGlide::ActivateAbility(const FGameplayAbilitySpecHandle Handle, const FGameplayAbilityActorInfo* ActorInfo, const FGameplayAbilityActivationInfo ActivationInfo, const FGameplayEventData* TriggerEventData)
 {
@@ -20,11 +77,15 @@ void UGA_StopGlide::ActivateAbility(const FGameplayAbilitySpecHandle Handle, con
     Character->GetCharacterMovement()->SetMovementMode(MOVE_Falling);
 
     ADaeva* Daeva = Cast<ADaeva>(ActorInfo->AvatarActor.Get());
-    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, Daeva->GetMontageByID(EMontageID::StopGlide), 1.5f);
+    UAnimMontage* BodyMontage = IsBodyMontageConfigured(Daeva, EMontageID::StopGlide) ? Daeva->GetMontageByID(EMontageID::StopGlide) : nullptr;
+    UAbilityTask_PlayMontageAndWait* MontageTask = UAbilityTask_PlayMontageAndWait::CreatePlayMontageAndWaitProxy(this, NAME_None, BodyMontage, 1.5f);
     if (Daeva->HasAuthority())
     {
         Daeva->SetWingVisibilityOnServer(true);
-        Daeva->Multicast_PlayWingMontage(EMontageID::Glide, 1.8f);
+        if (IsWingMontageConfigured(Daeva, EMontageID::Glide))
+        {
+            Daeva->Multicast_PlayWingMontage(EMontageID::Glide, 1.8f);
+        }
     }
 
     MontageTask->OnCompleted.AddDynamic(this, &UGA_StopGlide::OnMontageTaskFinished);

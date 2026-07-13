@@ -13,6 +13,10 @@
 #include "AbilitySystemComponent.h"
 #include "GameplayEffectTypes.h"
 
+#include "GameplayTagContainer.h"
+
+#include "Interface/AOCooldownTagProvider.h"
+
 void UAOQuickSkillHUD::NativeOnInitialized()
 {
     Super::NativeOnInitialized();
@@ -50,6 +54,18 @@ void UAOQuickSkillHUD::NativeOnInitialized()
     SkillSlotArray.Add(Skill_E);
     SkillSlotArray.Add(Skill_R);
     SkillSlotArray.Add(Skill_T);
+
+
+    // ======= 충전형 스킬 하드코딩 =======
+    const FGameplayTag AssassinKey3Tag =
+        FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Assassin.Key3"));
+
+    const FGameplayTag ClericKeyQTag =
+        FGameplayTag::RequestGameplayTag(TEXT("Cooldown.Cleric.KeyQ"));
+
+    //ChargeSkillMap.Add(AssassinKey3Tag, { AssassinKey3Tag , Skill_3, 2 });
+
+
 }
 
 void UAOQuickSkillHUD::BindToASC(UAbilitySystemComponent* InASC)
@@ -158,24 +174,23 @@ void UAOQuickSkillHUD::InitSkillSlots(const UDA_AbilitySet* InAbilitySet)
         ViewData.Icon = AbilityData.Icon;
         ViewData.AbilityLevel = AbilityData.AbilityLevel;
 
+        ViewData.CooldownTag = FGameplayTag();
+
         // Cooldown Tag는 Ability 자체의 쿨다운 Tag를 읽어와서 넣어주기 
         if (AbilityData.Ability)
         {
             const UGameplayAbility* AbilityCDO =
                 AbilityData.Ability->GetDefaultObject<UGameplayAbility>();
 
-            if (AbilityCDO)
+            // Interface를 사용해, UI에서는 어떤 공격 Ability인지 몰라도 된다.
+            if (const IAOCooldownTagProvider* CooldownProvider =
+                Cast<IAOCooldownTagProvider>(AbilityCDO))
             {
-                const FGameplayTagContainer* CooldownTags =
-                    AbilityCDO->GetCooldownTags();
-
-                if (CooldownTags && !CooldownTags->IsEmpty())
-                {
-                    ViewData.CooldownTag = CooldownTags->First();
-                }
+                CooldownProvider->GetUICooldownTag(
+                    ViewData.CooldownTag
+                );
             }
         }
-
         /*
         * TODO(SuYeon): 나중에.
         * SlotWidget은 이 정보를 바탕으로 다시 CoolTime 등에 대해 PlayerStatus 위에 띄운다.

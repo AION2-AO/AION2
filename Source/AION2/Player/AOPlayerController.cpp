@@ -20,6 +20,8 @@
 #include "UI/DungeonClearWidget.h"
 #include "Components/Widget.h"
 
+#include "AION2.h"
+
 
 TAutoConsoleVariable<int32> CVarDrawAttackTrace(TEXT("ao.Debug.DrawAttackTrace"), 0, TEXT("Draw attack trace debug"), ECVF_Cheat);
 
@@ -298,6 +300,17 @@ void AAOPlayerController::TestClearDungeon()
 	//ServerTestClearDungeon();
 }
 
+
+void AAOPlayerController::SendDungeonClearRequest()
+{
+	ADaeva* Owner = this->GetOwner<ADaeva>();
+
+	Protocol::C_RequestDungeonCompletePacket RequestPkt;
+	RequestPkt.set_playerid(Owner->GetMy());
+
+	SEND_PACKET(RequestPkt, PKT_C_DUNGEON_COMPLETE_REQUEST);
+}
+
 void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Gold)
 {
 	UE_LOG(LogTemp, Warning,
@@ -309,15 +322,11 @@ void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Go
 
 	if (!IsLocalController())
 	{
-		UE_LOG(LogTemp, Error,
-			TEXT("[DungeonClearUI] This controller is not local"));
 		return;
 	}
 
 	if (!DungeonClearWidgetClass)
 	{
-		UE_LOG(LogTemp, Error,
-			TEXT("[DungeonClearUI] DungeonClearWidgetClass is NULL"));
 		return;
 	}
 
@@ -331,22 +340,13 @@ void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Go
 
 		if (!DungeonClearWidget)
 		{
-			UE_LOG(LogTemp, Error,
-				TEXT("[DungeonClearUI] CreateWidget failed"));
 			return;
 		}
 
 		DungeonClearWidget->AddToViewport(100);
-
-		UE_LOG(LogTemp, Warning,
-			TEXT("[DungeonClearUI] Widget created and added: %s"),
-			*GetNameSafe(DungeonClearWidget));
 	}
 	else
 	{
-		UE_LOG(LogTemp, Warning,
-			TEXT("[DungeonClearUI] Existing widget found"));
-
 		if (!DungeonClearWidget->IsInViewport())
 		{
 			DungeonClearWidget->AddToViewport(100);
@@ -359,9 +359,7 @@ void AAOPlayerController::ClientCreateDungeonClearWidget_Implementation(int32 Go
 
 	FInputModeUIOnly InputMode;
 	InputMode.SetWidgetToFocus(DungeonClearWidget->TakeWidget());
-	InputMode.SetLockMouseToViewportBehavior(
-		EMouseLockMode::DoNotLock
-	);
+	InputMode.SetLockMouseToViewportBehavior(EMouseLockMode::DoNotLock);
 
 	SetInputMode(InputMode);
 	bShowMouseCursor = true;

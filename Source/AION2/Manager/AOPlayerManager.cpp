@@ -3,20 +3,24 @@
 
 #include "AOPlayerManager.h"
 #include "Game/AOGameInstance.h"
+#include "Game/AODungeonGameMode.h"
+
 #include "Character/Daeva/Daeva.h"
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "Player/AOPlayerController.h"
+
 #include "UI/AOPlayerHUDWidget.h"
 #include "UI/AOMainHUDWidget.h"
 #include "UI/GoldWidget.h"
 #include "UI/AOChattingWidget.h"
-
 #include "UI/AOQuickSlotComponent.h"
+
 #include "Item/AOItemDataBase.h"
 #include "AbilitySystemComponent.h"
 #include "GAS/AttributeSet/AOAttributeSet.h"
 #include "Kismet/GameplayStatics.h"
-#include "Game/AODungeonGameMode.h"
+
+#include "Manager/AOSoundManager.h"
 
 UAOPlayerManager::UAOPlayerManager()
 {
@@ -71,6 +75,7 @@ void UAOPlayerManager::HandleSpawn(const uint64 PlayerId, const FString& PlayerN
 {
 	if (!GameInstance)
 		return;
+	UAOSoundManager::Get(this)->PlayBGM(TEXT("VillageBGM"));
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
@@ -101,7 +106,7 @@ void UAOPlayerManager::HandleSpawn(const uint64 PlayerId, const FString& PlayerN
 				int Hp = 100;
 				if (PlayerInfo)
 					Hp = PlayerInfo->PlayerHp;
-				// === SuYeon: PlayerState¿¡ info¸¦ ¸í½ÃÀûÀ¸·Î »ðÀÔ ===
+				// === SuYeon: PlayerStateï¿½ï¿½ infoï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ï¿½ ï¿½ï¿½ï¿½ï¿½ ===
 				if (AAOPlayerState* AOPlayerState = PlayerController->GetPlayerState<AAOPlayerState>())
 				{
 					AOPlayerState->SetPlayerInfo(PlayerId, PlayerName, ClassType, Hp);
@@ -407,6 +412,18 @@ void UAOPlayerManager::HandleDungeonStart(FString ServerURL)
 	}
 }
 
+void UAOPlayerManager::HandleSetPvpState(Protocol::EPvpState State)
+{
+	if (State == Protocol::EPvpState::PVP_STATE_ACTIVE)
+	{
+		MyPlayer->SetPvpState(true, 600);
+	}
+	else if (State == Protocol::EPvpState::PVP_STATE_ACTIVE)
+	{
+		MyPlayer->SetPvpState(false, 600);
+	}
+}
+
 void UAOPlayerManager::HandleDungeonCreate(int32 DungeonId)
 {
 	if (!GameInstance)
@@ -509,6 +526,19 @@ void UAOPlayerManager::UpdateMyDungeonReadyState(int32 DungeonId, uint64 PlayerI
 	MyDungeonRoomState.ReadyState = EReadyState::Ready;
 }
 
+uint8 UAOPlayerManager::GetPlayerClassType(uint64 PlayerId) const
+{
+	if (const FPlayerInfo* Info = PlayerInfos.Find(PlayerId))
+	{
+		return Info->ClassType;
+	}
+	if (GameInstance && GameInstance->GetMyPlayerId() == PlayerId)
+	{
+		return static_cast<uint8>(GameInstance->GetMyPlayerClass());
+	}
+	return 0;
+}
+
 #pragma endregion
 
 void UAOPlayerManager::HandleDash(const uint64 PlayerId, FVector& NewLocation, FRotator& NewRotation, FVector& NewVel)
@@ -524,5 +554,63 @@ void UAOPlayerManager::HandleDash(const uint64 PlayerId, FVector& NewLocation, F
 	if (MMOPlayer)
 	{
 		MMOPlayer->ReceiveDashPacket(NewLocation, NewRotation, NewVel);
+	}
+}
+
+void UAOPlayerManager::HandleJump(const uint64 PlayerId, bool bIsGliding)
+{
+	if (!GameInstance)
+		return;
+
+	if (GameInstance->GetMyPlayerId() == PlayerId) return;
+
+	auto PlayerRef = Players.Find(PlayerId);
+	if (PlayerRef == nullptr) return;
+
+	AMMODaeva* MMOPlayer = *PlayerRef;
+	if (MMOPlayer)
+	{
+		MMOPlayer->ReceiveJumpPacket(bIsGliding);
+	}
+}
+
+void UAOPlayerManager::HandleAttack(Protocol::S_AttackResultPacket& Pkt)
+{
+	AMMODaeva* TargetPlayer = nullptr;
+
+	if (MyPlayer && MyPlayer->GetMyId() == Pkt.targetid())
+	{
+		TargetPlayer = MyPlayer;
+	}
+	else if (auto PlayerRef = Players.Find(Pkt.targetid()))
+	{
+		TargetPlayer = *PlayerRef;
+	}
+
+	if (TargetPlayer)
+	{
+		UAbilitySystemComponent* MyASC = TargetPlayer->GetAbilitySystemComponent();
+		if (MyASC)
+		{
+			MyASC->SetNumericAttributeBase(UAOAttributeSet::GetHealthAttribute(), Pkt.targethp());
+		}
+		if (Pkt.isdead())
+		{
+			EMontageID PlayMontageID = EMontageID::Die;
+			TargetPlayer->PlayMontageWithSection(PlayMontageID, 2.0f, NAME_None); 
+		}
+	}
+
+	if (MyPlayer && MyPlayer->GetMyId() != Pkt.attackerid())
+	{
+		if (auto PlayerRef = Players.Find(Pkt.attackerid()))
+		{
+			AMMODaeva* AttackerPlayer = *PlayerRef;
+			if (AttackerPlayer)
+			{
+				EMontageID PlayMontageID = static_cast<EMontageID>(Pkt.skillid());
+				AttackerPlayer->PlayMontageWithSection(PlayMontageID, 1.0f, NAME_None);
+			}
+		}
 	}
 }

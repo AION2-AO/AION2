@@ -27,10 +27,14 @@ public:
 	void HandleItem(Protocol::S_ItemDataPacket Items);
 	void HnadleMove(const uint64 PlayerId, FVector& NewLocation, FRotator& NewRotation, FVector& NewVel);
 	void HandleDash(const uint64 PlayerId, FVector& NewLocation, FRotator& NewRotation, FVector& NewVel);
+	void HandleJump(const uint64 PlayerId, bool bIsGliding);
+	void HandleAttack(Protocol::S_AttackResultPacket& Pkt);
 
 	void HandleDungeonCreate(int32 DungeonId);
 	void HandleDungeonEnter(int32 DungeonId);
 	void HandleDungeonStart(FString ServerURL);
+
+	void HandleSetPvpState(Protocol::EPvpState State);
 
 	void HandleChatting(FString SenderName, FString SendMessage);
 	void HandleStorePurchase(Protocol::ItemData ItemInfo, int32 Gold);
@@ -57,6 +61,8 @@ public:
 
 	const FPlayerDungeonRoomState& GetMyDungeonRoomState() const { return MyDungeonRoomState; }
 
+	uint8 GetPlayerClassType(uint64 PlayerId) const;
+
 private:
 	UPROPERTY()
 	FPlayerDungeonRoomState MyDungeonRoomState;
@@ -81,6 +87,9 @@ private:
 	TMap<int32, Protocol::ItemData> MyItems;
 
 	int32 MyGold;
+private:
+	FTimerHandle DieHandle; 
+	float DieTimer = 2.0f;
 
 private:
 	class UAOGameInstance* GameInstance;

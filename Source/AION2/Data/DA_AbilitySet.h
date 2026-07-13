@@ -33,6 +33,10 @@ struct FGAData
     // 스킬 버튼 아이콘
     UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI")
     TObjectPtr<UTexture2D> Icon = nullptr;
+
+    UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "UI", meta = (Categories = "Cooldown"))
+    FGameplayTag CooldownTag;
+
 };
 
 UCLASS()

@@ -289,6 +289,14 @@ bool PacketHandler::HandleMapComplete(PacketSessionRef& session, Protocol::C_Map
 	if (!gameSession)return false;
 	PlayerRef player = gameSession->_player;
 	if (!player) return false;
+
+	// 세션 스레드(네트워크 스레드)에서 Redis를 미리 조회하여 Room 스레드 블로킹을 방지합니다.
+	int32 ttl = GRedisManager.GetDeathPenaltyTtl(player->GetName());
+	if (ttl > 0)
+	{
+		player->_deathPenaltyTtl = ttl;
+	}
+
 	GRoom->DoAsync(&Room::HandleEnterPlayer, player);
 
 	return true;
@@ -314,6 +322,28 @@ bool PacketHandler::HandleDash(PacketSessionRef& session, Protocol::C_DashPacket
 		return false;
 
 	GRoom->DoAsync(&Room::HandlePlayerDash, pkt, player);
+	return true;
+}
+
+bool PacketHandler::HandleJump(PacketSessionRef& session, Protocol::C_JumpPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	if (player == nullptr)
+		return false;
+
+	GRoom->DoAsync(&Room::HandlePlayerJump, pkt, player);
+	return true;
+}
+
+bool PacketHandler::HandleAttack(PacketSessionRef& session, Protocol::C_AttackPacket& pkt)
+{
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	if (player == nullptr)
+		return false;
+
+	GRoom->DoAsync(&Room::HandleAttack, pkt, player);
 	return true;
 }
 
@@ -395,7 +425,6 @@ bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_Du
 {
 	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
 	PlayerRef player = gameSession->_player;
-	//GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleCreateDungeon, player);
 
 	int32 dungeonId = pkt.dungeonid();
 	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonStart, player, dungeonId);
@@ -404,17 +433,18 @@ bool PacketHandler::HandleDungeonStart(PacketSessionRef& session, Protocol::C_Du
 
 bool PacketHandler::HandleDungeonEnd(PacketSessionRef& session, Protocol::C_RequestDungeonCompletePacket& pkt)
 {
-	DedicatedSessionRef dediSession = static_pointer_cast<DedicatedSession>(session);
+	GameSessionRef gameSession = static_pointer_cast<GameSession>(session);
+	PlayerRef player = gameSession->_player;
+	int32 dungeonId = player->GetDungeonId();
 
-	//GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleCreateDungeon, player);
-	int32 dungeonId = pkt.dungeonid();
+	int32 playerId = pkt.playerid();
 	int32 gold = pkt.gold();
 
 	DBConnection* dbConnect = GDBConnectionPool->Pop();
 	DBBind<2, 1> dbBind(*dbConnect, L"{CALL sp_SetDungeonReward(?, ?)");
 	
 	dbBind.BindCol(0, gold);
-	dbBind.BindCol(1, dungeonId);
+	dbBind.BindCol(1, playerId);
 
 	int resultCode = 0;
 
@@ -431,8 +461,11 @@ bool PacketHandler::HandleDungeonEnd(PacketSessionRef& session, Protocol::C_Requ
 
 	if (!resultCode) return false;
 
-	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonEnd, dungeonId, gold);
-	dediSession->SetUsing(false);
+	GDungeonWaitingRoom->DoAsync(&DungeonWaitingRoom::HandleDungeonEnd, dungeonId);
+	player->SetDungeonId(0);
+	Protocol::S_RequestDungeonCompletePacket endPacket;
+	endPacket.set_gold(gold);
+	SendBufferRef endBuffer = PacketHandler::MakeSendBuffer(endPacket);
 	return false;
 }
 

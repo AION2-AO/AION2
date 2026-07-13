@@ -25,7 +25,7 @@ protected:
 	virtual void OnPossess(APawn* InPawn) override;	
 
 	void RemoveTarget(AActor* Target);
-	bool RefreshOrReset();  // true면 타겟 재설정 성공, false면 전투 종료 리셋
+	virtual bool RefreshOrReset();  // true면 타겟 재설정 성공, false면 전투 종료 리셋
 
 
 public:

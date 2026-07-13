@@ -193,8 +193,9 @@ protected:
 	virtual void OnAttackSucceeded(const FAttackData& AttackData, AActor* HitActor, const FHitResult& HitResult, bool& bDidShakeCamera) override;
 	virtual void TakeDamageAO(const FAttackData& AttackData, const FHitResult& HitResult, AAOCharacter* DamageCauser) override;
 
-private:
 	void InputSpacePressed();
+
+private:
 	void InputLBPressed();
 	void InputRBPressed();
 	void InputMoveReleased();

@@ -84,7 +84,6 @@ void UDungeonClearWidget::DungeonReward()
 		PC->SetInputMode(InputMode);
 		PC->bShowMouseCursor = true;
 	}
-
 }
 
 void UDungeonClearWidget::UpdateCountdown()
@@ -119,7 +118,7 @@ void UDungeonClearWidget::OnCheckClicked()
 		return;
 	}
 
-	PlayerController->ServerRequestDungeonComplete();
+	PlayerController->SendDungeonClearRequest();
 
 	FInputModeGameOnly InputMode;
 	PlayerController->SetInputMode(InputMode);

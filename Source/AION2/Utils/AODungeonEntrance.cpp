@@ -9,6 +9,7 @@
 #include "Manager/AOUIManager.h"
 #include "Character/ServerCharacter/MMODaeva.h"
 #include "UI/AODungeonEntranceWidget.h"
+#include "Manager/AOSoundManager.h"
 
 
 // Sets default values
@@ -112,7 +113,7 @@ void AAODungeonEntrance::OnOverlapEnd(UPrimitiveComponent* OverlappedComp, AActo
 }
 
 void AAODungeonEntrance::EnterDungeon()
-{
+{ 
 }
 
 void AAODungeonEntrance::EnterDungeonWaitingRoom()
@@ -127,6 +128,9 @@ void AAODungeonEntrance::EnterDungeonWaitingRoom()
 	UAODungeonEntranceWidget* DungeonEntranceWidget = Cast<UAODungeonEntranceWidget>(DungeonRoomWidget);
 	if (DungeonEntranceWidget)
 	{
+		UAOSoundManager::Get(this)->StopBGM(1.0f);
+		UAOSoundManager::Get(this)->PlayBGM(TEXT("DungeonEntranceBGM"));
+
 		DungeonEntranceWidget->InitializeWaitingRoom();
 
 		// UI 종료(Close Button 클릭) 델리게이트 이벤트 바인딩
@@ -148,6 +152,8 @@ void AAODungeonEntrance::OnDungeonRoomWidgetClosed()
 {
 	if (PC)
 	{
+		UAOSoundManager::Get(this)->StopBGM(0.5f);
+		UAOSoundManager::Get(this)->PlayBGM(TEXT("VillageBGM"));
 		PC->SetShowMouseCursor(false);
 		DungeonWaitingRoomWidget = UIManager->ShowWidget(DungeonWaitingRoomClass, EUILayer::PopUp);
 	}

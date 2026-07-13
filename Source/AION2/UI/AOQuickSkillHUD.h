@@ -18,6 +18,19 @@ class UDA_AbilitySet;
 
 struct FAOSkillSlotViewData;
 
+// 충전형 스킬에 대한 정보,
+USTRUCT()
+struct FChargeSkillConfig
+{
+	GENERATED_BODY()
+
+	UPROPERTY()
+	int32 SlotIndex = INDEX_NONE;
+
+	UPROPERTY()
+	int32 MaxCharge = 0;
+};
+
 /**
  * = PlayerHUDWidget 하위에서 =  
  * [Player의 각 Skill에 대해 시각적으로 반응하는 SkillSlot들을 소유 및 관리]
@@ -27,7 +40,7 @@ UCLASS()
 class AION2_API UAOQuickSkillHUD : public UAOUserWidgetBase
 {
 	GENERATED_BODY()
-	
+
 public:
 	// 상위 Widget에서 호출
 	virtual void BindToASC(UAbilitySystemComponent* InASC) override;
@@ -92,8 +105,8 @@ private:
 	* Key Slot을 순회해서, 현재 Event로 받은 CooldownTag를 ViewData로 가진 Slot을 찾는다.
 	* GAS Evnet는 Tag와 Count만 보내므로, 어떤 Slot에 Bind되어있는지 알 수 없음.
 	* QuickSlot의 개수가 많지 않고, 슬롯 Array가 있으므로 이렇게 처리해줌.
-	* [CooldownTag : SlotIndex]의 Map을 만들어줄 수는 있으나, 
-	* 그러면 Event 시점에 현재 표시 중인지도 검사해야 함. => 시점이 엇갈리면 조건 검사가 애매해짐. 
+	* [CooldownTag : SlotIndex]의 Map을 만들어줄 수는 있으나,
+	* 그러면 Event 시점에 현재 표시 중인지도 검사해야 함. => 시점이 엇갈리면 조건 검사가 애매해짐.
 	* + 지금 HUD에 있는 정보도 너무 많음.
 	*/
 	UAOSkillQuickSlotWidget* FindCurrentSlotByCooldownTag(FGameplayTag CooldownTag) const;
@@ -103,7 +116,7 @@ private:
 	// 이 함수는 시간을 새로 세지 않고, GAS가 관리 중인 Active GameplayEffect 정보를 읽기만 함.
 	bool GetCooldownTime(FGameplayTag CooldownTag, float& OutRemainingTime, float& OutDuration) const;
 
-	
+
 	// 등록한 Tag와 FDelegateHandle을 먼저 저장해서, 같은 ASC에서 제거 => 중복 바인딩 방지
 	TArray<TPair<FGameplayTag, FDelegateHandle>> CooldownTagDelegateHandles;
 
@@ -144,13 +157,18 @@ protected:
 	// 해당 Slot에서 현재 보여줄 Skill의 내부 Index. { SlotIndex : SkillID  }.
 	// => Slot 내에서, viewData의 array를 들고 있도록 하고 입력을 받으면 변경.
 	TMap<int32, int32> SkillSlotBySlotIndex;
-	
+
 	// === Buff Effect Area// 만약 생기면. ===
 	TObjectPtr<UHorizontalBox> EffectArea;
 
 	TObjectPtr<UAOWidgetBase> EffectSlotBase;
-	
+
 
 	UPROPERTY()
 	TObjectPtr<const UDA_AbilitySet> BoundAbilitySet;
+
+	// === 충전형 스킬 ===
+	TMap<FGameplayTag, FChargeSkillConfig> ChargeSkillConfigs;
+
 };
+

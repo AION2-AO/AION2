@@ -182,7 +182,7 @@ message S_DungeonFailPacket
 
 message C_RequestDungeonCompletePacket
 {
-	int32 dungeonId = 1;
+	int32 playerId = 1;
 	int32 Gold = 2;
 }
 
@@ -309,4 +309,42 @@ message S_MailContentPacket
 	bool isRead = 11;
 	string sendDate = 12;
 	string ExpiredDate = 13;
+}
+
+message S_PvpStatePacket
+{
+	EPvpState  state = 1;
+	int32 remainingSeconds = 2;
+}
+
+message C_AttackPacket
+{
+	uint64 playerId = 1;
+	uint64 targetId = 2;
+	int32 damage = 3;
+	// 마나 수급 처리를 위함
+	bool isBasicAttack = 4;
+	int32 skillId = 5;
+}
+
+message S_AttackResultPacket 
+{
+    uint64 attackerId = 1; 
+    uint64 targetId = 2;   
+    int32 damage = 3;      
+    int32 targetHp = 4;    
+    bool isDead = 5;       
+    int32 skillId = 6;
+}
+
+message C_JumpPacket
+{
+	uint64 playerId = 1;
+	bool isGliding = 2;
+}
+
+message S_JumpPacket
+{
+	uint64 playerId = 1;
+	bool isGliding = 2;
 }

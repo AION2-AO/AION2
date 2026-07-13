@@ -55,5 +55,8 @@ void ADungeonGameState::OnRep_Music()
 
     CurrentBGM = UGameplayStatics::SpawnSound2D(this, Next);
     if (CurrentBGM)
-        CurrentBGM->FadeIn(1.5f, 3.f);
+    {
+        // 볼륨 조절은 각 SoundWave 애셋에서 조절하기
+        CurrentBGM->FadeIn(1.5f, 1.f);
+    }
 }

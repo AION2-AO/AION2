@@ -17,7 +17,10 @@ class AION2_API UAOSoundManager : public UGameInstanceSubsystem
 public:
 	UAOSoundManager();
 	virtual ~UAOSoundManager()= default;
-	
+
+	UFUNCTION(BlueprintPure, Category = "FZFAudio", meta = (WorldContext = "WorldContextObject"))
+	static UAOSoundManager* Get(const UObject* WorldContextObject);
+
 	virtual void Initialize(FSubsystemCollectionBase& Collection) override;
 	virtual void Deinitialize() override;
 	
